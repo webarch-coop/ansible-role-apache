@@ -38,12 +38,13 @@
 
 - name: Apache localhost enabled
   command: a2ensite localhost
-  creates: /etc/apache2/sites-enabled/localhost.conf 
+  args:
+    creates: /etc/apache2/sites-enabled/localhost.conf 
 
 - name: Apache configtest
   command: apache2ctl configtest
   register: apache2ctl_configtest
-  when: apache_packages.changed or or apache_ratelimit.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
+  when: apache_packages.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
 
 - name: Apache restarted
   service:
