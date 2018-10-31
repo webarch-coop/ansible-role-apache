@@ -50,10 +50,10 @@
   service:
     name: apache2
     state: restarted
-  when: "'Syntax OK' in apache2ctl_configtest.stdout"
+  when: '"Syntax OK" in apache2ctl_configtest.stdout'
 
 - name: Fail if Apache configtest is not OK
   fail:
     msg: "{{ apache2ctl_configtest.stdout }}"
-  when: "'Syntax OK' not in apache2ctl_configtest.stdout"
+  when: '"Syntax OK" not in apache2ctl_configtest.stdout'
  
