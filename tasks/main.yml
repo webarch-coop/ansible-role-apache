@@ -1,0 +1,58 @@
+---
+- name: Apache packages installed
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - apache2
+    - apache2-utils
+    - lynx
+  register: apache_packages
+
+- name: Apache modules enabled
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - rewrite
+    - headers
+    - http2
+    - env
+    - dir
+    - mime
+    - ssl
+  register: apache_modules
+
+- name: Custom Apache ssl.conf in place
+  copy:
+    src: files/ssl.conf
+    dest: /etc/apache2/mods-available/ssl.conf
+  register: apache_ssl
+
+- name: Apache localhost.conf in place
+  copy:
+    src: files/localhost.conf
+    dest: /etc/apache2/sites-available/localhost.conf
+  register: apache_localhost
+
+- name: Apache localhost enabled
+  command: a2ensite localhost
+  creates: /etc/apache2/sites-enabled/localhost.conf 
+
+- name: Apache configtest
+  command: apache2ctl configtest
+  register: apache2ctl_configtest
+  when: apache_packages.changed or or apache_ratelimit.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
+
+- name: Apache restarted
+  service:
+    name: apache2
+    state: restarted
+  when: "'Syntax OK' in apache2ctl_configtest.stdout"
+
+- name: Fail if Apache configtest is not OK
+  fail:
+    msg: "{{ apache2ctl_configtest.stdout }}"
+  when: "'Syntax OK' not in apache2ctl_configtest.stdout"
+ 
