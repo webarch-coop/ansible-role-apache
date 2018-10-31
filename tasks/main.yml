@@ -30,6 +30,11 @@
     dest: /etc/apache2/mods-available/ssl.conf
   register: apache_ssl
 
+- name: Apache localhost directory in place
+  file:
+    path: /var/www/localhost
+    state: directory
+
 - name: Apache localhost.conf in place
   copy:
     src: files/localhost.conf
