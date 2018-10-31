@@ -41,23 +41,25 @@
   args:
     creates: /etc/apache2/sites-enabled/localhost.conf 
 
-- name: Apache configtest
-  command: apache2ctl configtest
-  register: apache2ctl_configtest
-  when: apache_packages.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
+- block:
 
-- debug:
-    msg: "{{ apache2ctl_configtest.stdout }}"
-    verbosity: 1 
-
-- name: Apache restarted
-  service:
-    name: apache2
-    state: restarted
-  when: '"Syntax OK" in apache2ctl_configtest.stdout'
-
-- name: Fail if Apache configtest is not OK
-  fail:
-    msg: "{{ apache2ctl_configtest.stdout }}"
-  when: '"Syntax OK" not in apache2ctl_configtest.stdout'
+  - name: Apache configtest
+    command: apache2ctl configtest
+    register: apache2ctl_configtest
+  
+  - debug:
+      msg: "{{ apache2ctl_configtest.stdout }}"
+      verbosity: 1 
+  
+  - name: Apache restarted
+    service:
+      name: apache2
+      state: restarted
+    when: '"Syntax OK" in apache2ctl_configtest.stdout'
+  
+  - name: Fail if Apache configtest is not OK
+    fail:
+      msg: "{{ apache2ctl_configtest.stdout }}"
+    when: '"Syntax OK" not in apache2ctl_configtest.stdout'
  
+  when: apache_packages.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
