@@ -46,6 +46,10 @@
   register: apache2ctl_configtest
   when: apache_packages.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
 
+- debug:
+    msg: "{{ apache2ctl_configtest.stdout }}"
+    verbosity: 1 
+
 - name: Apache restarted
   service:
     name: apache2
