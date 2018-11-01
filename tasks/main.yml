@@ -10,6 +10,9 @@
     - lynx
   register: apache_packages
 
+# TODO
+#- name: Apache modules disabled
+
 - name: Apache modules enabled
   apache2_module:
     name: "{{ item }}"
