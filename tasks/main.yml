@@ -10,8 +10,13 @@
     - lynx
   register: apache_packages
 
-# TODO
-#- name: Apache modules disabled
+- name: Apache conf disabled
+  command: "a2dismod {{ item }}"
+  args:
+    removes: /etc/apache2/conf-enabled/{{ item }}
+  with_items:
+    - serve-cgi-bin.conf
+  register: apache_conf
 
 - name: Apache modules enabled
   apache2_module:
@@ -70,4 +75,4 @@
       msg: "{{ apache2ctl_configtest.stdout }}"
     when: '"Syntax OK" not in apache2ctl_configtest.stdout'
  
-  when: apache_packages.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
+  when: apache_packages.changed or apache_conf.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
