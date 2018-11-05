@@ -13,9 +13,9 @@
 - name: Apache conf disabled
   command: "a2dismod {{ item }}"
   args:
-    removes: /etc/apache2/conf-enabled/{{ item }}
+    removes: /etc/apache2/conf-enabled/{{ item }}.conf
   with_items:
-    - serve-cgi-bin.conf
+    - serve-cgi-bin
   register: apache_conf
 
 - name: Apache modules enabled
