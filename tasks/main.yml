@@ -11,7 +11,7 @@
   register: apache_packages
 
 - name: Apache conf disabled
-  command: "a2dismod {{ item }}"
+  command: "a2disconf {{ item }}"
   args:
     removes: /etc/apache2/conf-enabled/{{ item }}.conf
   with_items:
