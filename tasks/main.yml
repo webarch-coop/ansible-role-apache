@@ -16,7 +16,7 @@
     state: latest
     update_cache: false
   register: apache_suexec_suexec-pristine
-  when: ( apache_suexec is defined ) and ( apache_suexec is True )
+  when: ( apache_suexec is defined ) and ( apache_suexec == True )
 
 - name: Apache conf disabled
   command: "a2disconf {{ item }}"
