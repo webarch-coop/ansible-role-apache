@@ -7,6 +7,11 @@
   tags:
     - apache
 
+- name: Debian default site disabled
+  command: a2dissite 000-default
+  tags:
+    - apache
+
 - name: WSH Apache config in place
   template:
     src: templates/webarch.conf.j2
