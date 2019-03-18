@@ -1,0 +1,256 @@
+# WSH Settings for all sites
+# Ansible Generated
+
+# Log formats
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
+LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedioproxy
+LogFormat "%I %O" bandwidth
+
+# HTTP/2 https://httpd.apache.org/docs/trunk/mod/mod_http2.html
+#Protocols h2 h2c http/1.1
+#ProtocolsHonorOrder Off
+# Let's Encrypt
+Alias "/.well-known/acme-challenge" "/var/www/.well-known/acme-challenge"
+# Webarchitects HTML/CSS
+Alias /wsh /var/www/wsh
+Alias /wsh.shtml /var/www/wsh/wsh.shtml
+# icons for directory index icons
+Alias /icons /usr/share/apache2/icons
+# env vars for the default index page, wsh.shtml
+SetEnv PHPMYADMIN_DOMAIN "{{ hostname }}" 
+SetEnv HOME_DOMAIN "webarch.net"
+SetEnv SITE_TITLE "Webarchitects Shared Hosting"
+SetEnv STATIC_DIR "/wsh/"
+SetEnv STATIC_TOP "top.shtml"
+SetEnv STATIC_BOT "bot.shtml"
+# default page title 
+SetEnv PAGE_TITLE "Directory Listing"
+SetEnv PAGE_DESC  ""
+<Directory "/">
+  Options FollowSymLinks
+  AllowOverride None
+  <IfModule mod_version.c>
+    <IfVersion < 2.4>
+      Order Deny,Allow
+      Deny from all
+    </IfVersion>
+    <IfVersion >= 2.4>
+      Require all denied
+    </IfVersion>
+  </IfModule>
+  <IfModule !mod_version.c>
+    <IfModule !mod_authz_core.c>
+      Order Deny,Allow
+      Deny from all
+    </IfModule>
+    <IfModule mod_authz_core.c>
+      Require all denied
+    </IfModule>
+  </IfModule>
+</Directory>
+<Directory "/var/www">
+  Options IncludesNoExec 
+  DirectoryIndex wsh.shtml
+  AddOutputFilter Includes shtml
+  #<Files wsh.shtml>
+  #  Header add Link "</wsh/webarch.css>;rel=preload;nopush"
+  #  Header add Link "</wsh/lib/pure/0.6.0/pure-min.css>;rel=preload;nopush"
+  #  Header add Link "</wsh/lib/pure/0.6.0/grids-responsive-min.css>;rel=preload;nopush"
+  #  Header add Link "</wsh/webarch-print.css>;rel=preload;nopush"
+  #  Header add Link "</wsh/favicon.ico>;rel=preload;nopush"
+  #</Files>
+  <IfModule mod_version.c>
+    <IfVersion >= 2.4>
+      SSILegacyExprParser on 
+    </IfVersion>
+  </IfModule>
+  <IfModule !mod_version.c>
+    <IfModule mod_authz_core.c>
+      SSILegacyExprParser on
+    </IfModule>
+  </IfModule>
+  <IfModule mod_version.c>
+    <IfVersion >= 2.2>
+      SSILastModified on 
+    </IfVersion>
+  </IfModule>
+  HeaderName /wsh/top.shtml
+  ReadmeName /wsh/bot.shtml
+  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
+  IndexOptions Charset=UTF-8 SuppressHTMLPreamble XHTML TrackModified IconsAreLinks
+  IndexOptions SuppressDescription
+  AllowOverride None
+  <IfModule mod_version.c>
+    <IfVersion < 2.4>
+      Order Allow,Deny 
+      Allow from all 
+    </IfVersion>
+    <IfVersion >= 2.4>
+      Require all granted
+    </IfVersion>
+  </IfModule>
+  <IfModule !mod_version.c>
+    <IfModule !mod_authz_core.c>
+      Order Allow,Deny 
+      Allow from all 
+    </IfModule>
+    <IfModule mod_authz_core.c>
+      Require all granted
+    </IfModule>
+  </IfModule>
+  <IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault A1209600
+    ExpiresByType text/html "now plus 5 minutes"
+    ExpiresByType image/gif "access plus 1 years"
+    ExpiresByType image/jpg "access plus 1 years"
+    ExpiresByType image/jpeg "access plus 1 years"
+    ExpiresByType image/png "access plus 1 years"
+    ExpiresByType image/vnd.microsoft.icon "access plus 1 years"
+    ExpiresByType image/x-icon "access plus 1 years"
+    ExpiresByType image/ico "access plus 1 years"
+    ExpiresByType application/javascript "now plus 1 week"
+    ExpiresByType application/x-javascript "now plus 1 week"
+    ExpiresByType text/javascript "now plus 1 week"
+    ExpiresByType text/css "now plus 1 week"
+  </IfModule>
+</Directory>
+<Directory "/var/www/.well-known">
+  Options None
+  AllowOverride None 
+  ForceType text/plain
+</Directory>
+<Directory "/home/*/sites/*">
+  DirectoryIndex wsh.shtml
+  AddOutputFilter Includes shtml
+  <IfModule mod_version.c>
+    <IfVersion >= 2.4>
+      SSILegacyExprParser on 
+    </IfVersion>
+  </IfModule>
+  <IfModule !mod_version.c>
+    <IfModule mod_authz_core.c>
+      SSILegacyExprParser on
+    </IfModule>
+  </IfModule>
+  HeaderName /wsh/top.shtml
+  ReadmeName /wsh/bot.shtml
+  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
+  IndexOptions Charset=UTF-8 SuppressHTMLPreamble XHTML TrackModified IconsAreLinks
+  IndexOptions SuppressDescription
+</Directory>
+ErrorDocument 404 /wsh/404.shtml
+ErrorDocument 401 /wsh/401.shtml
+ErrorDocument 500 /wsh/500.shtml
+ErrorDocument 403 /wsh/403.shtml
+
+# The default virtual host for port 80
+<VirtualHost *:80>
+  ServerName {{ hostname }} 
+  {% if hostname_ip.stdout == www_hostname_dig_ip.stdout %}ServerAlias www.{{ hostname }}{% endif %} 
+  AssignUserID www-data www-data 
+  ServerAdmin support@webarch.net
+  SetEnv PIWIK_SITE_ID "1"
+  SetEnv PIWIK_SITE_DOMAIN "stats.{{ hostname }}"
+  DocumentRoot "/var/www"
+  #RewriteEngine On
+  #RewriteRule ^/?phpmyadmin(.*) https://%{SERVER_NAME}/phpmyadmin$1 [R,L]
+  RedirectPermanent /phpmyadmin https://{{ hostname }}/phpmyadmin
+  ErrorLog ${APACHE_LOG_DIR}/wsh-error.log
+  LogLevel warn
+  CustomLog ${APACHE_LOG_DIR}/wsh-access.log combined
+</VirtualHost>
+
+# The default virtual host for port 443
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+  ServerName {{ hostname }} 
+  {% if hostname_ip.stdout == www_hostname_dig_ip.stdout %}ServerAlias www.{{ hostname }}{% endif %} 
+  AssignUserID www-data www-data 
+  ServerAdmin support@webarch.net
+  SetEnv PIWIK_SITE_ID "1"
+  SetEnv PIWIK_SITE_DOMAIN "stats.{{ hostname }}"
+  SSLEngine on
+  # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
+  #Protocols h2 http/1.1
+  #H2Direct on
+  SSLCertificateFile    	/etc/ssl/wsh/cert.pem
+  SSLCertificateKeyFile 	/etc/ssl/wsh/key.pem
+  SSLCertificateChainFile       /etc/ssl/wsh/ca.pem
+  Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
+  DocumentRoot "/var/www"
+  <FilesMatch "\.(cgi|shtml|phtml|php)$">
+    SSLOptions +StdEnvVars
+  </FilesMatch>
+  #Alias /phpmyadmin /usr/share/phpmyadmin
+  #Include conf-available/phpmyadmin.conf 
+  ErrorLog ${APACHE_LOG_DIR}/wsh-error.log
+  LogLevel warn
+  CustomLog ${APACHE_LOG_DIR}/wsh-ssl_access.log combined
+  # phpmyadmin log for fail2ban, see https://www.phryneas.de/fail2ban-phpmyadmin/
+  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %{userID}n %{userStatus}n" pma_combined
+  CustomLog ${APACHE_LOG_DIR}/phpmyadmin_access.log pma_combined
+</VirtualHost>
+</IfModule>
+
+# localhost virtual host for server-status and other things for munin stats
+<VirtualHost 127.0.0.1:80>
+  ServerName localhost
+  <IfModule mod_status.c>
+    <Location /server-status>
+      SetHandler server-status
+      <IfModule mod_version.c>
+        <IfVersion < 2.4>
+          Order allow,deny
+        Deny from all
+          Allow from localhost 127.0.0.1 ::1
+        </IfVersion>
+        <IfVersion >= 2.4>
+        Require host localhost 127.0.0.1 ::1
+        </IfVersion>
+      </IfModule>
+      <IfModule !mod_version.c>
+        <IfModule !mod_authz_core.c>
+          Order allow,deny
+          Deny from all
+          Allow from localhost 127.0.0.1 ::1
+        </IfModule>
+        <IfModule mod_authz_core.c>
+          Require host localhost 127.0.0.1 ::1
+        </IfModule>
+      </IfModule>
+    </Location>
+  </IfModule>
+  DocumentRoot "/var/www/localhost"
+  <Directory "/var/www/localhost">
+    Options +Indexes +SymlinksIfOwnerMatch -MultiViews -Includes -ExecCGI
+    AllowOverride AuthConfig Indexes FileInfo Limit
+    <IfModule mod_php5.c>
+      php_admin_value doc_root /var/www/localhost
+      php_admin_value open_basedir /var/www/localhost/:/tmp/:/usr/share/php/
+      <FilesMatch "\.ph(p3?|tml)$">
+        SetHandler application/x-httpd-php
+      </FilesMatch>
+      <IfModule mod_version.c>
+        <IfVersion < 2.4>
+          Order allow,deny
+          Deny from all
+          Allow from localhost 127.0.0.1 ::1
+        </IfVersion>
+        <IfVersion >= 2.4>
+        Require host localhost 127.0.0.1 ::1
+        </IfVersion>
+      </IfModule>
+      <IfModule !mod_version.c>
+        <IfModule !mod_authz_core.c>
+          Order allow,deny
+          Deny from all
+          Allow from localhost 127.0.0.1 ::1
+        </IfModule>
+        <IfModule mod_authz_core.c>
+          Require host localhost 127.0.0.1 ::1
+        </IfModule>
+      </IfModule>
+    </IfModule>
+  </Directory>
+</VirtualHost>

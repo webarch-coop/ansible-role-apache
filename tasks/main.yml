@@ -30,6 +30,12 @@
   tags:
     - apache
 
+- name: Conditionally include WSH config
+  include_tasks: wsh.yml
+  when: apache_conf_enabled is defined and "webarch" in apache_conf_enabled 
+  tags:
+    - apache
+
 - name: Custom Apache ssl.conf in place
   copy:
     src: files/ssl.conf
@@ -64,6 +70,15 @@
   tags:
     - apache
 
+- name: Apache conf enabled
+  command: "a2enconf {{ item }}"
+  args:
+    removes: /etc/apache2/conf-enabled/{{ item }}.conf
+  with_items: "{{ apache_conf_enabled }}"
+  when: apache_conf_enabled is defined
+  tags:
+    - apache
+
 - name: Apache localhost directory in place
   file:
     path: /var/www/localhost
@@ -87,12 +102,12 @@
 
 - name: Apache configtest
   command: apache2ctl configtest
-  register: apache2ctl_configtest
+  register: apache_configtest
   tags:
     - apache
 
 - debug:
-    msg: "{{ apache2ctl_configtest.stderr }}"
+    msg: "{{ apache_configtest.stderr }}"
     verbosity: 1
   tags:
     - apache
@@ -101,13 +116,13 @@
   service:
     name: apache2
     state: restarted
-  when: '"Syntax OK" in apache2ctl_configtest.stderr'
+  when: '"Syntax OK" in apache_configtest.stderr'
   tags:
     - apache
 
 - name: Fail if Apache configtest is not OK
   fail:
     msg: "{{ apache2ctl_configtest.stdout }}"
-  when: '"Syntax OK" not in apache2ctl_configtest.stderr'
+  when: '"Syntax OK" not in apache_configtest.stderr'
   tags:
     - apache

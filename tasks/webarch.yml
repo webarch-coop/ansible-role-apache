@@ -1,0 +1,15 @@
+---
+- name: Webarchitects templates present
+  git:
+    repo: https://git.coop/webarch/website-templates.git
+    dest: /var/www/wsh
+    update: yes
+  tags:
+    - apache
+
+- name: WSH Apache config in place
+  template:
+    src: templates/webarch.conf.j2
+    dest: /etc/apache2/conf-available/webarch.conf
+  tags:
+    - apache
