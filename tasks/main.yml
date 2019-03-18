@@ -16,7 +16,7 @@
       - apache2-suexec-pristine
     state: present
     update_cache: false
-  when: '"suexec" in apache_mods_enabled'
+  when: apache_mods_enabled is defined and "suexec" in apache_mods_enabled
   tags:
     - apache
 
@@ -26,7 +26,14 @@
       - apache2-suexec-pristine
     state: absent
     update_cache: false
-  when: '"suexec" not in apache_mods_enabled'
+  when: apache_mods_enabled is not defined or "suexec" not in apache_mods_enabled
+  tags:
+    - apache
+
+- name: Custom Apache ssl.conf in place
+  copy:
+    src: files/ssl.conf
+    dest: /etc/apache2/mods-available/ssl.conf
   tags:
     - apache
 
@@ -35,6 +42,7 @@
     name: "{{ item }}"
     state: absent
   with_items: "{{ apache_mods_disabled }}"
+  when: apache_mods_disabled is defined
   tags:
     - apache
 
@@ -43,6 +51,7 @@
     name: "{{ item }}"
     state: present
   with_items: "{{ apache_mods_enabled }}"
+  when: apache_mods_enabled is defined
   tags:
     - apache
 
@@ -51,13 +60,7 @@
   args:
     removes: /etc/apache2/conf-enabled/{{ item }}.conf
   with_items: "{{ apache_conf_disabled }}"
-  tags:
-    - apache
-
-- name: Custom Apache ssl.conf in place
-  copy:
-    src: files/ssl.conf
-    dest: /etc/apache2/mods-available/ssl.conf
+  when: apache_conf_disabled is defined
   tags:
     - apache
 

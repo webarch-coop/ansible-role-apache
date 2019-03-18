@@ -28,13 +28,22 @@ The other repo should also contain a `.yml` file that contains something like th
   hosts: apache_servers
 
   vars:
-    apache_suexec: true
+    apache_mods_enabled:
+      - dir
+      - env
+      - headers
+      - http2
+      - includes
+      - mime
+      - rewrite
+      - ssl
+      - suexec
+    apache_conf_disabled:
+      - serve-cgi-bin
 
   roles:
     - apache
 ```
-
-The `apache_suexec` variable is optional and if it is set to true then the Debian `apache2-suexec-pristine` package will be installed.
 
 And a `hosts.yml` file that contains a `apache_servers` list as follows: 
 
