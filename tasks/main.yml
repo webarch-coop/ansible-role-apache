@@ -1,94 +1,110 @@
 ---
-- name: Apache packages installed
+- name: Apache packages present
   apt:
     pkg:
       - apache2
       - apache2-utils
       - lynx
-    state: latest
+    state: present
     update_cache: true
-  register: apache_packages
+  tags:
+    - apache
 
-- name: Apache conf disabled
-  command: "a2disconf {{ item }}"
-  args:
-    removes: /etc/apache2/conf-enabled/{{ item }}.conf
-  with_items:
-    - serve-cgi-bin
-  register: apache_conf
+- name: Apache suexec package present
+  apt:
+    pkg:
+      - apache2-suexec-pristine
+    state: present
+    update_cache: false
+  when: '"suexec" in apache_mods_enabled'
+  tags:
+    - apache
+
+- name: Apache suexec package absent
+  apt:
+    pkg:
+      - apache2-suexec-pristine
+    state: absent
+    update_cache: false
+  when: '"suexec" not in apache_mods_enabled'
+  tags:
+    - apache
+
+- name: Apache modules disabled
+  apache2_module:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ apache_mods_disabled }}"
+  tags:
+    - apache
 
 - name: Apache modules enabled
   apache2_module:
     name: "{{ item }}"
     state: present
-  with_items:
-    - dir
-    - env
-    - headers
-    - http2
-    - includes
-    - mime
-    - rewrite
-    - ssl
-  register: apache_modules
+  with_items: "{{ apache_mods_enabled }}"
+  tags:
+    - apache
 
-- name: Apache suexec package installed
-  apt:
-    pkg:
-      - apache2-suexec-pristine
-    state: latest
-    update_cache: false
-  register: apache_suexec_pristine
-  when: ( apache_suexec is defined ) and ( apache_suexec == True )
-
-- name: Apache suexec module enabled
-  apache2_module:
-    name: suexec
-    state: present
-  register: apache_suexec_module
-  when: ( apache_suexec is defined ) and ( apache_suexec == True )
+- name: Apache conf disabled
+  command: "a2disconf {{ item }}"
+  args:
+    removes: /etc/apache2/conf-enabled/{{ item }}.conf
+  with_items: "{{ apache_conf_disabled }}"
+  tags:
+    - apache
 
 - name: Custom Apache ssl.conf in place
   copy:
     src: files/ssl.conf
     dest: /etc/apache2/mods-available/ssl.conf
-  register: apache_ssl
+  tags:
+    - apache
 
 - name: Apache localhost directory in place
   file:
     path: /var/www/localhost
     state: directory
+  tags:
+    - apache
 
 - name: Apache localhost.conf in place
   copy:
     src: files/localhost.conf
     dest: /etc/apache2/sites-available/localhost.conf
-  register: apache_localhost
+  tags:
+    - apache
 
 - name: Apache localhost enabled
   command: a2ensite localhost
   args:
     creates: /etc/apache2/sites-enabled/localhost.conf
+  tags:
+    - apache
 
-- block:
+- name: Apache configtest
+  command: apache2ctl configtest
+  register: apache2ctl_configtest
+  tags:
+    - apache
 
-    - name: Apache configtest
-      command: apache2ctl configtest
-      register: apache2ctl_configtest
+- debug:
+    msg: "{{ apache2ctl_configtest.stderr }}"
+    verbosity: 1
+  tags:
+    - apache
 
-    - debug:
-        msg: "{{ apache2ctl_configtest.stderr }}"
-        verbosity: 1
+- name: Apache restarted
+  service:
+    name: apache2
+    state: restarted
+  when: '"Syntax OK" in apache2ctl_configtest.stderr'
+  tags:
+    - apache
 
-    - name: Apache restarted
-      service:
-        name: apache2
-        state: restarted
-      when: '"Syntax OK" in apache2ctl_configtest.stderr'
-
-    - name: Fail if Apache configtest is not OK
-      fail:
-        msg: "{{ apache2ctl_configtest.stdout }}"
-      when: '"Syntax OK" not in apache2ctl_configtest.stderr'
-
-  when: apache_packages.changed or apache_conf.changed or apache_conf.changed or apache_modules.changed or apache_suexec_pristine.changed or apache_suexec_module.changed or apache_ssl.changed or apache_localhost.changed
+- name: Fail if Apache configtest is not OK
+  fail:
+    msg: "{{ apache2ctl_configtest.stdout }}"
+  when: '"Syntax OK" not in apache2ctl_configtest.stderr'
+  tags:
+    - apache
