@@ -64,23 +64,23 @@
 
 - block:
 
-  - name: Apache configtest
-    command: apache2ctl configtest
-    register: apache2ctl_configtest
+    - name: Apache configtest
+      command: apache2ctl configtest
+      register: apache2ctl_configtest
 
-  - debug:
-      msg: "{{ apache2ctl_configtest.stderr }}"
-      verbosity: 1
+    - debug:
+        msg: "{{ apache2ctl_configtest.stderr }}"
+        verbosity: 1
 
-  - name: Apache restarted
-    service:
-      name: apache2
-      state: restarted
-    when: '"Syntax OK" in apache2ctl_configtest.stderr'
+    - name: Apache restarted
+      service:
+        name: apache2
+        state: restarted
+      when: '"Syntax OK" in apache2ctl_configtest.stderr'
 
-  - name: Fail if Apache configtest is not OK
-    fail:
-      msg: "{{ apache2ctl_configtest.stdout }}"
-    when: '"Syntax OK" not in apache2ctl_configtest.stderr'
+    - name: Fail if Apache configtest is not OK
+      fail:
+        msg: "{{ apache2ctl_configtest.stdout }}"
+      when: '"Syntax OK" not in apache2ctl_configtest.stderr'
 
   when: apache_packages.changed or apache_suexec_pristine.changed or apache_conf.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed

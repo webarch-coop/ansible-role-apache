@@ -34,6 +34,8 @@ The other repo should also contain a `.yml` file that contains something like th
     - apache
 ```
 
+The `apache_suexec` variable is optional and if it is set to true then the Debian `apache2-suexec-pristine` package will be installed.
+
 And a `hosts.yml` file that contains a `apache_servers` list as follows: 
 
 ```yml
