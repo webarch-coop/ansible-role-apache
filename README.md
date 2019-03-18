@@ -28,12 +28,13 @@ The other repo should also contain a `.yml` file that contains something like th
   hosts: apache_servers
 
   vars:
+    apache_suexec: true
 
   roles:
     - apache
 ```
 
-And a `hosts.yml` file that contains a `matomo_servers` list as follows: 
+And a `hosts.yml` file that contains a `apache_servers` list as follows: 
 
 ```yml
 ---

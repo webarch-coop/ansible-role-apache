@@ -6,8 +6,17 @@
       - apache2-utils
       - lynx
     state: latest
-    update_cache: yes
+    update_cache: true
   register: apache_packages
+
+- name: Apache suexec package installed
+  apt:
+    pkg:
+      - apache2-suexec-pristine
+    state: latest
+    update_cache: false
+  register: apache_suexec_suexec-pristine
+  when: ( apache_suexec is defined ) and ( apache_suexec is True )
 
 - name: Apache conf disabled
   command: "a2disconf {{ item }}"
@@ -74,4 +83,4 @@
       msg: "{{ apache2ctl_configtest.stdout }}"
     when: '"Syntax OK" not in apache2ctl_configtest.stderr'
 
-  when: apache_packages.changed or apache_conf.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
+  when: apache_packages.changed or apache_suexec_pristine.changed or apache_conf.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
