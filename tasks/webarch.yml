@@ -9,6 +9,8 @@
 
 - name: Debian default site disabled
   command: a2dissite 000-default
+  register: apache_a2dissite_default
+  changed_when: '"already disabled" not in apache_a2dissite_default.stdout'
   tags:
     - apache
 
