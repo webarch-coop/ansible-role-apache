@@ -22,12 +22,13 @@
     name: "{{ item }}"
     state: present
   with_items:
-    - rewrite
+    - dir
+    - env
     - headers
     - http2
-    - env
-    - dir
+    - includes
     - mime
+    - rewrite
     - ssl
   register: apache_modules
 
