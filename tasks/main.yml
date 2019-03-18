@@ -30,8 +30,8 @@
   tags:
     - apache
 
-- name: Conditionally include WSH config
-  include_tasks: wsh.yml
+- name: Conditionally include Webarchitects config
+  include_tasks: webarch.yml
   when: apache_conf_enabled is defined and "webarch" in apache_conf_enabled 
   tags:
     - apache
