@@ -9,15 +9,6 @@
     update_cache: true
   register: apache_packages
 
-- name: Apache suexec package installed
-  apt:
-    pkg:
-      - apache2-suexec-pristine
-    state: latest
-    update_cache: false
-  register: apache_suexec_pristine
-  when: ( apache_suexec is defined ) and ( apache_suexec == True )
-
 - name: Apache conf disabled
   command: "a2disconf {{ item }}"
   args:
@@ -39,6 +30,22 @@
     - mime
     - ssl
   register: apache_modules
+
+- name: Apache suexec package installed
+  apt:
+    pkg:
+      - apache2-suexec-pristine
+    state: latest
+    update_cache: false
+  register: apache_suexec_pristine
+  when: ( apache_suexec is defined ) and ( apache_suexec == True )
+
+- name: Apache suexec module enabled
+  apache2_module:
+    name: suexec
+    state: present
+  register: apache_suexec_module
+  when: ( apache_suexec is defined ) and ( apache_suexec == True )
 
 - name: Custom Apache ssl.conf in place
   copy:
@@ -83,4 +90,4 @@
         msg: "{{ apache2ctl_configtest.stdout }}"
       when: '"Syntax OK" not in apache2ctl_configtest.stderr'
 
-  when: apache_packages.changed or apache_suexec_pristine.changed or apache_conf.changed or apache_modules.changed or apache_ssl.changed or apache_localhost.changed
+  when: apache_packages.changed or apache_conf.changed or apache_conf.changed or apache_modules.changed or apache_suexec_pristine.changed or apache_suexec_module.changed or apache_ssl.changed or apache_localhost.changed
