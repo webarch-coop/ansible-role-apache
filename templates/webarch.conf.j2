@@ -148,7 +148,12 @@ ErrorDocument 403 /wsh/403.shtml
 <VirtualHost *:80>
   ServerName {{ inventory_hostname }} 
   ServerAlias www.{{ inventory_hostname }}
-  AssignUserID www-data www-data 
+  <IfModule mpm_itk_module>
+    AssignUserID www-data www-data 
+  </IfModule>
+  <IfModule suexec_module>
+    SuexecUserGroup www-data www-data 
+  </IfModule>
   ServerAdmin support@webarch.net
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
@@ -166,7 +171,12 @@ ErrorDocument 403 /wsh/403.shtml
 <VirtualHost *:443>
   ServerName {{ inventory_hostname }} 
   ServerAlias www.{{ inventory_hostname }}
-  AssignUserID www-data www-data 
+  <IfModule mpm_itk_module>
+    AssignUserID www-data www-data 
+  </IfModule>
+  <IfModule suexec_module>
+    SuexecUserGroup www-data www-data 
+  </IfModule>
   ServerAdmin support@webarch.net
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
@@ -196,6 +206,12 @@ ErrorDocument 403 /wsh/403.shtml
 # localhost virtual host for server-status and other things for munin stats
 <VirtualHost 127.0.0.1:80>
   ServerName localhost
+  <IfModule mpm_itk_module>
+    AssignUserID www-data www-data 
+  </IfModule>
+  <IfModule suexec_module>
+    SuexecUserGroup www-data www-data 
+  </IfModule>
   <IfModule mod_status.c>
     <Location /server-status>
       SetHandler server-status
