@@ -184,8 +184,8 @@ ErrorDocument 403 /wsh/403.shtml
   # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
   #Protocols h2 http/1.1
   #H2Direct on
-  SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}/cert.pem
-  SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}/key.pem
+  SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
+  SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
   SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
   Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
   DocumentRoot "/var/www"
