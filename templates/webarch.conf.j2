@@ -17,7 +17,7 @@ Alias /wsh.shtml /var/www/wsh/wsh.shtml
 # icons for directory index icons
 Alias /icons /usr/share/apache2/icons
 # env vars for the default index page, wsh.shtml
-SetEnv PHPMYADMIN_DOMAIN "{{ hostname }}" 
+SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}" 
 SetEnv HOME_DOMAIN "webarch.net"
 SetEnv SITE_TITLE "Webarchitects Shared Hosting"
 SetEnv STATIC_DIR "/wsh/"
@@ -146,16 +146,16 @@ ErrorDocument 403 /wsh/403.shtml
 
 # The default virtual host for port 80
 <VirtualHost *:80>
-  ServerName {{ hostname }} 
-  {% if hostname_ip.stdout == www_hostname_dig_ip.stdout %}ServerAlias www.{{ hostname }}{% endif %} 
+  ServerName {{ inventory_hostname }} 
+  ServerAlias www.{{ inventory_hostname }}
   AssignUserID www-data www-data 
   ServerAdmin support@webarch.net
   SetEnv PIWIK_SITE_ID "1"
-  SetEnv PIWIK_SITE_DOMAIN "stats.{{ hostname }}"
+  SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   DocumentRoot "/var/www"
   #RewriteEngine On
   #RewriteRule ^/?phpmyadmin(.*) https://%{SERVER_NAME}/phpmyadmin$1 [R,L]
-  RedirectPermanent /phpmyadmin https://{{ hostname }}/phpmyadmin
+  RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
   ErrorLog ${APACHE_LOG_DIR}/wsh-error.log
   LogLevel warn
   CustomLog ${APACHE_LOG_DIR}/wsh-access.log combined
@@ -164,12 +164,12 @@ ErrorDocument 403 /wsh/403.shtml
 # The default virtual host for port 443
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
-  ServerName {{ hostname }} 
-  {% if hostname_ip.stdout == www_hostname_dig_ip.stdout %}ServerAlias www.{{ hostname }}{% endif %} 
+  ServerName {{ inventory_hostname }} 
+  ServerAlias www.{{ inventory_hostname }}
   AssignUserID www-data www-data 
   ServerAdmin support@webarch.net
   SetEnv PIWIK_SITE_ID "1"
-  SetEnv PIWIK_SITE_DOMAIN "stats.{{ hostname }}"
+  SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   SSLEngine on
   # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
   #Protocols h2 http/1.1
