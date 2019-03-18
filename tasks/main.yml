@@ -20,6 +20,14 @@
   tags:
     - apache
 
+- name: Apache FastCGI present
+  apt:
+    pkg:
+      - libapache2-mod-fcgid
+    state: present
+    update_cache: false
+  when: apache_mods_enabled is defined and "fcgid" in apache_mods_enabled
+
 - name: Apache suexec package absent
   apt:
     pkg:
