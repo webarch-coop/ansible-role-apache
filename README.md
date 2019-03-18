@@ -33,7 +33,7 @@ The other repo should also contain a `.yml` file that contains something like th
       - env
       - headers
       - http2
-      - includes
+      - include
       - mime
       - rewrite
       - ssl
