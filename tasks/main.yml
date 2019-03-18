@@ -73,7 +73,7 @@
 - name: Apache conf enabled
   command: "a2enconf {{ item }}"
   args:
-    removes: /etc/apache2/conf-enabled/{{ item }}.conf
+    creates: /etc/apache2/conf-enabled/{{ item }}.conf
   with_items: "{{ apache_conf_enabled }}"
   when: apache_conf_enabled is defined
   tags:
