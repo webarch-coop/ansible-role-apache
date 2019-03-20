@@ -1,6 +1,6 @@
 ---
 - name: "Apache conf for {{ item }} checked"
-  stat: 
+  stat:
     path: "/etc/apache2/conf-enabled/{{ item }}.conf"
   register: apache_conf_status
   tags:

@@ -61,7 +61,7 @@
     - apache
 
 - name: Apache modules enabled
-  include_tasks: a2enmod.yml 
+  include_tasks: a2enmod.yml
   with_items: "{{ apache_mods_enabled }}"
   when: apache_mods_enabled is defined
   tags:
