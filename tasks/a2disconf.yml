@@ -1,0 +1,15 @@
+---
+- name: "Apache conf for {{ item }} checked"
+  stat:
+    path: "/etc/apache2/conf-enabled/{{ item }}.conf"
+  register: apache_conf_status
+  tags:
+    - apache
+
+- name: "Apache conf for {{ item }} disabled"
+  command: "a2disconf {{ item }}"
+  args:
+    removes: /etc/apache2/conf-enabled/{{ item }}.conf
+  when: apache_conf_status.stat.exists
+  tags:
+    - apache

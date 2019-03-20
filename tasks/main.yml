@@ -10,7 +10,7 @@
   tags:
     - apache
 
-- name: Apache suexec package present
+- name: Apache Suexec package present
   apt:
     pkg:
       - apache2-suexec-pristine
@@ -54,36 +54,28 @@
     - apache
 
 - name: Apache modules disabled
-  apache2_module:
-    name: "{{ item }}"
-    state: absent
+  include_tasks: a2dismod.yml
   with_items: "{{ apache_mods_disabled }}"
   when: apache_mods_disabled is defined
   tags:
     - apache
 
 - name: Apache modules enabled
-  apache2_module:
-    name: "{{ item }}"
-    state: present
+  include_tasks: a2enmod.yml 
   with_items: "{{ apache_mods_enabled }}"
   when: apache_mods_enabled is defined
   tags:
     - apache
 
 - name: Apache conf disabled
-  command: "a2disconf {{ item }}"
-  args:
-    removes: /etc/apache2/conf-enabled/{{ item }}.conf
+  include_tasks: a2enconf.yml
   with_items: "{{ apache_conf_disabled }}"
   when: apache_conf_disabled is defined
   tags:
     - apache
 
 - name: Apache conf enabled
-  command: "a2enconf {{ item }}"
-  args:
-    creates: /etc/apache2/conf-enabled/{{ item }}.conf
+  include_tasks: a2enconf.yml
   with_items: "{{ apache_conf_enabled }}"
   when: apache_conf_enabled is defined
   tags:
