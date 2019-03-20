@@ -1,6 +1,6 @@
 ---
 - name: "Apache {{ item }} module checked"
-  stat: 
+  stat:
     path: "/etc/apache2/mods-enabled/{{ item }}.conf"
   register: apache_mod_status
   tags:
