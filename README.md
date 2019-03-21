@@ -41,6 +41,8 @@ The other repo should also contain a `.yml` file that contains something like th
     apache_conf_disabled:
       - serve-cgi-bin
     apache_user: www-data
+    apache_group: www-data
+    apache_ulimit: 65536
 
   roles:
     - apache
