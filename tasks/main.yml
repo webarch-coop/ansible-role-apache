@@ -48,7 +48,7 @@
   tags:
     - apache
 
-- name: Apache suexec package absent
+- name: Apache suEXEC package absent
   apt:
     pkg:
       - apache2-suexec-pristine
