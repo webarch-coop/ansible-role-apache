@@ -18,25 +18,15 @@
     owner: root
     group: root
 
-- block:
-
-    - name: Apache ITK MPM package present
-      apt:
-        pkg:
-          - libapache2-mpm-itk
-        state: present
-        update_cache: false
-      tags:
-        - apache
-
-    - name: Apache mpm_prefork.conf in place
-      template:
-        src: templates/mpm_prefork.conf.j2
-        dest: /etc/apache2/mods-enabled/mpm_prefork.conf
-      tags:
-        - apache
-
+- name: Apache ITK MPM package present
+  apt:
+    pkg:
+      - libapache2-mpm-itk
+    state: present
+    update_cache: false
   when: apache_mods_enabled is defined and "mpm-itk" in apache_mods_enabled
+  tags:
+    - apache
 
 - name: Apache ITK MPM package absent
   apt:
@@ -89,6 +79,13 @@
 - name: Conditionally include Webarchitects config
   include_tasks: webarch.yml
   when: apache_conf_enabled is defined and "webarch" in apache_conf_enabled
+  tags:
+    - apache
+
+- name: Apache mpm_prefork.conf in place
+  template:
+    src: templates/mpm_prefork.conf.j2
+    dest: /etc/apache2/mods-enabled/mpm_prefork.conf
   tags:
     - apache
 
