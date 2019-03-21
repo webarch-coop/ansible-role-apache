@@ -18,6 +18,36 @@
     owner: root
     group: root
 
+- block:
+
+    - name: Apache ITK MPM package present
+      apt:
+        pkg:
+          - libapache2-mpm-itk
+        state: present
+        update_cache: false
+      tags:
+        - apache
+
+    - name: Apache mpm_prefork.conf in place
+      template:
+        src: templates/mpm_prefork.conf.j2
+        dest: /etc/apache2/mods-enabled/mpm_prefork.conf
+      tags:
+        - apache
+
+  when: apache_mods_enabled is defined and "mpm-itk" in apache_mods_enabled
+
+- name: Apache ITK MPM package absent
+  apt:
+    pkg:
+      - libapache2-mpm-itk
+    state: absent
+    update_cache: false
+  when: apache_mods_enabled is defined and "mpm-itk" in apache_mods_disabled
+  tags:
+    - apache
+
 - name: Apache Suexec package present
   apt:
     pkg:
@@ -34,7 +64,7 @@
       - apache2-suexec-pristine
     state: absent
     update_cache: false
-  when: apache_mods_enabled is not defined or "suexec" not in apache_mods_enabled
+  when: apache_mods_enabled is defined and "suexec" in apache_mods_disabled
   tags:
     - apache
 
@@ -54,7 +84,7 @@
       - libapache2-mod-fcgid
     state: absent
     update_cache: false
-  when: apache_mods_enabled is not defined or "fcgid" not in apache_mods_enabled
+  when: apache_mods_enabled is defined and "fcgid" not in apache_mods_disabled
 
 - name: Conditionally include Webarchitects config
   include_tasks: webarch.yml
