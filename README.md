@@ -37,12 +37,18 @@ The other repo should also contain a `.yml` file that contains something like th
       - mime
       - rewrite
       - ssl
+    apache_mods_disabled:
       - suexec
+      - mpm-itk
+    apache_conf_enabled:
+      - webarch
     apache_conf_disabled:
       - serve-cgi-bin
     apache_user: www-data
     apache_group: www-data
     apache_ulimit: 65536
+    apache_mpm_max_request_workers: 128
+    apache_mpm_max_connections_per_child: 10000
 
   roles:
     - apache
