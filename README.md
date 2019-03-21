@@ -40,6 +40,7 @@ The other repo should also contain a `.yml` file that contains something like th
       - suexec
     apache_conf_disabled:
       - serve-cgi-bin
+    apache_user: www-data
 
   roles:
     - apache

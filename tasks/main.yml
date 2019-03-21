@@ -10,6 +10,14 @@
   tags:
     - apache
 
+- name: Apache envars in place
+  template:
+    src: templates/envars.j2
+    dest: /etc/apache2/envvars
+    mode: 0755
+    owner: root
+    group: root
+
 - name: Apache Suexec package present
   apt:
     pkg:
