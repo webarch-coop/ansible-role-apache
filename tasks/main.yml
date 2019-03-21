@@ -12,7 +12,7 @@
 
 - name: Apache envars in place
   template:
-    src: templates/envars.j2
+    src: templates/envvars.j2
     dest: /etc/apache2/envvars
     mode: 0755
     owner: root
