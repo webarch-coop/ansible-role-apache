@@ -111,7 +111,7 @@
     - apache
 
 - name: Apache conf disabled
-  include_tasks: a2enconf.yml
+  include_tasks: a2disconf.yml
   with_items: "{{ apache_conf_disabled }}"
   when: apache_conf_disabled is defined
   tags:
