@@ -166,6 +166,7 @@ ErrorDocument 403 /wsh/403.shtml
   CustomLog ${APACHE_LOG_DIR}/wsh-access.log combined
 </VirtualHost>
 
+{% if apache_cert.stat.exists %}
 # The default virtual host for port 443
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
@@ -202,6 +203,7 @@ ErrorDocument 403 /wsh/403.shtml
   CustomLog ${APACHE_LOG_DIR}/phpmyadmin_access.log pma_combined
 </VirtualHost>
 </IfModule>
+{% endif %}
 
 # localhost virtual host for server-status and other things for munin stats
 <VirtualHost 127.0.0.1:80>

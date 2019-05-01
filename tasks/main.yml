@@ -83,7 +83,7 @@
 
 - name: Conditionally include Webarchitects config
   include_tasks: webarch.yml
-  when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled ) and ( apache_cert.stat.exists )
+  when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled )
   tags:
     - apache
 
