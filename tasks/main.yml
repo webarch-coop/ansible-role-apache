@@ -76,9 +76,14 @@
     update_cache: false
   when: apache_mods_enabled is defined and "fcgid" not in apache_mods_disabled
 
+- name: Check we we have a HTTPS cert
+  stat:
+    path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
+  register: apache_cert
+
 - name: Conditionally include Webarchitects config
   include_tasks: webarch.yml
-  when: apache_conf_enabled is defined and "webarch" in apache_conf_enabled
+  when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled ) and ( apache_cert.stat.exists )
   tags:
     - apache
 
