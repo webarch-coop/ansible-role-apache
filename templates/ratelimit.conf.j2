@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+# https://httpd.apache.org/docs/trunk/mod/mod_ratelimit.html
+{% if apache_rate_limit is defined %}
+SetOutputFilter RATE_LIMIT
+SetEnv rate-limit {{ apache_rate_limit }}
+{% else %}
+# rate-limit not set as apache_rate_limit was not defined
+{% endif %}
+{% if apache_rate_initial_burst is defined %}
+SetEnv rate-initial-burst {{ apache_rate_initial_burst }}
+{% else %}
+# rate-initial-burst not set as apache_rate_initial_burst was not defined
+{% endif %}
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+

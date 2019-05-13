@@ -17,14 +17,6 @@
     mode: 0755
     owner: root
     group: root
-
-- name: Apache ITK MPM package present
-  apt:
-    pkg:
-      - libapache2-mpm-itk
-    state: present
-    update_cache: false
-  when: apache_mods_enabled is defined and "mpm-itk" in apache_mods_enabled
   tags:
     - apache
 
@@ -34,7 +26,38 @@
       - libapache2-mpm-itk
     state: absent
     update_cache: false
-  when: apache_mods_enabled is defined and "mpm-itk" in apache_mods_disabled
+  when: ( apache_mods_enabled is defined ) and ( "mpm-itk" in apache_mods_disabled )
+  tags:
+    - apache
+
+- name: Apache ITK MPM configuration
+  block:
+
+    - name: Apache ITK MPM package present
+      apt:
+        pkg:
+          - libapache2-mpm-itk
+        state: present
+        update_cache: false
+      tags:
+        - apache
+
+    - name: Apache mpm_prefork.conf in place
+      template:
+        src: templates/mpm_prefork.conf.j2
+        dest: /etc/apache2/mods-available/mpm_prefork.conf
+      tags:
+        - apache
+
+  when: ( apache_mods_enabled is defined ) and ( "mpm-itk" in apache_mods_enabled )
+
+- name: Apache suEXEC package absent
+  apt:
+    pkg:
+      - apache2-suexec-pristine
+    state: absent
+    update_cache: false
+  when: ( apache_mods_enabled is defined ) and ( "suexec" in apache_mods_disabled )
   tags:
     - apache
 
@@ -44,27 +67,7 @@
       - apache2-suexec-pristine
     state: present
     update_cache: false
-  when: apache_mods_enabled is defined and "suexec" in apache_mods_enabled
-  tags:
-    - apache
-
-- name: Apache suEXEC package absent
-  apt:
-    pkg:
-      - apache2-suexec-pristine
-    state: absent
-    update_cache: false
-  when: apache_mods_enabled is defined and "suexec" in apache_mods_disabled
-  tags:
-    - apache
-
-- name: Apache FastCGI present
-  apt:
-    pkg:
-      - libapache2-mod-fcgid
-    state: present
-    update_cache: false
-  when: apache_mods_enabled is defined and "fcgid" in apache_mods_enabled
+  when: ( apache_mods_enabled is defined ) and ( "suexec" in apache_mods_enabled )
   tags:
     - apache
 
@@ -74,23 +77,38 @@
       - libapache2-mod-fcgid
     state: absent
     update_cache: false
-  when: apache_mods_enabled is defined and "fcgid" not in apache_mods_disabled
+  when: ( apache_mods_enabled is defined ) and ( "fcgid" not in apache_mods_disabled )
+  tags:
+    - apache
+
+- name: Apache FastCGI present
+  apt:
+    pkg:
+      - libapache2-mod-fcgid
+    state: present
+    update_cache: false
+  when: ( apache_mods_enabled is defined ) and ( "fcgid" in apache_mods_enabled )
+  tags:
+    - apache
+
+- name: Apache ratelimit conf present
+  template:
+    src: templates/ratelimit.conf.j2
+    dest: /etc/apache2/mods-available/ratelimit.conf
+  when: ( apache_mods_enabled is defined ) and ( "ratelimit" in apache_mods_enabled )
+  tags:
+    - apache
 
 - name: Check we we have a HTTPS cert
   stat:
     path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
   register: apache_cert
+  tags:
+    - apache
 
 - name: Conditionally include Webarchitects config
   include_tasks: webarch.yml
   when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled )
-  tags:
-    - apache
-
-- name: Apache mpm_prefork.conf in place
-  template:
-    src: templates/mpm_prefork.conf.j2
-    dest: /etc/apache2/mods-enabled/mpm_prefork.conf
   tags:
     - apache
 
@@ -116,7 +134,7 @@
     - apache
 
 - name: Apache conf disabled
-  include_tasks: a2disconf.yml
+a include_tasks: a2disconf.yml
   with_items: "{{ apache_conf_disabled }}"
   when: apache_conf_disabled is defined
   tags:

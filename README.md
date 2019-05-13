@@ -15,7 +15,7 @@ To use this role you need to use Ansible Galaxy to install it into another repos
 To pull this repo in run:
 
 ```bash
-ansible-galaxy install -r requirements.yml --force -p roles 
+ansible-galaxy install -r requirements.yml --force -p galaxy/roles 
 ```
 
 The other repo should also contain a `.yml` file that contains something like this:
@@ -37,6 +37,7 @@ The other repo should also contain a `.yml` file that contains something like th
       - mime
       - rewrite
       - ssl
+      - mpm_event
     apache_mods_disabled:
       - suexec
       - mpm-itk
@@ -49,6 +50,8 @@ The other repo should also contain a `.yml` file that contains something like th
     apache_ulimit: 65536
     apache_mpm_max_request_workers: 128
     apache_mpm_max_connections_per_child: 10000
+    apache_apache_rate_limit: 64
+    apache_rate_initial_burst: 256
 
   roles:
     - apache
