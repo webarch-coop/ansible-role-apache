@@ -18,7 +18,7 @@ To pull this repo in run:
 ansible-galaxy install -r requirements.yml --force -p galaxy/roles 
 ```
 
-The other repo should also contain a `.yml` file that contains something like this:
+The other repo should also contain a `.yml` file that contains something like this (for `mpm_event`):
 
 ```yml
 ---
@@ -41,15 +41,19 @@ The other repo should also contain a `.yml` file that contains something like th
     apache_mods_disabled:
       - suexec
       - mpm-itk
+      - mod_php
     apache_conf_enabled:
       - webarch
     apache_conf_disabled:
       - serve-cgi-bin
     apache_user: www-data
     apache_group: www-data
+    # The following vars are all optional
     apache_ulimit: 65536
+    # These vars depend on mpm-itk / mpm_prefork modules
     apache_mpm_max_request_workers: 128
     apache_mpm_max_connections_per_child: 10000
+    # These vars depend on the ratelimit conf
     apache_apache_rate_limit: 64
     apache_rate_initial_burst: 256
 

@@ -1,4 +1,14 @@
 ---
+- name: Check /etc/debian_version
+  shell: "lsb_release -c | awk '{ print $2 }'"
+  register: apache_debian_version_check
+  changed_when: false
+
+- name: Set a fact for the Debian and PHP version
+  set_fact:
+    apache_debian_version: "{{ apache_debian_version_check.stdout }}"
+    apache_php_version: "{% if apache_debian_version_check.stdout == 'buster' %}7.3{% elif apache_debian_version_check.stdout == 'stretch' %}7.0{% endif %}"
+
 - name: Apache packages present
   apt:
     pkg:
@@ -17,85 +27,6 @@
     mode: 0755
     owner: root
     group: root
-  tags:
-    - apache
-
-- name: Apache ITK MPM package absent
-  apt:
-    pkg:
-      - libapache2-mpm-itk
-    state: absent
-    update_cache: false
-  when: ( apache_mods_enabled is defined ) and ( "mpm-itk" in apache_mods_disabled )
-  tags:
-    - apache
-
-- name: Apache ITK MPM configuration
-  block:
-
-    - name: Apache ITK MPM package present
-      apt:
-        pkg:
-          - libapache2-mpm-itk
-        state: present
-        update_cache: false
-      tags:
-        - apache
-
-    - name: Apache mpm_prefork.conf in place
-      template:
-        src: templates/mpm_prefork.conf.j2
-        dest: /etc/apache2/mods-available/mpm_prefork.conf
-      tags:
-        - apache
-
-  when: ( apache_mods_enabled is defined ) and ( "mpm-itk" in apache_mods_enabled )
-
-- name: Apache suEXEC package absent
-  apt:
-    pkg:
-      - apache2-suexec-pristine
-    state: absent
-    update_cache: false
-  when: ( apache_mods_enabled is defined ) and ( "suexec" in apache_mods_disabled )
-  tags:
-    - apache
-
-- name: Apache Suexec package present
-  apt:
-    pkg:
-      - apache2-suexec-pristine
-    state: present
-    update_cache: false
-  when: ( apache_mods_enabled is defined ) and ( "suexec" in apache_mods_enabled )
-  tags:
-    - apache
-
-- name: Apache FastCGI absent
-  apt:
-    pkg:
-      - libapache2-mod-fcgid
-    state: absent
-    update_cache: false
-  when: ( apache_mods_enabled is defined ) and ( "fcgid" not in apache_mods_disabled )
-  tags:
-    - apache
-
-- name: Apache FastCGI present
-  apt:
-    pkg:
-      - libapache2-mod-fcgid
-    state: present
-    update_cache: false
-  when: ( apache_mods_enabled is defined ) and ( "fcgid" in apache_mods_enabled )
-  tags:
-    - apache
-
-- name: Apache ratelimit conf present
-  template:
-    src: templates/ratelimit.conf.j2
-    dest: /etc/apache2/mods-available/ratelimit.conf
-  when: ( apache_mods_enabled is defined ) and ( "ratelimit" in apache_mods_enabled )
   tags:
     - apache
 
@@ -120,18 +51,126 @@
     - apache
 
 - name: Apache modules disabled
-  include_tasks: a2dismod.yml
-  with_items: "{{ apache_mods_disabled }}"
+  block:
+
+- name: Enable modules
+  block:
+
+    - name: Apache ITK MPM package absent
+      apt:
+        pkg:
+          - libapache2-mpm-itk
+        state: absent
+        update_cache: false
+      when: '"mpm-itk" in apache_mods_disabled'
+      tags:
+        - apache
+
+    - name: Apache FastCGI absent
+      apt:
+        pkg:
+          - libapache2-mod-fcgid
+        state: absent
+        update_cache: false
+      when: '"fcgid" in apache_mods_disabled'
+      tags:
+        - apache
+
+    - name: Apache suEXEC package absent
+      apt:
+        pkg:
+          - apache2-suexec-pristine
+        state: absent
+        update_cache: false
+      when: '"suexec" in apache_mods_disabled' 
+      tags:
+        - apache
+
+    - name: "Apache php{{ apache_php_version }} package absent"
+      apt:
+        pkg:
+          - "libapache2-mod-php{{ apache_php_version }}"
+        state: absent
+        update_cache: false
+      when: '"php{{ apache_php_version }}" in apache_mods_disabled' 
+      tags:
+        - apache
+
+    - name: Enable modules
+      include_tasks: a2dismod.yml
+      with_items: "{{ apache_mods_disabled }}"
+      tags:
+        - apache
+
   when: apache_mods_disabled is defined
-  tags:
-    - apache
 
 - name: Apache modules enabled
-  include_tasks: a2enmod.yml
-  with_items: "{{ apache_mods_enabled }}"
+  block:
+
+    - name: Apache ITK MPM package present
+      apt:
+        pkg:
+          - libapache2-mpm-itk
+        state: present
+        update_cache: false
+      when: '"mpm-itk" in apache_mods_enabled'
+      tags:
+        - apache
+
+    - name: Apache mpm_prefork.conf in place
+      template:
+        src: templates/mpm_prefork.conf.j2
+        dest: /etc/apache2/mods-available/mpm_prefork.conf
+      when: ( "mpm-itk" in apache_mods_enabled ) or ( "php{{ apache_php_version }}" in apache_mods_enabled )
+      tags:
+        - apache
+
+    - name: Apache Suexec package present
+      apt:
+        pkg:
+          - apache2-suexec-pristine
+        state: present
+        update_cache: false
+      when: '"suexec" in apache_mods_enabled'
+      tags:
+        - apache
+
+    - name: Apache FastCGI package present
+      apt:
+        pkg:
+          - libapache2-mod-fcgid
+        state: present
+        update_cache: false
+      when: '"fcgid" in apache_mods_enabled'
+      tags:
+        - apache
+
+    - name: Apache ratelimit conf present
+      template:
+        src: templates/ratelimit.conf.j2
+        dest: /etc/apache2/mods-available/ratelimit.conf
+      when: '"ratelimit" in apache_mods_enabled'
+      tags:
+        - apache
+
+    - name: Apache mod_php package present
+      apt:
+        pkg:
+          - "libapache2-mod-php{{ apache_php_version }}"
+        state: present
+        update_cache: false
+      when: '"php{{ apache_php_version }}" in apache_mods_enabled' 
+      tags:
+        - apache
+
+    - name: Apache modules enabled
+      include_tasks: a2enmod.yml
+      with_items: "{{ apache_mods_enabled }}"
+      when: apache_mods_enabled is defined
+      tags:
+        - apache
+
   when: apache_mods_enabled is defined
-  tags:
-    - apache
 
 - name: Apache conf disabled
   include_tasks: a2disconf.yml
