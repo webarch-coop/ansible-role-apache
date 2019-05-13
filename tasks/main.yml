@@ -53,9 +53,6 @@
 - name: Apache modules disabled
   block:
 
-- name: Enable modules
-  block:
-
     - name: Apache ITK MPM package absent
       apt:
         pkg:
