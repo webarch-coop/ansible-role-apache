@@ -1,6 +1,6 @@
 # Ansible Apache Role
 
-Currently this repository contains an Ansible role for installing Apache on Debian Stretch. 
+Currently this repository contains an Ansible role for installing Apache on Debian Stretch and Buster. 
 
 To use this role you need to use Ansible Galaxy to install it into another repository by adding a `requirements.yml` file in that repo that contains:
 
@@ -41,7 +41,7 @@ The other repo should also contain a `.yml` file that contains something like th
     apache_mods_disabled:
       - suexec
       - mpm-itk
-      - mod_php
+      - php7.3
     apache_conf_enabled:
       - webarch
     apache_conf_disabled:

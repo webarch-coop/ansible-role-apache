@@ -30,7 +30,7 @@
   tags:
     - apache
 
-- name: Check we we have a HTTPS cert
+- name: Check if we have a HTTPS cert
   stat:
     path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
   register: apache_cert
