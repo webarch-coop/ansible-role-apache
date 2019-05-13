@@ -79,7 +79,7 @@
           - apache2-suexec-pristine
         state: absent
         update_cache: false
-      when: '"suexec" in apache_mods_disabled' 
+      when: '"suexec" in apache_mods_disabled'
       tags:
         - apache
 
@@ -89,7 +89,7 @@
           - "libapache2-mod-php{{ apache_php_version }}"
         state: absent
         update_cache: false
-      when: '"php{{ apache_php_version }}" in apache_mods_disabled' 
+      when: ( "php7.0" in apache_mods_disabled ) or ( "php7.3" in apache_mods_disabled )
       tags:
         - apache
 
@@ -118,7 +118,7 @@
       template:
         src: templates/mpm_prefork.conf.j2
         dest: /etc/apache2/mods-available/mpm_prefork.conf
-      when: ( "mpm-itk" in apache_mods_enabled ) or ( "php{{ apache_php_version }}" in apache_mods_enabled )
+      when: ( "mpm-itk" in apache_mods_enabled ) or ( "php7.0" in apache_mods_enabled ) or ( "php7.3" in apache_mods_enabled )
       tags:
         - apache
 
@@ -156,7 +156,7 @@
           - "libapache2-mod-php{{ apache_php_version }}"
         state: present
         update_cache: false
-      when: '"php{{ apache_php_version }}" in apache_mods_enabled' 
+      when: ( "php7.0" in apache_mods_enabled ) or ( "php7.3" in apache_mods_enabled )
       tags:
         - apache
 
