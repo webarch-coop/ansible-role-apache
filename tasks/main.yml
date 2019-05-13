@@ -4,7 +4,7 @@
   register: apache_debian_version_check
   changed_when: false
 
-- name: Set a fact for the Debian and PHP version
+- name: Set facts for the Debian and PHP versions
   set_fact:
     apache_debian_version: "{{ apache_debian_version_check.stdout }}"
     apache_php_version: "{% if apache_debian_version_check.stdout == 'buster' %}7.3{% elif apache_debian_version_check.stdout == 'stretch' %}7.0{% endif %}"
