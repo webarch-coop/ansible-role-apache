@@ -46,6 +46,7 @@ The other repo should also contain a `.yml` file that contains something like th
       - webarch
     apache_conf_disabled:
       - serve-cgi-bin
+      - phpmyadmin
     apache_user: www-data
     apache_group: www-data
     # The following vars are all optional

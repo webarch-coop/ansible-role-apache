@@ -1,15 +1,15 @@
 ---
-- name: "Apache conf for {{ item }} checked"
+- name: "Apache conf for {{ conf }} checked"
   stat:
-    path: "/etc/apache2/conf-enabled/{{ item }}.conf"
+    path: "/etc/apache2/conf-enabled/{{ conf }}.conf"
   register: apache_conf_status
   tags:
     - apache
 
-- name: "Apache conf for {{ item }} enabled"
-  command: "a2enconf {{ item }}"
+- name: "Apache conf for {{ conf }} enabled"
+  command: "a2enconf {{ conf }}"
   args:
-    creates: /etc/apache2/conf-enabled/{{ item }}.conf
+    creates: /etc/apache2/conf-enabled/{{ conf }}.conf
   when: apache_conf_status.stat.exists == False
   tags:
     - apache

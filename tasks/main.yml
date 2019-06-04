@@ -95,7 +95,9 @@
 
     - name: Enable modules
       include_tasks: a2dismod.yml
-      with_items: "{{ apache_mods_disabled }}"
+      loop: "{{ apache_mods_disabled }}"
+      loop_control:
+        loop_var: mod
       tags:
         - apache
 
@@ -162,7 +164,9 @@
 
     - name: Apache modules enabled
       include_tasks: a2enmod.yml
-      with_items: "{{ apache_mods_enabled }}"
+      loop: "{{ apache_mods_enabled }}"
+      loop_control:
+        loop_var: mod
       when: apache_mods_enabled is defined
       tags:
         - apache
@@ -171,14 +175,18 @@
 
 - name: Apache conf disabled
   include_tasks: a2disconf.yml
-  with_items: "{{ apache_conf_disabled }}"
+  loop: "{{ apache_conf_disabled }}"
+  loop_control:
+    loop_var: conf
   when: apache_conf_disabled is defined
   tags:
     - apache
 
 - name: Apache conf enabled
   include_tasks: a2enconf.yml
-  with_items: "{{ apache_conf_enabled }}"
+  loop: "{{ apache_conf_enabled }}"
+  loop_control:
+    loop_var: conf
   when: apache_conf_enabled is defined
   tags:
     - apache

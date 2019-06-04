@@ -1,14 +1,14 @@
 ---
-- name: "Apache {{ item }} module checked"
+- name: "Apache {{ mod }} module checked"
   stat:
-    path: "/etc/apache2/mods-enabled/{{ item }}.conf"
+    path: "/etc/apache2/mods-enabled/{{ mod }}.conf"
   register: apache_mod_status
   tags:
     - apache
 
-- name: "Apache {{ item }} module disabled"
+- name: "Apache {{ mod }} module disabled"
   apache2_module:
-    name: "{{ item }}"
+    name: "{{ mod }}"
     state: absent
   when: apache_mod_status.stat.exists
   tags:
