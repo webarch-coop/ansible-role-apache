@@ -194,7 +194,6 @@ ErrorDocument 403 /wsh/403.shtml
       </IfModule>
       <FilesMatch "\.php$">
         <If "-f %{REQUEST_FILENAME}">
-          # SetHandler "proxy:unix:{{ item.value.users_home | default('/home/' + item.key) }}/php-fpm.sock|fcgi://localhost/"
           SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
         </If>
       </FilesMatch>
