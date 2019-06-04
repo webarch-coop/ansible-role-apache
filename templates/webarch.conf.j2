@@ -6,9 +6,11 @@ LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" c
 LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedioproxy
 LogFormat "%I %O" bandwidth
 
+{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
 # HTTP/2 https://httpd.apache.org/docs/trunk/mod/mod_http2.html
 Protocols h2 h2c http/1.1
 ProtocolsHonorOrder Off
+{% endif %}
 # Let's Encrypt
 # Alias "/.well-known/acme-challenge" "/var/www/html/.well-known/acme-challenge"
 # Webarchitects HTML/CSS
@@ -37,16 +39,8 @@ SetEnv PAGE_DESC  ""
   Options IncludesNoExec 
   DirectoryIndex wsh.shtml
   AddOutputFilter Includes shtml
-  <Files wsh.shtml>
-    Header add Link "</wsh/webarch.css>;rel=preload;nopush"
-    Header add Link "</wsh/lib/pure/0.6.0/pure-min.css>;rel=preload;nopush"
-    Header add Link "</wsh/lib/pure/0.6.0/grids-responsive-min.css>;rel=preload;nopush"
-    Header add Link "</wsh/webarch-print.css>;rel=preload;nopush"
-    Header add Link "</wsh/favicon.ico>;rel=preload;nopush"
-  </Files>
   SSILegacyExprParser on 
   SSILastModified on 
-  </IfModule>
   HeaderName /wsh/top.shtml
   ReadmeName /wsh/bot.shtml
   IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
@@ -54,6 +48,15 @@ SetEnv PAGE_DESC  ""
   IndexOptions SuppressDescription
   AllowOverride None
   Require all granted
+  {% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
+  <Files wsh.shtml>
+    Header add Link "</wsh/webarch.css>;rel=preload;nopush"
+    Header add Link "</wsh/lib/pure/0.6.0/pure-min.css>;rel=preload;nopush"
+    Header add Link "</wsh/lib/pure/0.6.0/grids-responsive-min.css>;rel=preload;nopush"
+    Header add Link "</wsh/webarch-print.css>;rel=preload;nopush"
+    Header add Link "</wsh/favicon.ico>;rel=preload;nopush"
+  </Files>
+  {% endif %}
   <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault A1209600
@@ -129,9 +132,11 @@ ErrorDocument 403 /wsh/403.shtml
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   SSLEngine on
+  {% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
   # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
-  #Protocols h2 http/1.1
-  #H2Direct on
+  Protocols h2 http/1.1
+  H2Direct on
+  {% endif %}
   SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
   SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
   SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
@@ -171,7 +176,7 @@ ErrorDocument 403 /wsh/403.shtml
   <Directory "/var/www/localhost">
     Options +Indexes +SymlinksIfOwnerMatch -MultiViews -Includes -ExecCGI
     AllowOverride AuthConfig Indexes FileInfo Limit
-    {% if apache_mods_enabled is defined and "php7.0" in apache_mods_enabled or "php7.3" in apache_mods_enabled %}
+    {% ( if apache_mods_enabled is defined ) and ( "php7.0" in apache_mods_enabled or "php7.3" in apache_mods_enabled ) %}
     <IfModule php7_module>
       php_admin_value doc_root /var/www/localhost
       php_admin_value open_basedir /var/www/localhost/:/tmp/:/usr/share/php/
@@ -179,6 +184,20 @@ ErrorDocument 403 /wsh/403.shtml
         SetHandler application/x-httpd-php
       </FilesMatch>
       Require host localhost 127.0.0.1 ::1
+    </IfModule>
+    {% endif %}
+    {% if apache_mods_enabled is defined and "proxy_fcgi" in apache_mods_enabled %}
+    # https://wiki.apache.org/httpd/PHP-FPM#Proxy_via_handler
+    <IfModule proxy_fcgi_module>
+      <IfModule setenvif_module>
+        SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
+      </IfModule>
+      <FilesMatch "\.php$">
+        <If "-f %{REQUEST_FILENAME}">
+          # SetHandler "proxy:unix:{{ item.value.users_home | default('/home/' + item.key) }}/php-fpm.sock|fcgi://localhost/"
+          SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
+        </If>
+      </FilesMatch>
     </IfModule>
     {% endif %}
   </Directory>
