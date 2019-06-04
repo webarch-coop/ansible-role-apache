@@ -1,4 +1,4 @@
----
+--
 - name: Webarchitects templates present
   git:
     repo: https://git.coop/webarch/website-templates.git

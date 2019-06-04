@@ -3,11 +3,15 @@
   shell: "lsb_release -c | awk '{ print $2 }'"
   register: apache_debian_version_check
   changed_when: false
+  tags:
+    - apache
 
 - name: Set facts for the Debian and PHP versions
   set_fact:
     apache_debian_version: "{{ apache_debian_version_check.stdout }}"
     apache_php_version: "{% if apache_debian_version_check.stdout == 'buster' %}7.3{% elif apache_debian_version_check.stdout == 'stretch' %}7.0{% endif %}"
+  tags:
+    - apache
 
 - name: Apache packages present
   apt:
