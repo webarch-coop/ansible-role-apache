@@ -213,7 +213,7 @@
     - apache
 
 - name: Apache sites disabled
-  include_tasks: a2didsite.yml
+  include_tasks: a2dissite.yml
   loop: "{{ apache_sites_disabled }}"
   loop_control:
     loop_var: site
