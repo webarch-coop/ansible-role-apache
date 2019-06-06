@@ -9,7 +9,7 @@
 - name: "Apache site for {{ site }} enabled"
   command: "a2ensite {{ site }}"
   args:
-    creates: /etc/apache2/sites-enabled/{{ site }}.conf
+    creates: "/etc/apache2/sites-enabled/{{ site }}.conf"
   when: apache_site_status.stat.exists == False
   tags:
     - apache
