@@ -62,7 +62,7 @@
     - apache
 
 - name: Apache sites available in place
-  copy:
+  template:
     src: "templates/{{ site }}.conf.j2"
     dest: "/etc/apache2/sites-available/{{ site }}.conf"
   loop:
