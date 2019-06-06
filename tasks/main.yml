@@ -9,7 +9,7 @@
 - name: Set facts for the Debian and PHP versions
   set_fact:
     apache_debian_version: "{{ apache_debian_version_check.stdout }}"
-    apache_php_version: "{% if apache_debian_version_check.stdout == 'buster' %}7.3{% elif apache_debian_version_check.stdout == 'stretch' %}7.0{% endif %}"
+    apache_php_version: "{% if apache_debian_version_check.stdout == 'buster' %}7.3{% elif users_debian_version == 'bionic' %}7.2{% elif apache_debian_version_check.stdout == 'stretch' %}7.0{% endif %}"
   tags:
     - apache
 
@@ -51,6 +51,24 @@
   copy:
     src: files/ssl.conf
     dest: /etc/apache2/mods-available/ssl.conf
+  tags:
+    - apache
+
+- name: Apache localhost directory in place
+  file:
+    path: /var/www/localhost
+    state: directory
+  tags:
+    - apache
+
+- name: Apache sites available in place
+  copy:
+    src: "templates/{{ site }}.conf.j2"
+    dest: "/etc/apache2/sites-available/{{ site }}.conf"
+  loop:
+    - localhost
+  loop_control:
+    - loop_var: site
   tags:
     - apache
 
@@ -105,7 +123,7 @@
       tags:
         - apache
 
-  when: apache_mods_disabled is defined
+  when: ( apache_mods_disabled is defined ) and ( apache_mods_disabled != [] )
 
 - name: Apache modules enabled
   block:
@@ -171,18 +189,17 @@
       loop: "{{ apache_mods_enabled }}"
       loop_control:
         loop_var: mod
-      when: apache_mods_enabled is defined
       tags:
         - apache
 
-  when: apache_mods_enabled is defined
+  when: ( apache_mods_enabled is defined ) and ( apache_mods_enabled != [] )
 
 - name: Apache conf disabled
   include_tasks: a2disconf.yml
   loop: "{{ apache_conf_disabled }}"
   loop_control:
     loop_var: conf
-  when: apache_conf_disabled is defined
+  when: ( apache_conf_disabled is defined ) and ( apache_conf_disabled != [] )
   tags:
     - apache
 
@@ -191,28 +208,25 @@
   loop: "{{ apache_conf_enabled }}"
   loop_control:
     loop_var: conf
-  when: apache_conf_enabled is defined
+  when: ( apache_conf_enabled is defined ) and ( apache_conf_enabled != [] )
   tags:
     - apache
 
-- name: Apache localhost directory in place
-  file:
-    path: /var/www/localhost
-    state: directory
+- name: Apache sites disabled
+  include_tasks: a2didsite.yml
+  loop: "{{ apache_sites_disabled }}"
+  loop_control:
+    - loop_var: site
+  when: ( apache_sites_disabled is defined ) and ( apache_sites_disabled != [] )
   tags:
     - apache
 
-- name: Apache localhost.conf in place
-  copy:
-    src: files/localhost.conf
-    dest: /etc/apache2/sites-available/localhost.conf
-  tags:
-    - apache
-
-- name: Apache localhost enabled
-  command: a2ensite localhost
-  args:
-    creates: /etc/apache2/sites-enabled/localhost.conf
+- name: Apache sites enabled
+  include_tasks: a2ensite.yml
+  loop: "{{ apache_sites_enabled }}"
+  loop_control:
+    - loop_var: site
+  when: ( apache_sites_enabled is defined ) and ( apache_sites_enabled != [] )
   tags:
     - apache
 

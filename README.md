@@ -18,14 +18,14 @@ To pull this repo in run:
 ansible-galaxy install -r requirements.yml --force -p galaxy/roles 
 ```
 
-The other repo should also contain a `.yml` file that contains something like this (for `mpm_event`):
+The other repo should also contain a `.yml` file that contains something like this (for `mpm_event` / `php-fpm`):
 
 ```yml
 ---
 - name: Install Apache
   become: yes
 
-  hosts: apache_servers
+  hosts: apache_buster_servers
 
   vars:
     apache_mods_enabled:
@@ -35,28 +35,83 @@ The other repo should also contain a `.yml` file that contains something like th
       - http2
       - include
       - mime
+      - proxy
+      - proxy_fcgi
       - rewrite
       - ssl
       - mpm_event
     apache_mods_disabled:
       - suexec
       - mpm-itk
+      - mpm_prefork
       - php7.3
     apache_conf_enabled:
       - webarch
     apache_conf_disabled:
       - serve-cgi-bin
       - phpmyadmin
+    apache_sites_enabled:
+      - localhost
+    apache_sites_disabled:
+      - 000-default
     apache_user: www-data
     apache_group: www-data
     # The following vars are all optional
     apache_ulimit: 65536
-    # These vars depend on mpm-itk / mpm_prefork modules
-    apache_mpm_max_request_workers: 128
-    apache_mpm_max_connections_per_child: 10000
     # These vars depend on the ratelimit conf
     apache_apache_rate_limit: 64
     apache_rate_initial_burst: 256
+
+  roles:
+    - apache
+```
+
+Or something liek this for `mod_php` and `mpm-itk`:
+
+```yml
+---
+- name: Install Apache
+  become: yes
+
+  hosts: apache_buster_servers
+
+  vars:
+    apache_mods_enabled:
+      - dir
+      - env
+      - headers
+      - include
+      - mime
+      - proxy
+      - rewrite
+      - ssl
+      - mpm-itk
+      - mpm_prefork
+      - php7.3
+    apache_mods_disabled:
+      - http2
+      - mpm_event
+      - suexec
+      - proxy_fcgi
+    apache_conf_enabled:
+      - webarch
+    apache_conf_disabled:
+      - serve-cgi-bin
+      - phpmyadmin
+    apache_sites_enabled:
+      - localhost
+    apache_sites_disabled:
+      - 000-default
+    apache_user: www-data
+    apache_group: www-data
+    # The following vars are all optional
+    apache_ulimit: 65536
+    # These vars depend on the ratelimit conf
+    apache_apache_rate_limit: 64
+    apache_rate_initial_burst: 256
+    # These vars depend on mpm-itk / mpm_prefork modules
+    apache_mpm_max_request_workers: 128
+    apache_mpm_max_connections_per_child: 10000
 
   roles:
     - apache
