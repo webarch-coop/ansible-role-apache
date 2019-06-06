@@ -13,6 +13,11 @@
       SetHandler server-status
     </Location>
   </IfModule>
+{% if apache_mods_enabled is defined and "proxy_fcgi" in apache_mods_enabled %}
+  <Location /status$>                                                       
+    SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
+  </Location> 
+{% endif %}
   DocumentRoot "/var/www/localhost"
   <Directory "/var/www/localhost">
     Options +Indexes +SymlinksIfOwnerMatch -MultiViews -Includes -ExecCGI
@@ -33,9 +38,6 @@
       <IfModule setenvif_module>
         SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
       </IfModule>
-      <FilesMatch "^ping|status$">                                                       
-        SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
-      </FilesMatch> 
       <FilesMatch "\.php$">
         <If "-f %{REQUEST_FILENAME}">
           SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
