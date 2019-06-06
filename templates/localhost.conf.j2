@@ -2,6 +2,7 @@
 # localhost virtual host for server-status and other things for munin stats
 <VirtualHost 127.0.0.1:80>
   ServerName localhost
+  Require host localhost 127.0.0.1 ::1
   <IfModule mpm_itk_module>
     AssignUserID www-data www-data 
   </IfModule>
@@ -11,7 +12,6 @@
   <IfModule mod_status.c>
     <Location /server-status>
       SetHandler server-status
-      Require host localhost 127.0.0.1 ::1
     </Location>
   </IfModule>
   DocumentRoot "/var/www/localhost"
@@ -25,7 +25,6 @@
       <FilesMatch "\.ph(p3?|tml)$">
         SetHandler application/x-httpd-php
       </FilesMatch>
-      Require host localhost 127.0.0.1 ::1
     </IfModule>
     {% endif %}
     {% if apache_mods_enabled is defined and "proxy_fcgi" in apache_mods_enabled %}
@@ -34,6 +33,9 @@
       <IfModule setenvif_module>
         SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
       </IfModule>
+      <FilesMatch "^ping|status$">                                                       
+        SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
+      </FilesMatch> 
       <FilesMatch "\.php$">
         <If "-f %{REQUEST_FILENAME}">
           SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
