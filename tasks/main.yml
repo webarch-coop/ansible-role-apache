@@ -68,7 +68,7 @@
   loop:
     - localhost
   loop_control:
-    - loop_var: site
+    loop_var: site
   tags:
     - apache
 
