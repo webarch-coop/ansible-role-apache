@@ -66,7 +66,7 @@ The other repo should also contain a `.yml` file that contains something like th
     - apache
 ```
 
-Or something liek this for `mod_php` and `mpm-itk`:
+Or something like this for `mod_php` and `mpm-itk`:
 
 ```yml
 ---

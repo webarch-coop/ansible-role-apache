@@ -216,7 +216,7 @@
   include_tasks: a2didsite.yml
   loop: "{{ apache_sites_disabled }}"
   loop_control:
-    - loop_var: site
+    loop_var: site
   when: ( apache_sites_disabled is defined ) and ( apache_sites_disabled != [] )
   tags:
     - apache
@@ -225,7 +225,7 @@
   include_tasks: a2ensite.yml
   loop: "{{ apache_sites_enabled }}"
   loop_control:
-    - loop_var: site
+    loop_var: site
   when: ( apache_sites_enabled is defined ) and ( apache_sites_enabled != [] )
   tags:
     - apache
