@@ -9,7 +9,7 @@
 - name: "Apache site for {{ site }} disabled"
   command: "a2dissite {{ site }}"
   args:
-    removes: /etc/apache2/sites-enabled/{{ conf }}.conf
+    removes: "/etc/apache2/sites-enabled/{{ conf }}.conf"
   when: apache_site_status.stat.exists
   tags:
     - apache
