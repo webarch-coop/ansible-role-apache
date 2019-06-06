@@ -2,7 +2,6 @@
 # localhost virtual host for server-status and other things for munin stats
 <VirtualHost 127.0.0.1:80>
   ServerName localhost
-  Require host localhost 127.0.0.1 ::1
   <IfModule mpm_itk_module>
     AssignUserID www-data www-data 
   </IfModule>
@@ -18,6 +17,7 @@
   <Directory "/var/www/localhost">
     Options +Indexes +SymlinksIfOwnerMatch -MultiViews -Includes -ExecCGI
     AllowOverride AuthConfig Indexes FileInfo Limit
+    Require host localhost 127.0.0.1 ::1
     {% if apache_mods_enabled is defined and "php7.0" in apache_mods_enabled or "php7.2" in apache_mods_enabled or "php7.3" in apache_mods_enabled %}
     <IfModule php7_module>
       php_admin_value doc_root /var/www/localhost
