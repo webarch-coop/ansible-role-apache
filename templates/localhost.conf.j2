@@ -11,11 +11,13 @@
   <IfModule mod_status.c>
     <Location /server-status>
       SetHandler server-status
+      Require host localhost 127.0.0.1 ::1
     </Location>
   </IfModule>
 {% if apache_mods_enabled is defined and "proxy_fcgi" in apache_mods_enabled %}
   <Location /status$>                                                       
     SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
+    Require host localhost 127.0.0.1 ::1
   </Location> 
 {% endif %}
   DocumentRoot "/var/www/localhost"
