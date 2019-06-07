@@ -45,6 +45,7 @@
           SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
         </If>
       </FilesMatch>
+      IncludeOptional /etc/apache2/localhost.d/*.conf
     </IfModule>
 {% endif %}
   </Directory>

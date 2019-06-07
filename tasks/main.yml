@@ -55,10 +55,15 @@
   tags:
     - apache
 
-- name: Apache localhost directory in place
+- name: Apache localhost and localhost.d directories in place
   file:
-    path: /var/www/localhost
+    path: "{{ dir }}"
     state: directory
+  loop:
+    - /var/www/localhost
+    - /etc/apache2/localhost.d
+  loop_control:
+    loop_var: dir
   tags:
     - apache
 
