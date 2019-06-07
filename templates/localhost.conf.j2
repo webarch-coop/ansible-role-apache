@@ -20,6 +20,7 @@
     Require host localhost 127.0.0.1 ::1
   </Location> 
 {% endif %}
+  IncludeOptional /etc/apache2/localhost.d/*.conf
   DocumentRoot "/var/www/localhost"
   <Directory "/var/www/localhost">
     Options +Indexes +SymlinksIfOwnerMatch -MultiViews -Includes -ExecCGI
@@ -45,7 +46,6 @@
           SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
         </If>
       </FilesMatch>
-      IncludeOptional /etc/apache2/localhost.d/*.conf
     </IfModule>
 {% endif %}
   </Directory>
