@@ -39,6 +39,7 @@ The other repo should also contain a `.yml` file that contains something like th
       - proxy_fcgi
       - rewrite
       - ssl
+      - status
       - mpm_event
     apache_mods_disabled:
       - suexec

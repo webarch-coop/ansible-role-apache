@@ -2,23 +2,30 @@
 # localhost virtual host for server-status and other things for munin stats
 <VirtualHost 127.0.0.1:80>
   ServerName localhost
+{% if apache_mods_enabled is defined %}
+{% if "mpm-itk" in apache_mods_enabled %}
   <IfModule mpm_itk_module>
     AssignUserID www-data www-data 
   </IfModule>
+{% if "suexec" in apache_mods_enabled %}
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data 
   </IfModule>
+{% endif %}
+{% if "status" in apache_mods_enabled %}
   <IfModule mod_status.c>
     <Location /server-status>
       SetHandler server-status
       Require host localhost 127.0.0.1 ::1
     </Location>
   </IfModule>
-{% if apache_mods_enabled is defined and "proxy_fcgi" in apache_mods_enabled %}
+{% endif %}
+{% if "proxy_fcgi" in apache_mods_enabled %}
   <Location /status>                                                       
     SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
     Require host localhost 127.0.0.1 ::1
   </Location> 
+{% endif %}
 {% endif %}
   IncludeOptional /etc/apache2/localhost.d/*.conf
   DocumentRoot "/var/www/localhost"
@@ -26,7 +33,8 @@
     Options +Indexes +SymlinksIfOwnerMatch -MultiViews -Includes -ExecCGI
     AllowOverride AuthConfig Indexes FileInfo Limit
     Require host localhost 127.0.0.1 ::1
-{% if apache_mods_enabled is defined and "php7.0" in apache_mods_enabled or "php7.2" in apache_mods_enabled or "php7.3" in apache_mods_enabled %}
+{% if apache_mods_enabled is defined %}
+{% if "php7.0" in apache_mods_enabled or "php7.2" in apache_mods_enabled or "php7.3" in apache_mods_enabled %}
     <IfModule php7_module>
       php_admin_value doc_root /var/www/localhost
       php_admin_value open_basedir /var/www/localhost/:/tmp/:/usr/share/php/
@@ -35,7 +43,7 @@
       </FilesMatch>
     </IfModule>
 {% endif %}
-{% if apache_mods_enabled is defined and "proxy_fcgi" in apache_mods_enabled %}
+{% if "proxy_fcgi" in apache_mods_enabled %}
     # https://wiki.apache.org/httpd/PHP-FPM#Proxy_via_handler
     <IfModule proxy_fcgi_module>
       <IfModule setenvif_module>
@@ -47,6 +55,7 @@
         </If>
       </FilesMatch>
     </IfModule>
+{% endif %}
 {% endif %}
   </Directory>
 </VirtualHost>

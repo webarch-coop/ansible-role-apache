@@ -67,14 +67,10 @@
   tags:
     - apache
 
-- name: Apache sites available in place
+- name: Apache localhost site available in place
   template:
-    src: "templates/{{ site }}.conf.j2"
-    dest: "/etc/apache2/sites-available/{{ site }}.conf"
-  loop:
-    - localhost
-  loop_control:
-    loop_var: site
+    src: "templates/localhost.conf.j2"
+    dest: "/etc/apache2/sites-available/localhost.conf"
   tags:
     - apache
 
