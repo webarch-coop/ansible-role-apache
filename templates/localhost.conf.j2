@@ -7,6 +7,7 @@
   <IfModule mpm_itk_module>
     AssignUserID www-data www-data 
   </IfModule>
+{% endif %}
 {% if "suexec" in apache_mods_enabled %}
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data 
