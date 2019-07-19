@@ -117,7 +117,7 @@
       tags:
         - apache
 
-    - name: Enable modules
+    - name: Disable modules
       include_tasks: a2dismod.yml
       loop: "{{ apache_mods_disabled }}"
       loop_control:
