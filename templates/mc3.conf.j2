@@ -95,9 +95,9 @@ ErrorDocument 403 /mc3/403.shtml
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data 
   </IfModule>
-  ServerAdmin support@mc3.coop
-  SetEnv PIWIK_SITE_ID "1"
-  SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
+  ServerAdmin graham@mc3.coop
+  #SetEnv PIWIK_SITE_ID "1"
+  #SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   DocumentRoot "/var/www"
   {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
@@ -119,9 +119,9 @@ ErrorDocument 403 /mc3/403.shtml
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data 
   </IfModule>
-  ServerAdmin support@webarch.net
-  SetEnv PIWIK_SITE_ID "1"
-  SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
+  ServerAdmin graham@mc3.coop
+  #SetEnv PIWIK_SITE_ID "1"
+  #SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   SSLEngine on
   {% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
   # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
