@@ -1,0 +1,150 @@
+# {{ ansible_managed }}
+# WSH Settings for all sites
+
+# Log formats
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
+LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedioproxy
+LogFormat "%I %O" bandwidth
+
+{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
+# HTTP/2 https://httpd.apache.org/docs/trunk/mod/mod_http2.html
+Protocols h2 h2c http/1.1
+ProtocolsHonorOrder Off
+{% endif %}
+# Let's Encrypt
+# Alias "/.well-known/acme-challenge" "/var/www/html/.well-known/acme-challenge"
+# Webarchitects HTML/CSS
+Alias /mc3 /var/www/mc3
+Alias /mc3.shtml /var/www/mc3/mc3.shtml
+# icons for directory index icons
+Alias /icons /usr/share/apache2/icons
+# env vars for the default index page, mc3.shtml
+{% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}" 
+{% endif %}
+SetEnv HOME_DOMAIN "mc3.coop"
+SetEnv SITE_TITLE "MC3 Co-operative Hosting"
+SetEnv STATIC_DIR "/mc3/"
+SetEnv STATIC_TOP "top.shtml"
+SetEnv STATIC_BOT "bot.shtml"
+# default page title 
+SetEnv PAGE_TITLE "Directory Listing"
+SetEnv PAGE_DESC  ""
+<Directory "/">
+  Options FollowSymLinks
+  AllowOverride None
+  Require all denied
+</Directory>
+<Directory "/var/www">
+  Options IncludesNoExec 
+  DirectoryIndex mc3.shtml
+  AddOutputFilter Includes shtml
+  SSILegacyExprParser on 
+  SSILastModified on 
+  HeaderName /mc3/top.shtml
+  ReadmeName /mc3/bot.shtml
+  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
+  IndexOptions Charset=UTF-8 SuppressHTMLPreamble XHTML TrackModified IconsAreLinks
+  IndexOptions SuppressDescription
+  AllowOverride None
+  Require all granted
+  <IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault A1209600
+    ExpiresByType text/html "now plus 5 minutes"
+    ExpiresByType image/gif "access plus 1 years"
+    ExpiresByType image/jpg "access plus 1 years"
+    ExpiresByType image/jpeg "access plus 1 years"
+    ExpiresByType image/png "access plus 1 years"
+    ExpiresByType image/vnd.microsoft.icon "access plus 1 years"
+    ExpiresByType image/x-icon "access plus 1 years"
+    ExpiresByType image/ico "access plus 1 years"
+    ExpiresByType application/javascript "now plus 1 week"
+    ExpiresByType application/x-javascript "now plus 1 week"
+    ExpiresByType text/javascript "now plus 1 week"
+    ExpiresByType text/css "now plus 1 week"
+  </IfModule>
+</Directory>
+<Directory "/var/www/.well-known">
+  Options None
+  AllowOverride None 
+  ForceType text/plain
+</Directory>
+<Directory "/home/*/sites/*">
+  DirectoryIndex mc3.shtml
+  AddOutputFilter Includes shtml
+  SSILegacyExprParser on 
+  HeaderName /mc3/top.shtml
+  ReadmeName /mc3/bot.shtml
+  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
+  IndexOptions Charset=UTF-8 SuppressHTMLPreamble XHTML TrackModified IconsAreLinks
+  IndexOptions SuppressDescription
+</Directory>
+ErrorDocument 404 /mc3/404.shtml
+ErrorDocument 401 /mc3/401.shtml
+ErrorDocument 500 /mc3/500.shtml
+ErrorDocument 403 /mc3/403.shtml
+
+# The default virtual host for port 80
+<VirtualHost *:80>
+  ServerName {{ inventory_hostname }} 
+  ServerAlias www.{{ inventory_hostname }}
+  <IfModule mpm_itk_module>
+    AssignUserID www-data www-data 
+  </IfModule>
+  <IfModule suexec_module>
+    SuexecUserGroup www-data www-data 
+  </IfModule>
+  ServerAdmin support@mc3.coop
+  SetEnv PIWIK_SITE_ID "1"
+  SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
+  DocumentRoot "/var/www"
+  {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+  RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
+  {% endif %}
+  ErrorLog ${APACHE_LOG_DIR}/mc3-error.log
+  LogLevel warn
+  CustomLog ${APACHE_LOG_DIR}/mc3-access.log combined
+</VirtualHost>
+
+{% if apache_cert.stat.exists %}
+# The default virtual host for port 443
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+  ServerName {{ inventory_hostname }} 
+  ServerAlias www.{{ inventory_hostname }}
+  <IfModule mpm_itk_module>
+    AssignUserID www-data www-data 
+  </IfModule>
+  <IfModule suexec_module>
+    SuexecUserGroup www-data www-data 
+  </IfModule>
+  ServerAdmin support@webarch.net
+  SetEnv PIWIK_SITE_ID "1"
+  SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
+  SSLEngine on
+  {% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
+  # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
+  Protocols h2 http/1.1
+  H2Direct on
+  {% endif %}
+  SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
+  SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
+  SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
+  Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
+  DocumentRoot "/var/www"
+  <FilesMatch "\.(cgi|shtml|phtml|php)$">
+    SSLOptions +StdEnvVars
+  </FilesMatch>
+  ErrorLog ${APACHE_LOG_DIR}/mc3-error.log
+  LogLevel warn
+  CustomLog ${APACHE_LOG_DIR}/mc3-ssl_access.log combined
+  {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+  # phpmyadmin log for fail2ban, see https://www.phryneas.de/fail2ban-phpmyadmin/
+  LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %{userID}n %{userStatus}n" pma_combined
+  CustomLog ${APACHE_LOG_DIR}/phpmyadmin_access.log pma_combined
+  {% endif %}
+</VirtualHost>
+</IfModule>
+{% endif %}
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet

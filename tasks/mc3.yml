@@ -1,0 +1,22 @@
+---
+- name: mc3 templates present
+  git:
+    repo: https://git.coop/mc3coop/ssh-templates.git
+    dest: /var/www/mc3
+    update: true
+  tags:
+    - apache
+
+- name: Debian default site disabled
+  command: a2dissite 000-default
+  register: apache_a2dissite_default
+  changed_when: '"already disabled" not in apache_a2dissite_default.stdout'
+  tags:
+    - apache
+
+- name: WSH Apache config in place
+  template:
+    src: templates/mc3.conf.j2
+    dest: /etc/apache2/conf-available/mc3.conf
+  tags:
+    - apache

@@ -48,6 +48,12 @@
   tags:
     - apache
 
+- name: Conditionally include mc3 config
+  include_tasks: mc3.yml
+  when: ( apache_conf_enabled is defined ) and ( "mc3" in apache_conf_enabled )
+  tags:
+    - apache
+
 - name: Custom Apache ssl.conf in place
   copy:
     src: files/ssl.conf
