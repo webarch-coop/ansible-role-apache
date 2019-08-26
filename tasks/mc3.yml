@@ -4,6 +4,7 @@
     repo: https://git.coop/mc3coop/ssh-templates.git
     dest: /var/www/mc3
     update: true
+    force: true
   tags:
     - apache
 
