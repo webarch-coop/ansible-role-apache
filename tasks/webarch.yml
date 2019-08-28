@@ -8,10 +8,18 @@
   tags:
     - apache
 
+- name: Check if /etc/apache2/sites-available/000-default exists
+  stat:
+    path: /etc/apache2/sites-available/000-default
+  register: apache_default
+  tags:
+    - apache
+
 - name: Debian default site disabled
   command: a2dissite 000-default
   register: apache_a2dissite_default
   changed_when: '"already disabled" not in apache_a2dissite_default.stdout'
+  when: apache_default is defined and apache_default.stat.exists
   tags:
     - apache
 
