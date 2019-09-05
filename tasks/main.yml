@@ -241,8 +241,10 @@
 - name: Apache enabled for systemd servers
   systemd:
     name: apache2
-    enabled: yes
+    enabled: true
   when: apache_debian_version == "buster"
+  tags:
+    - apache
 
 - name: Apache configtest
   command: apache2ctl configtest
