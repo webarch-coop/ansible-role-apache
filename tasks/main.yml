@@ -119,7 +119,7 @@
           - "libapache2-mod-php{{ apache_php_version }}"
         state: absent
         update_cache: false
-      when: ( "php7.0" in apache_mods_disabled ) or ( "php7.3" in apache_mods_disabled )
+      when: ( "php7.0" in apache_mods_disabled ) or ( "php7.2" in apache_mods_disabled ) or ( "php7.3" in apache_mods_disabled )
       tags:
         - apache
 
