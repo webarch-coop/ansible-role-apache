@@ -250,6 +250,7 @@
   command: apache2ctl configtest
   register: apache_configtest
   changed_when: '"Syntax OK" not in apache_configtest.stderr'
+  check_mode: false
   tags:
     - apache
 
