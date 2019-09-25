@@ -29,6 +29,7 @@ SetEnv PHPMYADMIN_PATH "{{ phpmyadmin_path }}"
 {% else %}
 SetEnv PHPMYADMIN_PATH "/"
 {% endif %}
+{% endif %}
 SetEnv HOME_DOMAIN "webarch.net"
 SetEnv SITE_TITLE "Webarchitects Shared Hosting"
 SetEnv STATIC_DIR "/wsh/"
