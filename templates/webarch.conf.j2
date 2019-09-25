@@ -30,7 +30,7 @@ SetEnv PHPMYADMIN_PATH "{{ phpmyadmin_path }}"
 SetEnv PHPMYADMIN_PATH "/"
 {% endif %}
 {% endif %}
-{% if matomo_domain is defined }}
+{% if matomo_domain is defined %}
 SetEnv PIWIK_DOMAIN "{{ matomo_domain }}"
 {% endif %}
 SetEnv HOME_DOMAIN "webarch.net"
@@ -116,7 +116,7 @@ ErrorDocument 403 /wsh/403.shtml
     SuexecUserGroup www-data www-data 
   </IfModule>
   ServerAdmin support@webarch.net
-  {% if matomo_domain is defined }}
+  {% if matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
   {% else %}
@@ -151,7 +151,7 @@ ErrorDocument 403 /wsh/403.shtml
     SuexecUserGroup www-data www-data 
   </IfModule>
   ServerAdmin support@webarch.net
-  {% if matomo_domain is defined }}
+  {% if matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
   {% else %}
