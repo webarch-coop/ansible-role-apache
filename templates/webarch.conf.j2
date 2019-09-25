@@ -30,6 +30,9 @@ SetEnv PHPMYADMIN_PATH "{{ phpmyadmin_path }}"
 SetEnv PHPMYADMIN_PATH "/"
 {% endif %}
 {% endif %}
+{% if matomo_domain is defined }}
+SetEnv PIWIK_DOMAIN "{{ matomo_domain }}"
+{% endif %}
 SetEnv HOME_DOMAIN "webarch.net"
 SetEnv SITE_TITLE "Webarchitects Shared Hosting"
 SetEnv STATIC_DIR "/wsh/"
@@ -113,12 +116,23 @@ ErrorDocument 403 /wsh/403.shtml
     SuexecUserGroup www-data www-data 
   </IfModule>
   ServerAdmin support@webarch.net
+  {% if matomo_domain is defined }}
+  SetEnv PIWIK_SITE_ID "1"
+  SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
+  {% else %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
-  DocumentRoot "/var/www"
-  {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
-  RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
   {% endif %}
+  DocumentRoot "/var/www"
+{% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+  RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
+{% elif phpmyadmin_domain is defined %}
+{% if phpmyadmin_path is defined %}
+  RedirectPermanent /phpmyadmin https://{{ phpmyadmin_domain }}{{ phpmyadmin_path }}
+{% else %}
+  RedirectPermanent /phpmyadmin https://{{ phpmyadmin_domain }}
+{% endif %}
+{% endif %}
   ErrorLog ${APACHE_LOG_DIR}/wsh-error.log
   LogLevel warn
   CustomLog ${APACHE_LOG_DIR}/wsh-access.log combined
@@ -137,8 +151,13 @@ ErrorDocument 403 /wsh/403.shtml
     SuexecUserGroup www-data www-data 
   </IfModule>
   ServerAdmin support@webarch.net
+  {% if matomo_domain is defined }}
+  SetEnv PIWIK_SITE_ID "1"
+  SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
+  {% else %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
+  {% endif %}
   SSLEngine on
   {% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
   # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
