@@ -21,6 +21,13 @@ Alias /icons /usr/share/apache2/icons
 # env vars for the default index page, wsh.shtml
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
 SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}" 
+SetEnv PHPMYADMIN_PATH "/phpmyadmin/"
+{% elif phpmyadmin_domain is defined %}
+SetEnv PHPMYADMIN_DOMAIN "{{ phpmyadmin_domain }}"
+{% if phpmyadmin_path is defined %}
+SetEnv PHPMYADMIN_PATH "{{ phpmyadmin_path }}"
+{% else %}
+SetEnv PHPMYADMIN_PATH "/"
 {% endif %}
 SetEnv HOME_DOMAIN "webarch.net"
 SetEnv SITE_TITLE "Webarchitects Shared Hosting"
