@@ -21,6 +21,7 @@ apache_mods_enabled:
   - deflate
   - dir
   - env
+  - expires
   - filter
   - headers
   - http2
@@ -68,7 +69,6 @@ apache_mods_disabled:
   - dialup
   - dump_io
   - echo
-  - expires
   - ext_filter
   - fcgid
   - file_cache
