@@ -274,3 +274,4 @@
   when: '"Syntax OK" not in apache_configtest.stderr'
   tags:
     - apache
+...
