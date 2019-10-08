@@ -54,6 +54,13 @@
   tags:
     - apache
 
+- name: Let's Encrypt /.well-known/acme-challenge server-wide alias in place
+  template:
+    src: templates/le.conf.j2
+    dest: /etc/apache2/conf-available/le.conf
+  tags:
+    - apache
+
 - name: Custom Apache ssl.conf in place
   copy:
     src: files/ssl.conf

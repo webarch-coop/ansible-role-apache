@@ -1,6 +1,8 @@
 ---
+apache_document_root: /var/www/html
 apache_conf_enabled:
   - charset
+  - le
   - localized-error-pages
   - other-vhosts-access-log
   - security
