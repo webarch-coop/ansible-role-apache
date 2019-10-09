@@ -96,12 +96,14 @@
 
 - name: Expires and robots conf available
   template:
-    src: "templates/{{ tmpl }}.j2"
-    dest: "/etc/apache2/conf-available/{{ tmpl }}"
+    src: "templates/{{ file }}.j2"
+    dest: "/etc/apache2/conf-available/{{ file }}"
   loop:
     - robots-deny.conf
     - expires-strict.conf
     - expires-medium.conf
+  loop_control:
+    loop_var: file
   tags:
     - apache
 
