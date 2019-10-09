@@ -87,6 +87,24 @@
   tags:
     - apache
 
+- name: Deny robots file in place
+  copy:
+    src: templates/robots.deny.txt.j2
+    dest: /var/www/html/robots.deny.txt
+  tags:
+    - apache
+
+- name: Expires and robots conf available
+  template:
+    src: "templates/{{ tmpl }}.j2"
+    dest: "/etc/apache2/conf-available/{{ tmpl }}"
+  loop:
+    - robots-deny.conf
+    - expires-strict.conf
+    - expires-medium.conf
+  tags:
+    - apache
+
 - name: Apache modules disabled
   block:
 
