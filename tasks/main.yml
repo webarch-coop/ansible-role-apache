@@ -88,7 +88,7 @@
     - apache
 
 - name: Deny robots file in place
-  copy:
+  template:
     src: templates/robots.deny.txt.j2
     dest: /var/www/html/robots.deny.txt
   tags:
