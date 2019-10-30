@@ -42,11 +42,11 @@ SetEnv STATIC_BOT "bot.shtml"
 SetEnv PAGE_TITLE "Directory Listing"
 SetEnv PAGE_DESC  ""
 <Directory "/">
-  Options FollowSymLinks
+  Options SymlinksIfOwnerMatch
   AllowOverride None
   Require all denied
 </Directory>
-<Directory "/var/www">
+<Directory "/var/www/html">
   Options IncludesNoExec 
   DirectoryIndex wsh.shtml
   AddOutputFilter Includes shtml
@@ -85,7 +85,7 @@ SetEnv PAGE_DESC  ""
     ExpiresByType text/css "now plus 1 week"
   </IfModule>
 </Directory>
-<Directory "/var/www/.well-known">
+<Directory "/var/www/html/.well-known">
   Options None
   AllowOverride None 
   ForceType text/plain
@@ -123,7 +123,7 @@ ErrorDocument 403 /wsh/403.shtml
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   {% endif %}
-  DocumentRoot "/var/www"
+  DocumentRoot "/var/www/html"
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
 {% elif phpmyadmin_domain is defined %}
@@ -169,7 +169,7 @@ ErrorDocument 403 /wsh/403.shtml
   SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
   Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
   DocumentRoot "/var/www"
-  <FilesMatch "\.(cgi|shtml|phtml|php)$">
+  <FilesMatch "\.shtml$">
     SSLOptions +StdEnvVars
   </FilesMatch>
   ErrorLog ${APACHE_LOG_DIR}/wsh-error.log

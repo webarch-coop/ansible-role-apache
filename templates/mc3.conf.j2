@@ -31,11 +31,11 @@ SetEnv STATIC_BOT "bot.shtml"
 SetEnv PAGE_TITLE "Directory Listing"
 SetEnv PAGE_DESC  ""
 <Directory "/">
-  Options FollowSymLinks
+  Options SymlinksIfOwnerMatch
   AllowOverride None
   Require all denied
 </Directory>
-<Directory "/var/www">
+<Directory "/var/www/html">
   Options IncludesNoExec 
   DirectoryIndex mc3.shtml
   AddOutputFilter Includes shtml
@@ -65,7 +65,7 @@ SetEnv PAGE_DESC  ""
     ExpiresByType text/css "now plus 1 week"
   </IfModule>
 </Directory>
-<Directory "/var/www/.well-known">
+<Directory "/var/www/html/.well-known">
   Options None
   AllowOverride None 
   ForceType text/plain
@@ -98,7 +98,7 @@ ErrorDocument 403 /mc3/403.shtml
   ServerAdmin graham@mc3.coop
   #SetEnv PIWIK_SITE_ID "1"
   #SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
-  DocumentRoot "/var/www"
+  DocumentRoot "/var/www/html"
   {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
   {% endif %}
