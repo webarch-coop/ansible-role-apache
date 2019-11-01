@@ -123,10 +123,7 @@ ErrorDocument 403 /wsh/403.shtml
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   {% endif %}
-  DocumentRoot "/var/www/html"
-  <Directory "/var/www/html">
-    Options -Indexes
-  </Directory>
+  DocumentRoot "/var/www/wsh"
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
 {% elif phpmyadmin_domain is defined %}
@@ -171,10 +168,7 @@ ErrorDocument 403 /wsh/403.shtml
   SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
   SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
   Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
-  DocumentRoot "/var/www/html"
-  <Directory "/var/www/html">
-    Options -Indexes
-  </Directory>
+  DocumentRoot "/var/www/wsh"
   <FilesMatch "\.shtml$">
     SSLOptions +StdEnvVars
   </FilesMatch>
