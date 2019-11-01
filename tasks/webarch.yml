@@ -23,6 +23,13 @@
   tags:
     - apache
 
+- name: Debian default /var/www/html/index.html absent
+  file:
+    path: /var/www/html/index.html
+    state: absent
+  tags:
+    - apache
+
 - name: WSH Apache config in place
   template:
     src: templates/webarch.conf.j2

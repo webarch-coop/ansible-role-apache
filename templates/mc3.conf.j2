@@ -132,7 +132,7 @@ ErrorDocument 403 /mc3/403.shtml
   SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
   SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
   Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
-  DocumentRoot "/var/www"
+  DocumentRoot "/var/www/html"
   <FilesMatch "\.(cgi|shtml|phtml|php)$">
     SSLOptions +StdEnvVars
   </FilesMatch>
