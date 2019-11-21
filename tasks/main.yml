@@ -1,7 +1,7 @@
 ---
-- name: Check /etc/debian_version
-  shell: "lsb_release -c | awk '{ print $2 }'"
-  register: apache_debian_version_check
+- name: Check PHP version 
+  command: phpquery -V
+  register: apache_php_version_check
   check_mode: false
   changed_when: false
   tags:
@@ -9,8 +9,8 @@
 
 - name: Set facts for the Debian and PHP versions
   set_fact:
-    apache_debian_version: "{{ apache_debian_version_check.stdout }}"
-    apache_php_version: "{% if apache_debian_version_check.stdout == 'buster' %}7.3{% elif apache_debian_version_check.stdout == 'bionic' %}7.2{% elif apache_debian_version_check.stdout == 'stretch' %}7.0{% endif %}"
+    apache_debian_version: "{{ ansible_distribution_release }}"
+    apache_php_version: "{{ apache_php_version_check.stdout }}"
   tags:
     - apache
 
