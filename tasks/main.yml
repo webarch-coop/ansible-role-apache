@@ -1,5 +1,5 @@
 ---
-- name: Check PHP version 
+- name: Check PHP version
   command: phpquery -V
   register: apache_php_version_check
   check_mode: false
