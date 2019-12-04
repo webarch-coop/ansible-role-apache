@@ -59,7 +59,7 @@ SetEnv PAGE_DESC  ""
   IndexOptions SuppressDescription
   AllowOverride None
   Require all granted
-{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
+  {% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
   <Files wsh.shtml>
     Header add Link "</wsh/webarch.css>;rel=preload;nopush"
     Header add Link "</wsh/lib/pure/0.6.0/pure-min.css>;rel=preload;nopush"
@@ -67,7 +67,7 @@ SetEnv PAGE_DESC  ""
     Header add Link "</wsh/webarch-print.css>;rel=preload;nopush"
     Header add Link "</wsh/favicon.ico>;rel=preload;nopush"
   </Files>
-{% endif %}
+  {% endif %}
   <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault A1209600
@@ -116,12 +116,13 @@ ErrorDocument 403 /wsh/403.shtml
     SuexecUserGroup www-data www-data 
   </IfModule>
   ServerAdmin support@webarch.net
-{% if matomo_domain is defined %}
+  {% if matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
-{% else %}
+  {% else %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
+  {% endif %}
   DocumentRoot "/var/www/wsh"
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
@@ -150,19 +151,19 @@ ErrorDocument 403 /wsh/403.shtml
     SuexecUserGroup www-data www-data 
   </IfModule>
   ServerAdmin support@webarch.net
-{% if matomo_domain is defined %}
+  {% if matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
-{% else %}
+  {% else %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
-{% endif %}
+  {% endif %}
   SSLEngine on
-{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
+  {% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
   # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
   Protocols h2 http/1.1
   H2Direct on
-{% endif %}
+  {% endif %}
   SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
   SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
   SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
@@ -174,11 +175,11 @@ ErrorDocument 403 /wsh/403.shtml
   ErrorLog ${APACHE_LOG_DIR}/wsh-error.log
   LogLevel warn
   CustomLog ${APACHE_LOG_DIR}/wsh-ssl_access.log combined
-{% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+  {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   # phpmyadmin log for fail2ban, see https://www.phryneas.de/fail2ban-phpmyadmin/
   LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %{userID}n %{userStatus}n" pma_combined
   CustomLog ${APACHE_LOG_DIR}/phpmyadmin_access.log pma_combined
-{% endif %}
+  {% endif %}
 </VirtualHost>
 </IfModule>
 {% endif %}
