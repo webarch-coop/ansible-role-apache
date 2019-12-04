@@ -4,7 +4,7 @@
   Alias /robots.txt /var/www/html/robots.deny.txt
 </IfModule>
 <IfModule headers_module>
-  Header set X-Robots-Tag "noindex"
+  Header set X-Robots-Tag "none, noindex, nofollow"
 </IfModule>
 <IfModule rewrite_module>
   # https://docs.phpmyadmin.net/en/latest/faq.html#faq1-42
