@@ -87,9 +87,9 @@
   tags:
     - apache
 
-- name: Deny robots file in place
+- name: Deny robots files in place
   template:
-    src: templates/robots.deny.txt.j2
+    src: robots.deny.txt.j2
     dest: /var/www/html/robots.deny.txt
   tags:
     - apache
@@ -100,6 +100,7 @@
     dest: "/etc/apache2/conf-available/{{ file }}"
   loop:
     - robots-deny.conf
+    - robots-deny-nextcloud.conf
     - expires-strict.conf
     - expires-medium.conf
   loop_control:
