@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+# Cloudflare
+# https://support.cloudflare.com/hc/en-us/articles/360029696071
+<IfModule remoteip_module>
+  RemoteIPHeader CF-Connecting-IP
+{% for ip in apache_cloudflare_ips %}
+  RemoteIPTrustedProxy {{ ip }}
+{% endfor %}
+</IfModule>
+# vim: set ft=apache:

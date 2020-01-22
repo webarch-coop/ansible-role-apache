@@ -1,28 +1,31 @@
 ---
-- name: Download Cloudflare IPv4 list
-  get_url:
-    url: "https://www.cloudflare.com/ips-v4"
-    dest: "/root/cloudflare_ips_v4.txt"
-  tags:
-    - apache
+- name: Generate Cloudflare config
+  block:
 
-- name: Slurp Cloudflare IPv4 list
-  slurp:
-    src: "/root/cloudflare_ips_v4.txt"
-  register: "apache_cloudflare_ips_v4_b64encoded"
-  tags:
-    - apache
+    - name: Download Cloudflare IPv4 list
+      get_url:
+        url: "https://www.cloudflare.com/ips-v4"
+        dest: "/root/cloudflare_ips_v4.txt"
 
-- name: Create an array from the Cloudflare IP lists
-  set_fact:
-    apache_cloudflare_ips: "{{ ( apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | trim ).split('\n') }}"
-  tags:
-    - apache
+    - name: Slurp Cloudflare IPv4 list
+      slurp:
+        src: "/root/cloudflare_ips_v4.txt"
+      register: "apache_cloudflare_ips_v4_b64encoded"
 
-- name: Debug Cloudflare IP array
-  debug:
-    msg: "apache_cloudflare_ips: {{ apache_cloudflare_ips }}"
-    verbosity: 1
+    - name: Create an array from the Cloudflare IP lists
+      set_fact:
+        apache_cloudflare_ips: "{{ ( apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | trim ).split('\n') }}"
+
+    - name: Debug Cloudflare IP array
+      debug:
+        msg: "apache_cloudflare_ips: {{ apache_cloudflare_ips }}"
+        verbosity: 1
+
+    - name: Apache Cloudflare config generated
+      template:
+        src: cloudflare.conf.j2
+        dest: /etc/apache/conf-available/coludflare.conf
+
   tags:
     - apache
 ...
