@@ -15,7 +15,7 @@
 
 - name: Create an array from the Cloudflare IP lists
   set_fact:
-    apache_cloudflare_ips: "{{ apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | regex_replace('\n', '|').split('|') }}"
+    apache_cloudflare_ips: "{{ (apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | regex_replace('\n', '|')).split('|') }}"
   tags:
     - apache
 
