@@ -33,6 +33,7 @@ apache_mods_enabled:
   - negotiation
   - proxy
   - reqtimeout
+  - remoteip
   - rewrite
   - setenvif
   - socache_shmcb
@@ -107,7 +108,6 @@ apache_mods_disabled:
   - proxy_wstunnel
   - ratelimit
   - reflector
-  - remoteip
   - request
   - sed
   - session_cookie
