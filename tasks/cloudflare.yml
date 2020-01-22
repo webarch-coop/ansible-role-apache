@@ -13,11 +13,9 @@
   tags:
     - apache
 
-# https://stackoverflow.com/a/53391297
 - name: Create an array from the Cloudflare IP lists
   set_fact:
-    # apache_cloudflare_ips: "{{ (apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | regex_replace('\n', '|')).split('|') }}"
-    apache_cloudflare_ips: "{{ ( apache_cloudflare_ips_v4_b64encoded['content'] | b64decode ).split('\n') }}"
+    apache_cloudflare_ips: "{{ ( apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | trim ).split('\n') }}"
   tags:
     - apache
 
@@ -25,11 +23,6 @@
   debug:
     msg: "apache_cloudflare_ips: {{ apache_cloudflare_ips }}"
     verbosity: 1
-  tags:
-    - apache
-
-- fail:
-    msg: Debug
   tags:
     - apache
 ...
