@@ -24,7 +24,7 @@
     - name: Apache Cloudflare config generated
       template:
         src: cloudflare.conf.j2
-        dest: /etc/apache/conf-available/coludflare.conf
+        dest: /etc/apache2/conf-available/coludflare.conf
 
   tags:
     - apache
