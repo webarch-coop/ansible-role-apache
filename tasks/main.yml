@@ -220,6 +220,12 @@
       tags:
         - apache
 
+    - name: Cloudflare config available
+      include_tasks: cloudflare.yml
+      when: '"remoteip" in apache_mods_enabled'
+      tags:
+        - apache
+
     - name: Apache modules enabled
       include_tasks: a2enmod.yml
       loop: "{{ apache_mods_enabled }}"
