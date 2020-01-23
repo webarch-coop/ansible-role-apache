@@ -37,7 +37,7 @@
       - apache2-utils
       - lynx
     state: present
-    update_cache: true
+    update_cache: false
   tags:
     - apache
 
