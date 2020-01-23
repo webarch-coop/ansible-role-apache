@@ -20,7 +20,9 @@
 
     - name: Debug error
       debug:
-        var: apache_a2enmod
+        var:
+          - apache_a2enmod
+          - mod
         verbosity: 1
       when: apache_a2enmod is defined
 
