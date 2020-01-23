@@ -18,7 +18,15 @@
 
   rescue:
 
-    - name: "Disable mod_php and then enable mpm_event"
+    - name: "Enable Apache mpm_event"
+      apache2_module:
+        name: mpm_event
+        state: present
+      when:
+        - ( "Configuration error: No MPM loaded" in ansible_failed_result )
+        - mod == "mpm_event"
+
+    - name: "Disable php{{ apache_php_version }} and mpm_prefork and then enable mpm_event"
       block:
 
         - name: "Disable Apache module php{{ apache_php_version }}"
@@ -26,15 +34,15 @@
             name: "php{{ apache_php_version }}"
             state: absent
 
-        - name: "Enable Apache mpm_event"
-          apache2_module:
-            name: mpm_event
-            state: present
-
         - name: "Disable Apache module mpm_prefork"
           apache2_module:
             name: mpm_prefork
             state: absent
+
+        - name: "Enable Apache mpm_event"
+          apache2_module:
+            name: mpm_event
+            state: present
 
       when: ( "Considering conflict mpm_worker for mpm_event" or "Considering conflict mpm_prefork for mpm_event" in apache_a2enmod.stdout )
 
