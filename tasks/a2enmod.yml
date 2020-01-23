@@ -24,59 +24,13 @@
         verbosity: 1
       when: apache_a2enmod is defined
 
-    - name: Debug error
-      debug:
-        msg:
-          - "apache_a2enmod.rc: {{ apache_a2enmod.rc }}"
-        verbosity: 1
-      when: apache_a2enmod.rc is defined
-
-    - name: Debug error
-      debug:
-        msg:
-          - "apache_a2enmod.result: {{ apache_a2enmod.result }}"
-        verbosity: 1
-      when: apache_a2enmod.result is defined
-
-    - name: Debug error
-      debug:
-        msg:
-          - "apache_a2enmod.stderr: {{ apache_a2enmod.stderr }}"
-        verbosity: 1
-      when: apache_a2enmod.stderr is defined
-
-    - name: Debug error
-      debug:
-        msg:
-          - "apache_a2enmod.stdout: {{ apache_a2enmod.stdout }}"
-        verbosity: 1
-      when: apache_a2enmod.stdout is defined
-
-    - name: Debug error
-      debug:
-        msg:
-          - "apache_a2enmod.warnings: {{ apache_a2enmod.warnings }}"
-        verbosity: 1
-      when: apache_a2enmod.warnings is defined
-
-    - name: Debug error
-      debug:
-        msg:
-          - "apache_a2enmod.rc: {{ apache_a2enmod.rc }}"
-          - "apache_a2enmod.result: {{ apache_a2enmod.result }}"
-          - "apache_a2enmod.stderr: {{ apache_a2enmod.stderr }}"
-          - "apache_a2enmod.stdout: {{ apache_a2enmod.stdout }}"
-          - "apache_a2enmod.warnings: {{ apache_a2enmod.warnings }}"
-        verbosity: 1
-      when: apache_a2enmod.rc is defined
-
     - name: "Enable Apache mpm_event"
       apache2_module:
         name: mpm_event
         state: present
         ignore_configcheck: true
       when:
-        - ( "Configuration error: No MPM loaded" in apache_a2enmod.stderr )
+        - ( "Configuration error: No MPM loaded" in apache_a2enmod.msg )
         - mod == "mpm_event"
 
     - name: "Disable php{{ apache_php_version }} and mpm_prefork and then enable mpm_event"
@@ -97,7 +51,9 @@
             name: mpm_event
             state: present
 
-      when: ( "Considering conflict mpm_worker for mpm_event" or "Considering conflict mpm_prefork for mpm_event" in apache_a2enmod.stdout )
+      when:
+        - apache_a2enmod is defined
+        - ( "Considering conflict mpm_worker for mpm_event" or "Considering conflict mpm_prefork for mpm_event" in apache_a2enmod.stdout )
 
   tags:
     - apache
