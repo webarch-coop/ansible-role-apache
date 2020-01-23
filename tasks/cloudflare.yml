@@ -6,6 +6,7 @@
       get_url:
         url: "https://www.cloudflare.com/ips-v4"
         dest: "/root/cloudflare_ips_v4.txt"
+        force: true
 
     - name: Slurp Cloudflare IPv4 list
       slurp:
