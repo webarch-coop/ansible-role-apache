@@ -20,6 +20,12 @@
 
     - name: Debug error
       debug:
+        var: apache_a2enmod
+        verbosity: 1
+      when: apache_a2enmod is defined
+
+    - name: Debug error
+      debug:
         msg:
           - "apache_a2enmod.rc: {{ apache_a2enmod.rc }}"
         verbosity: 1
