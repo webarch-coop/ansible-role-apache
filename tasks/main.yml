@@ -2,8 +2,8 @@
 - name: Check if phpquery is installed
   shell: which phpquery || echo absent
   check_mode: false
-  register: apache_phpversion_check
-  changed_when: '"phpquery" not in apache_phpversion_check.stdout'
+  register: apache_phpquery_check
+  changed_when: '"phpquery" not in apache_phpquery_check.stdout'
   tags:
     - apache
 
@@ -12,15 +12,15 @@
 
     - name: Run phpquery to get the PHP version
       command: phpquery -V
-      register: apache_php_version_check
+      register: apache_phpquery_version
       check_mode: false
       changed_when: false
 
     - name: Set a fact for the PHP version
       set_fact:
-        apache_php_version: "{{ apache_php_version_check.stdout }}"
+        apache_php_version: "{{ apache_phpquery_version.stdout }}"
 
-  when: ( apache_phpversion_check is defined ) and ( apache_phpversion_check.stdout == "phpquery" )
+  when: ( apache_phpversion_check is defined ) and ( "phpquery" in apache_phpversion_check.stdout )
   tags:
     - apache
 
