@@ -49,6 +49,7 @@
           apache2_module:
             name: mpm_prefork
             state: absent
+            ignore_configcheck: true
 
         - name: "Enable Apache mpm_event"
           apache2_module:
