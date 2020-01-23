@@ -2,8 +2,8 @@
 - name: Check if phpquery is installed
   shell: which phpquery || echo absent
   check_mode: false
-  register: apache_phpquery_check
-  changed_when: '"phpquery" not in apache_phpquery_check.stdout'
+  register: apache_phpquery_path
+  changed_when: '"phpquery" not in apache_phpquery_path.stdout'
   tags:
     - apache
 
@@ -20,7 +20,7 @@
       set_fact:
         apache_php_version: "{{ apache_phpquery_version.stdout }}"
 
-  when: ( apache_phpquery_check is defined ) and ( apache_phpquery_check.stdout == "/usr/sbin/phpquery" )
+  when: ( apache_phpquery_path is defined ) and ( apache_phpquery_path.stdout == "/usr/sbin/phpquery" )
   tags:
     - apache
 
