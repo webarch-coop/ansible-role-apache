@@ -22,11 +22,47 @@
       debug:
         msg:
           - "apache_a2enmod.rc: {{ apache_a2enmod.rc }}"
+        verbosity: 1
+      when: apache_a2enmod.rc is defined
+
+    - name: Debug error
+      debug:
+        msg:
+          - "apache_a2enmod.result: {{ apache_a2enmod.result }}"
+        verbosity: 1
+      when: apache_a2enmod.result is defined
+
+    - name: Debug error
+      debug:
+        msg:
+          - "apache_a2enmod.stderr: {{ apache_a2enmod.stderr }}"
+        verbosity: 1
+      when: apache_a2enmod.stderr is defined
+
+    - name: Debug error
+      debug:
+        msg:
+          - "apache_a2enmod.stdout: {{ apache_a2enmod.stdout }}"
+        verbosity: 1
+      when: apache_a2enmod.stdout is defined
+
+    - name: Debug error
+      debug:
+        msg:
+          - "apache_a2enmod.warnings: {{ apache_a2enmod.warnings }}"
+        verbosity: 1
+      when: apache_a2enmod.warnings is defined
+
+    - name: Debug error
+      debug:
+        msg:
+          - "apache_a2enmod.rc: {{ apache_a2enmod.rc }}"
           - "apache_a2enmod.result: {{ apache_a2enmod.result }}"
           - "apache_a2enmod.stderr: {{ apache_a2enmod.stderr }}"
           - "apache_a2enmod.stdout: {{ apache_a2enmod.stdout }}"
           - "apache_a2enmod.warnings: {{ apache_a2enmod.warnings }}"
         verbosity: 1
+      when: apache_a2enmod.rc is defined
 
     - name: "Enable Apache mpm_event"
       apache2_module:
