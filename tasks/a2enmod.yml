@@ -21,12 +21,17 @@
     - name: "Disable mod_php and then enable mpm_event"
       block:
 
-        - name:
+        - name: "Disable Apache module php{{ apache_php_version }}"
           apache2_module:
             name: "php{{ apache_php_version }}"
             state: absent
 
-        - name:
+        - name: "Enable Apache mpm_event"
+          apache2_module:
+            name: mpm_event
+            state: present
+
+        - name: "Disable Apache module mpm_prefork"
           apache2_module:
             name: mpm_prefork
             state: absent
