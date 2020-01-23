@@ -23,7 +23,7 @@
         name: mpm_event
         state: present
       when:
-        - ( "Configuration error: No MPM loaded" in apache_a2enmod.msg )
+        - ( "Configuration error: No MPM loaded" in apache_a2enmod.stderr )
         - mod == "mpm_event"
 
     - name: "Disable php{{ apache_php_version }} and mpm_prefork and then enable mpm_event"
