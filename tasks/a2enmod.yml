@@ -23,7 +23,7 @@
 
         - name:
           apache2_module:
-            name: "php{{ apache_phpversion }}"
+            name: "php{{ apache_php_version }}"
             state: absent
 
         - name:
