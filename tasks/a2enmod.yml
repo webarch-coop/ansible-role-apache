@@ -8,7 +8,7 @@
 
 - name: "Enable Apache {{ mod }} module"
   block:
-    
+
     - name: "Apache {{ mod }} module enabled"
       apache2_module:
         name: "{{ mod }}"
@@ -18,10 +18,19 @@
 
   rescue:
 
-    - name: 
-      apache2_module:
-        name: mpm_prefork
-        state: absent
+    - name: "Disable mod_php and then enable mpm_event"
+      block:
+
+        - name:
+          apache2_module:
+            name: "php{{ apache_phpversion }}"
+            state: absent
+
+        - name:
+          apache2_module:
+            name: mpm_prefork
+            state: absent
+
       when: ( "Considering conflict mpm_worker for mpm_event" or "Considering conflict mpm_prefork for mpm_event" in apache_a2enmod.stdout )
 
   tags:
