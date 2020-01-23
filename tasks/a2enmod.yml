@@ -20,18 +20,22 @@
 
     - name: Debug error
       debug:
-        var:
-          - apache_a2enmod
-          - mod
+        var: apache_a2enmod
         verbosity: 1
       when: apache_a2enmod is defined
+
+    - name: Debug mod
+      debug:
+        var: mod
+        verbosity: 1
+      when: mod is defined
 
     - name: "Enable Apache mpm_event"
       apache2_module:
         name: mpm_event
         state: present
         ignore_configcheck: true
-      when: ( "No MPM loaded" in apache_a2enmod.msg ) and ( mod == "mpm_event" )
+      when: ( "No MPM loaded" in apache_a2enmod.msg ) and ( "mpm_event" in apache_mods_enabled )
 
     - name: "Disable php{{ apache_php_version }} and mpm_prefork and then enable mpm_event"
       block:
