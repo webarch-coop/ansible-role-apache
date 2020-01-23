@@ -74,6 +74,7 @@
       apache2_module:
         name: mpm_event
         state: present
+        ignore_configcheck: true
       when:
         - ( "Configuration error: No MPM loaded" in apache_a2enmod.stderr )
         - mod == "mpm_event"
