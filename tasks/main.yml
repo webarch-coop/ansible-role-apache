@@ -20,7 +20,7 @@
       set_fact:
         apache_php_version: "{{ apache_phpquery_version.stdout }}"
 
-  when: ( apache_phpversion_check is defined ) and ( apache_phpversion_check.stdout == "/usr/sbin/phpquery" )
+  when: ( apache_phpquery_check is defined ) and ( apache_phpquery_check.stdout == "/usr/sbin/phpquery" )
   tags:
     - apache
 
