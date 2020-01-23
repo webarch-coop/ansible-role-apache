@@ -18,6 +18,16 @@
 
   rescue:
 
+    - name: Debug error
+      debug:
+        msg:
+          - "apache_a2enmod.rc: {{ apache_a2enmod.rc }}"
+          - "apache_a2enmod.result: {{ apache_a2enmod.result }}"
+          - "apache_a2enmod.stderr: {{ apache_a2enmod.stderr }}"
+          - "apache_a2enmod.stdout: {{ apache_a2enmod.stdout }}"
+          - "apache_a2enmod.warnings: {{ apache_a2enmod.warnings }}"
+        verbosity: 1
+
     - name: "Enable Apache mpm_event"
       apache2_module:
         name: mpm_event
