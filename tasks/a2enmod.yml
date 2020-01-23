@@ -6,11 +6,24 @@
   tags:
     - apache
 
-- name: "Apache {{ mod }} module enabled"
-  apache2_module:
-    name: "{{ mod }}"
-    state: present
-  when: apache_mod_status.stat.exists == False
+- name: "Enable Apache {{ mod }} module"
+  block:
+    
+    - name: "Apache {{ mod }} module enabled"
+      apache2_module:
+        name: "{{ mod }}"
+        state: present
+      register: apache_a2enmod
+      when: apache_mod_status.stat.exists == False
+
+  rescue:
+
+    - name: 
+      apache2_module:
+        name: mpm_prefork
+        state: absent
+      when: ( "Considering conflict mpm_worker for mpm_event" or "Considering conflict mpm_prefork for mpm_event" in apache_a2enmod.stdout )
+
   tags:
     - apache
 ...
