@@ -66,6 +66,7 @@
     - /etc/apache2/localhost.d
   loop_control:
     loop_var: dir
+    label: "{{ dir }}"
   tags:
     - apache
 
@@ -94,6 +95,7 @@
     - expires-medium.conf
   loop_control:
     loop_var: file
+    label: "{{ file }}"
   tags:
     - apache
 
@@ -273,18 +275,18 @@
   tags:
     - apache
 
+- name: Fail if Apache configtest is not OK
+  fail:
+    msg: "{{ apache2ctl_configtest.stdout }}"
+  when: '"Syntax OK" not in apache_configtest.stderr'
+  tags:
+    - apache
+
 - name: Apache restarted
   service:
     name: apache2
     state: restarted
   when: '"Syntax OK" in apache_configtest.stderr'
-  tags:
-    - apache
-
-- name: Fail if Apache configtest is not OK
-  fail:
-    msg: "{{ apache2ctl_configtest.stdout }}"
-  when: '"Syntax OK" not in apache_configtest.stderr'
   tags:
     - apache
 ...
