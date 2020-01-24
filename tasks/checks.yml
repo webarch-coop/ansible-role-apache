@@ -1,0 +1,97 @@
+---
+- name: Check the Apache modules and conf emabled
+  block:
+
+    - name: Check if phpquery is installed
+      shell: which phpquery || echo absent
+      check_mode: false
+      register: apache_phpquery_path
+      changed_when: '"phpquery" not in apache_phpquery_path.stdout'
+
+    - name: Check PHP version
+      block:
+
+        - name: Run phpquery to get the PHP version
+          command: phpquery -V
+          register: apache_phpquery_version
+          check_mode: false
+          changed_when: false
+
+        - name: Set a fact for the PHP version
+          set_fact:
+            apache_php_version: "{{ apache_phpquery_version.stdout }}"
+
+      when: ( apache_phpquery_path is defined ) and ( apache_phpquery_path.stdout == "/usr/sbin/phpquery" )
+
+    - name: Set a fact for the Debian version
+      set_fact:
+        apache_debian_version: "{{ ansible_distribution_release }}"
+
+    - name: Register the loaded modules
+      command: a2query -m
+      check_mode: false
+      register: apache_modules_check
+
+    - name: Debug the loaded modules
+      debug:
+        var: apache_modules_check.stdout_lines
+        verbosity: 2
+
+    - name: Set an array of the loaded modules
+      set_fact:
+        apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ line.split(' ')[0] ] }}" 
+      loop: "{{ apache_modules_check.stdout_lines }}"
+      loop_control:
+        loop_var: line
+        label: "{{ line }}"
+
+    - name: Debug loaded modules
+      debug:
+        var: apache_modules_loaded
+        verbosity: 2
+
+    - name: Register the loaded conf
+      command: a2query -c
+      check_mode: false
+      register: apache_conf_check
+
+    - name: Debug the loaded conf
+      debug:
+        var: apache_conf_check.stdout_lines
+        verbosity: 2
+
+    - name: Set an array of the loaded conf
+      set_fact:
+        apache_conf_loaded: "{{ apache_conf_loaded | default([]) + [ line.split(' ')[0] ] }}" 
+      loop: "{{ apache_conf_check.stdout_lines }}"
+      loop_control:
+        loop_var: line
+        label: "{{ line }}"
+
+    - name: Debug loaded conf
+      debug:
+        var: apache_conf_loaded
+        verbosity: 2
+
+    - name: Check the enabled MPM
+      command: a2query -M
+      check_mode: false
+      register: apache_mpm_check
+
+    - name: Debug the enabled MPM
+      debug:
+        msg: "{{ apache_mpm_check.stdout }}"
+        verbosity: 2
+
+    - name: Set a fact for the enabled MPM
+      set_fact:
+        apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
+
+    - name: Debug the enabled MPM
+      debug:
+        var: apache_mpm_loaded
+        verbosity: 2
+
+  tags:
+    - apache
+...
