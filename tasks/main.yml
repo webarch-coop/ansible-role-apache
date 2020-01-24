@@ -43,6 +43,7 @@
 
 - name: Register the loaded modules
   command: a2query -m
+  check_mode: false
   register: apache_modules_check
   tags:
     - apache
@@ -73,6 +74,7 @@
 
 - name: Check the enabled MPM
   command: a2query -M
+  check_mode: false
   register: apache_mpm_check
   tags:
     - apache
@@ -87,6 +89,13 @@
 - name: Set a fact for the enabled MPM
   set_fact:
     apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
+  tags:
+    - apache
+
+- name: Debug the enabled MPM
+  debug:
+    var: apache_mpm_loaded
+    verbosity: 2
   tags:
     - apache
 
