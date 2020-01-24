@@ -6,70 +6,11 @@
   tags:
     - apache
 
-- name: "Enable Apache {{ mod }} module"
-  block:
-
-    - name: "Apache {{ mod }} module config checked and enabled"
-      apache2_module:
-        name: "{{ mod }}"
-        state: present
-        ignore_configcheck: false
-      register: apache_a2enmod
-      when: mod is not regex("^mpm_(event|itk|prefork)$")
-
-    - name: "Apache {{ mod }} module enabled without config checked"
-      apache2_module:
-        name: "{{ mod }}"
-        state: present
-        ignore_configcheck: true
-      register: apache_a2enmod
-      when: mod is regex("^mpm_(event|itk|prefork)$")
-
-  rescue:
-
-    - name: Debug error
-      debug:
-        var: apache_a2enmod
-        verbosity: 1
-      when: apache_a2enmod is defined
-
-    - name: Debug mod
-      debug:
-        var: mod
-        verbosity: 1
-      when: mod is defined
-
-#    - name: "Enable Apache mpm_event"
-#      apache2_module:
-#        name: mpm_event
-#        state: present
-#        ignore_configcheck: true
-#      when: ( "No MPM loaded" in apache_a2enmod.msg ) and ( "mpm_event" in apache_mods_enabled )
-
-    - name: "Disable php{{ apache_php_version }} and mpm_prefork and then enable mpm_event"
-      block:
-
-        - name: "Disable Apache module php{{ apache_php_version }}"
-          apache2_module:
-            name: "php{{ apache_php_version }}"
-            state: absent
-
-        - name: "Disable Apache module mpm_prefork"
-          apache2_module:
-            name: mpm_prefork
-            state: absent
-            ignore_configcheck: true
-
-        - name: "Enable Apache mpm_event"
-          apache2_module:
-            name: mpm_event
-            state: present
-            ignore_configcheck: true
-
-      when:
-        - apache_a2enmod is defined
-        - ( "Considering conflict mpm_worker for mpm_event" or "Considering conflict mpm_prefork for mpm_event" in apache_a2enmod.stdout )
-
+- name: "Apache {{ mod }} module config enabled"
+  apache2_module:
+    name: "{{ mod }}"
+    state: present
+  register: apache_a2enmod
   when: apache_mod_status.stat.exists == False
   tags:
     - apache

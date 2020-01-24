@@ -217,7 +217,7 @@
       loop_control:
         loop_var: conf
         label: "{{ conf }}"
-    
+
     - name: Apache conf enabled
       include_tasks: a2enconf.yml
       when: conf not in apache_conf_loaded
@@ -239,7 +239,7 @@
       loop_control:
         loop_var: site
         label: "{{ site }}"
-    
+
     - name: Apache sites enabled
       include_tasks: a2ensite.yml
       loop: "{{ apache_sites_enabled }}"
