@@ -12,7 +12,7 @@
     - name: "Apache {{ mod }} module config checked and disabled"
       apache2_module:
         name: "{{ mod }}"
-        identifier: "{{ mod }}_module"
+        # identifier: "{{ mod }}_module"
         state: absent
         ignore_configcheck: false
       register: apache_a2enmod
@@ -21,7 +21,7 @@
     - name: "Apache {{ mod }} module disabled without config checked"
       apache2_module:
         name: "{{ mod }}"
-        identifier: "{{ mod }}_module"
+        # identifier: "{{ mod }}_module"
         state: absent
         ignore_configcheck: true
       register: apache_a2enmod
