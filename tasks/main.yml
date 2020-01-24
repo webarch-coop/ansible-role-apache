@@ -17,7 +17,7 @@
 
 - name: Include MPM switching tasks if the MPM loaded isn't in the apache_mods_enabled array
   include_tasks: mpm.yml
-  when: apache_mpm_loaded not in apache_mods_enabled 
+  when: apache_mpm_loaded not in apache_mods_enabled
   tags:
     - apache
 
@@ -28,13 +28,6 @@
     mode: 0755
     owner: root
     group: root
-  tags:
-    - apache
-
-- name: Check if we have a HTTPS cert
-  stat:
-    path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
-  register: apache_cert
   tags:
     - apache
 
@@ -114,8 +107,6 @@
         state: absent
         update_cache: false
       when: '"mpm-itk" in apache_mods_disabled'
-      tags:
-        - apache
 
     - name: Apache FastCGI absent
       apt:
@@ -124,8 +115,6 @@
         state: absent
         update_cache: false
       when: '"fcgid" in apache_mods_disabled'
-      tags:
-        - apache
 
     - name: Apache suEXEC package absent
       apt:
@@ -134,8 +123,6 @@
         state: absent
         update_cache: false
       when: '"suexec" in apache_mods_disabled'
-      tags:
-        - apache
 
     - name: "Apache php{{ apache_php_version }} package absent"
       apt:
@@ -144,18 +131,16 @@
         state: absent
         update_cache: false
       when: ( "php7.0" in apache_mods_disabled ) or ( "php7.2" in apache_mods_disabled ) or ( "php7.3" in apache_mods_disabled )
-      tags:
-        - apache
 
     - name: Disable modules
       include_tasks: a2dismod.yml
       loop: "{{ apache_mods_disabled }}"
       loop_control:
         loop_var: mod
-      tags:
-        - apache
 
   when: ( apache_mods_disabled is defined ) and ( apache_mods_disabled != [] )
+  tags:
+    - apache
 
 - name: Apache modules enabled
   block:
@@ -167,16 +152,12 @@
         state: present
         update_cache: false
       when: '"mpm-itk" in apache_mods_enabled'
-      tags:
-        - apache
 
     - name: Apache mpm_prefork.conf in place
       template:
         src: templates/mpm_prefork.conf.j2
         dest: /etc/apache2/mods-available/mpm_prefork.conf
       when: ( "mpm-itk" in apache_mods_enabled ) or ( "php7.0" in apache_mods_enabled ) or ( "php7.3" in apache_mods_enabled )
-      tags:
-        - apache
 
     - name: Apache Suexec package present
       apt:
@@ -185,8 +166,6 @@
         state: present
         update_cache: false
       when: '"suexec" in apache_mods_enabled'
-      tags:
-        - apache
 
     - name: Apache FastCGI package present
       apt:
@@ -195,16 +174,12 @@
         state: present
         update_cache: false
       when: '"fcgid" in apache_mods_enabled'
-      tags:
-        - apache
 
     - name: Apache ratelimit conf present
       template:
         src: templates/ratelimit.conf.j2
         dest: /etc/apache2/mods-available/ratelimit.conf
       when: '"ratelimit" in apache_mods_enabled'
-      tags:
-        - apache
 
     - name: Apache mod_php package present
       apt:
@@ -213,24 +188,20 @@
         state: present
         update_cache: false
       when: ( "php7.0" in apache_mods_enabled ) or ( "php7.3" in apache_mods_enabled )
-      tags:
-        - apache
 
     - name: Cloudflare config available
       include_tasks: cloudflare.yml
       when: '"remoteip" in apache_mods_enabled'
-      tags:
-        - apache
 
     - name: Apache modules enabled
       include_tasks: a2enmod.yml
       loop: "{{ apache_mods_enabled }}"
       loop_control:
         loop_var: mod
-      tags:
-        - apache
 
   when: ( apache_mods_enabled is defined ) and ( apache_mods_enabled != [] )
+  tags:
+    - apache
 
 - name: Apache conf disabled
   include_tasks: a2disconf.yml

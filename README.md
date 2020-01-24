@@ -47,6 +47,7 @@ The other repo should also contain a (for example) `apache.yml` file that contai
       - mpm_prefork
       - php7.3
     apache_conf_enabled:
+      - php7.3-fpm
       - webarch
     apache_conf_disabled:
       - serve-cgi-bin
@@ -98,6 +99,7 @@ Or something like this for `mod_php` and `mpm-itk`:
       - webarch
     apache_conf_disabled:
       - serve-cgi-bin
+      - php7.3-fpm
       - phpmyadmin
     apache_sites_enabled:
       - localhost

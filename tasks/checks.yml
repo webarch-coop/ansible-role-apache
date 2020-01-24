@@ -52,7 +52,7 @@
 
     - name: Set an array of the loaded modules
       set_fact:
-        apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ line.split(' ')[0] ] }}" 
+        apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ line.split(' ')[0] ] }}"
       loop: "{{ apache_modules_check.stdout_lines }}"
       loop_control:
         loop_var: line
@@ -76,7 +76,7 @@
 
     - name: Set an array of the loaded conf
       set_fact:
-        apache_conf_loaded: "{{ apache_conf_loaded | default([]) + [ line.split(' ')[0] ] }}" 
+        apache_conf_loaded: "{{ apache_conf_loaded | default([]) + [ line.split(' ')[0] ] }}"
       loop: "{{ apache_conf_check.stdout_lines }}"
       loop_control:
         loop_var: line
@@ -106,6 +106,12 @@
       debug:
         var: apache_mpm_loaded
         verbosity: 2
+
+    - name: "Check if a Let's Encrypt HTTPS cert is present for {{ inventory_hostname }}"
+      stat:
+        path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
+      check_mode: false
+      register: apache_cert
 
   tags:
     - apache
