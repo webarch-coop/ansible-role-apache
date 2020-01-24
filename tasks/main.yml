@@ -47,9 +47,16 @@
   tags:
     - apache
 
+- name: Debug the loaded modules
+  debug:
+    var: apache_modules_check.stdout_lines
+    verbosity: 1
+  tags:
+    - apache
+
 - name: Set an array of the loaded modules
   set_fact:
-    apache_modules_loaded: "{{ apache_modules_loaded | default('') + [ '{{ line.split(' ')[0] }}' ] }}" 
+    apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ '{{ line.split(' ')[0] }}' ] }}" 
     # apache_modules_loaded: "{{ ( apache_modules_check.stdout ).split(' ')[0] | list }}"
   loop: "{{ apache_modules_check.stdout_lines }}"
   loop_control:
