@@ -15,7 +15,7 @@
         state: present
         ignore_configcheck: false
       register: apache_a2enmod
-      when: mod is not regex("^mpm_[event|itk|prefork]$")
+      when: mod is not regex("^mpm_(event|itk|prefork)$")
 
     - name: "Apache {{ mod }} module enabled without config checked"
       apache2_module:
@@ -23,7 +23,7 @@
         state: present
         ignore_configcheck: true
       register: apache_a2enmod
-      when: mod is regex("^mpm_[event|itk|prefork]$")
+      when: mod is regex("^mpm_(event|itk|prefork)$")
 
   rescue:
 

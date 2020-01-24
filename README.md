@@ -18,7 +18,7 @@ To pull this repo in run:
 ansible-galaxy install -r requirements.yml --force -p galaxy/roles 
 ```
 
-The other repo should also contain a `.yml` file that contains something like this (for `mpm_event` / `php-fpm`):
+The other repo should also contain a (for example) `apache.yml` file that contains something like this (for `mpm_event` / `php-fpm`):
 
 ```yml
 ---
@@ -74,7 +74,7 @@ Or something like this for `mod_php` and `mpm-itk`:
 - name: Install Apache
   become: yes
 
-  hosts: apache_buster_servers
+  hosts: apache_servers
 
   vars:
     apache_mods_enabled:
@@ -133,5 +133,5 @@ all:
 Then it can be run as follows:
 
 ```bash
-ansible-playbook matomo.yml -i hosts.yml
+ansible-playbook apache.yml -i hosts.yml
 ``` 
