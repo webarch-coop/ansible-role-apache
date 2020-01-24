@@ -41,6 +41,25 @@
   tags:
     - apache
 
+- name: Register the loaded modules
+  command: a2query -m
+  register: apache_modules_check
+  tags:
+    - apache
+
+- name: Set an array of the loaded modules
+  set_fact:
+    apache_modules_loaded: "{{ ( apache_modules_check.stdout ).split(' ')[0] | list }}"
+  tags:
+    - apache
+
+- name: Debug loaded modules
+  debug:
+    var: apache_modules_loaded
+    verbosity: 1
+  tags:
+    - apache
+
 - name: Apache envars in place
   template:
     src: templates/envvars.j2
