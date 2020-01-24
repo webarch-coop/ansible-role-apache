@@ -1,0 +1,45 @@
+---
+- name: Switch from mpm_prefork to mpm_event
+  block:
+
+    - name: "Disable Apache module php{{ apache_php_version }}"
+      apache2_module:
+        name: "php{{ apache_php_version }}"
+        state: absent
+      when: "php{{ apache_php_version }} in apache_modules_loaded"
+
+    - name: "Disable Apache module mpm_prefork"
+      apache2_module:
+        name: mpm_prefork
+        state: absent
+        ignore_configcheck: true
+
+    - name: "Enable Apache mpm_event"
+      apache2_module:
+        name: mpm_event
+        state: present
+        ignore_configcheck: true
+
+  when: ( apache_mpm_loaded == "mpm_prefork" ) and ( "mpm_event" in apache_mods_enabled )
+  tags:
+    - apache
+
+- name: Switch from mpm_event to mpm_prefork
+  block:
+
+    - name: "Disable Apache module mpm_event"
+      apache2_module:
+        name: mpm_event
+        state: absent
+        ignore_configcheck: true
+
+    - name: "Enable Apache mpm_prefork"
+      apache2_module:
+        name: mpm_prefork
+        state: present
+        ignore_configcheck: true
+
+  when: ( apache_mpm_loaded == "mpm_event" ) and ( "mpm_prefork" in apache_mods_enabled )
+  tags:
+    - apache
+...
