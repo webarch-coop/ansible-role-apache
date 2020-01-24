@@ -30,6 +30,7 @@
     - name: Register the loaded modules
       command: a2query -m
       check_mode: false
+      changed_when: false
       register: apache_modules_check
 
     - name: Debug the loaded modules
@@ -53,6 +54,7 @@
     - name: Register the loaded conf
       command: a2query -c
       check_mode: false
+      changed_when: false
       register: apache_conf_check
 
     - name: Debug the loaded conf
@@ -76,6 +78,7 @@
     - name: Check the enabled MPM
       command: a2query -M
       check_mode: false
+      changed_when: false
       register: apache_mpm_check
 
     - name: Debug the enabled MPM
