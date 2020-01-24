@@ -27,14 +27,14 @@
 
         - name: Set a fact for the PHP FPM module and conf names
           set_fact:
-            apache_phpfpm_conf: "php{{ apache_php_version }}"
-            apache_phpfpm_mod: "php{{ apache_php_version }}-fpm"
+            apache_phpfpm_mod: "php{{ apache_php_version }}"
+            apache_phpfpm_conf: "php{{ apache_php_version }}-fpm"
 
         - name: Debug PHP FPM module and conf names
           debug:
             var:
-              - apache_phpfpm_conf
               - apache_phpfpm_mod
+              - apache_phpfpm_conf
             verbosity: 2
 
       when: ( apache_phpquery_path is defined ) and ( apache_phpquery_path.stdout == "/usr/sbin/phpquery" )
