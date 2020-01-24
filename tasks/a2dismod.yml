@@ -9,17 +9,19 @@
 - name: "Disable Apache {{ mod }} module"
   block:
 
-    - name: "Apache {{ mod }} module config checked and enabled"
+    - name: "Apache {{ mod }} module config checked and disabled"
       apache2_module:
         name: "{{ mod }}"
+        identifier: "{{ mod }}_module"
         state: absent
         ignore_configcheck: false
       register: apache_a2enmod
       when: mod is not regex("^mpm_[event|itk|prefork]$")
 
-    - name: "Apache {{ mod }} module enabled without config checked"
+    - name: "Apache {{ mod }} module disabled without config checked"
       apache2_module:
         name: "{{ mod }}"
+        identifier: "{{ mod }}_module"
         state: absent
         ignore_configcheck: true
       register: apache_a2enmod

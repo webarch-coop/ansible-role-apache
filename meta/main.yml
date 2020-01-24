@@ -5,7 +5,8 @@ galaxy_info:
   description: Ansible role for installing Apache
   company: Webarchitects Co-operative
   license: license (GPLv3)
-  min_ansible_version: 1.2
+  # 2.5 identifier added to apache2_module
+  min_ansible_version: 2.5
   platforms:
     - name: debian
       versions:
