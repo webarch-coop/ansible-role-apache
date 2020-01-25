@@ -48,20 +48,32 @@
 - name: Re-check modules enabled
   block:
 
-    - name: Register the loaded modules
-      command: a2query -m
-      check_mode: false
-      changed_when: false
-      register: apache_modules_check
+    - name: Check loaded modules
+      block:
+
+        - name: Register the loaded modules
+          command: a2query -m
+          check_mode: false
+          changed_when: false
+          register: apache_modules_check
+
+      rescue:
+
+        - name: No mod enabled
+          set_fact:
+            apache_modules_loaded: []
+          when: '"No module matches" in apache_modules_check.stderr'
 
     - name: Debug the loaded modules
       debug:
         var: apache_modules_check.stdout_lines
         verbosity: 2
+      when: apache_modules_check.stdout is defined
 
     - name: Set an array of the loaded modules
       set_fact:
         apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ line.split(' ')[0] ] }}"
+      when: apache_modules_check.stdout is defined
       loop: "{{ apache_modules_check.stdout_lines }}"
       loop_control:
         loop_var: line
@@ -71,6 +83,7 @@
       debug:
         var: apache_modules_loaded
         verbosity: 2
+      when: apache_modules_loaded is defined
 
   tags:
     - apache

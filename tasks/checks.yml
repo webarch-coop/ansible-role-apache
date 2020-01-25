@@ -73,6 +73,7 @@
       debug:
         var: apache_modules_loaded
         verbosity: 2
+      when: apache_modules_loaded is defined
 
     - name: Check loaded conf
       block:
@@ -145,6 +146,7 @@
       debug:
         var: apache_sites_loaded
         verbosity: 2
+      when: apache_sites_loaded is defined
 
     - name: Check the enabled MPM
       command: a2query -M
@@ -165,6 +167,7 @@
       debug:
         var: apache_mpm_loaded
         verbosity: 2
+      when: apache_mpm_loaded is defined
 
     - name: "Check if a Let's Encrypt HTTPS cert is present for {{ inventory_hostname }}"
       stat:
