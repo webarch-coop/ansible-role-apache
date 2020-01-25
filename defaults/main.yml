@@ -12,7 +12,8 @@ apache_ssl_protocol: all -SSLv3 -TLSv1 -TLSv1.1 +TLSv1.2
 # apache_ssl_protocol: all -SSLv3 -TLSv1 -TLSv1.1 +TLSv1.2 +TLSv1.3
 apache_sites_enabled:
   - localhost
-apache_sites_disabled: []
+apache_sites_disabled:
+  - 000-default
 apache_conf_enabled:
   - charset
   - le
