@@ -8,7 +8,7 @@
           - libapache2-mpm-itk
         state: absent
         update_cache: false
-      when: '"mpm-itk" in apache_mods_disabled'
+      when: '"mpm_itk" in apache_mods_disabled'
 
     - name: Apache FastCGI absent
       apt:
@@ -59,7 +59,7 @@
           - libapache2-mpm-itk
         state: present
         update_cache: false
-      when: '"mpm-itk" in apache_mods_enabled'
+      when: '"mpm_itk" in apache_mods_enabled'
 
     - name: Apache Suexec package present
       apt:

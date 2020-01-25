@@ -58,7 +58,7 @@
       template:
         src: templates/mpm_prefork.conf.j2
         dest: /etc/apache2/mods-available/mpm_prefork.conf
-      when: ( "mpm-itk" in apache_mods_enabled ) or ( "php7.0" in apache_mods_enabled ) or ( "php7.3" in apache_mods_enabled )
+      when: ( "mpm_itk" in apache_mods_enabled ) or ( apache_phpfpm_mod in apache_mods_enabled )
 
     - name: Apache ratelimit conf present
       template:
