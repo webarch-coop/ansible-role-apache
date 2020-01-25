@@ -9,18 +9,18 @@
         clone: true
         update: true
         force: true
-    
+
     - name: Debian default site disabled
       command: a2dissite 000-default
       register: apache_a2dissite_default
       changed_when: '"already disabled" not in apache_a2dissite_default.stdout'
-      when: '"000-default" in apache_sites_loaded' 
-    
+      when: '"000-default" in apache_sites_loaded'
+
     - name: Debian default /var/www/html/index.html absent
       file:
         path: /var/www/html/index.html
         state: absent
-    
+
     - name: WSH Apache config in place
       template:
         src: templates/webarch.conf.j2
