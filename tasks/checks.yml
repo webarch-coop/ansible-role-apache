@@ -38,20 +38,32 @@
 
       when: ( apache_phpquery_path is defined ) and ( apache_phpquery_path.stdout == "/usr/sbin/phpquery" )
 
-    - name: Register the loaded modules
-      command: a2query -m
-      check_mode: false
-      changed_when: false
-      register: apache_modules_check
+    - name: Check loaded modules
+      block:
+
+        - name: Register the loaded modules
+          command: a2query -m
+          check_mode: false
+          changed_when: false
+          register: apache_modules_check
+
+      rescue:
+
+        - name: No mod enabled
+          set_fact:
+            apache_mod_loaded: []
+          when: '"No module matches" in apache_conf_check.stderr'
 
     - name: Debug the loaded modules
       debug:
         var: apache_modules_check.stdout_lines
         verbosity: 2
+      when: apache_modules_check.stdout is defined
 
     - name: Set an array of the loaded modules
       set_fact:
         apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ line.split(' ')[0] ] }}"
+      when: apache_modules_check.stdout is defined
       loop: "{{ apache_modules_check.stdout_lines }}"
       loop_control:
         loop_var: line
@@ -62,20 +74,32 @@
         var: apache_modules_loaded
         verbosity: 2
 
-    - name: Register the loaded conf
-      command: a2query -c
-      check_mode: false
-      changed_when: false
-      register: apache_conf_check
+    - name: Check loaded conf
+      block:
+
+        - name: Register the loaded conf
+          command: a2query -c
+          check_mode: false
+          changed_when: false
+          register: apache_conf_check
+
+       rescue:
+
+        - name: No conf enabled
+          set_fact:
+            apache_conf_loaded: []
+          when: '"No conf matches" in apache_conf_check.stderr'
 
     - name: Debug the loaded conf
       debug:
         var: apache_conf_check.stdout_lines
         verbosity: 2
+      when: apache_conf_check.stdout is defined
 
     - name: Set an array of the loaded conf
       set_fact:
         apache_conf_loaded: "{{ apache_conf_loaded | default([]) + [ line.split(' ')[0] ] }}"
+      when: apache_conf_check.stdout is defined
       loop: "{{ apache_conf_check.stdout_lines }}"
       loop_control:
         loop_var: line
@@ -106,6 +130,7 @@
       debug:
         var: apache_sites_check.stdout_lines
         verbosity: 2
+      when: apache_sites_check.stdout is defined
 
     - name: Set an array of the loaded sites
       set_fact:
