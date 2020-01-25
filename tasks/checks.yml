@@ -83,7 +83,7 @@
           changed_when: false
           register: apache_conf_check
 
-       rescue:
+      rescue:
 
         - name: No conf enabled
           set_fact:
