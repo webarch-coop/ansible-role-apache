@@ -52,7 +52,7 @@
         - name: No mod enabled
           set_fact:
             apache_mod_loaded: []
-          when: '"No module matches" in apache_conf_check.stderr'
+          when: '"No module matches" in apache_modules_check.stderr'
 
     - name: Debug the loaded modules
       debug:
