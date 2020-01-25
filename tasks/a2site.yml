@@ -3,7 +3,7 @@
   block:
 
     - name: Apache sites disabled
-      command: "a2disconf {{ conf }}"
+      command: "a2dissite {{ site }}"
       args:
         removes: "/etc/apache2/conf-enabled/{{ conf }}.conf"
       when:
@@ -16,7 +16,7 @@
         label: "{{ site }}"
 
     - name: Apache sites enabled
-      command: "a2enconf {{ conf }}"
+      command: "a2ensite {{ site }}"
       args:
         creates: "/etc/apache2/conf-enabled/{{ conf }}.conf"
       when:
