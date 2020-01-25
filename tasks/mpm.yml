@@ -22,7 +22,9 @@
         state: present
         ignore_configcheck: true
 
-  when: ( apache_mpm_loaded == "mpm_prefork" ) and ( "mpm_event" in apache_mods_enabled )
+  when:
+    - ( apache_mpm_loaded == "mpm_prefork" ) or apache_mpm_loaded == "none" )
+    - ( "mpm_event" in apache_mods_enabled )
   tags:
     - apache
 
@@ -41,7 +43,36 @@
         state: present
         ignore_configcheck: true
 
-  when: ( apache_mpm_loaded == "mpm_event" ) and ( "mpm_prefork" in apache_mods_enabled )
+  when:
+    - ( apache_mpm_loaded == "mpm_event" ) or ( apache_mpm_loaded == "none" )
+    - ( "mpm_prefork" in apache_mods_enabled )
+  tags:
+    - apache
+
+- name: Re-check the MPM
+  block:
+
+    - name: Check the enabled MPM
+      command: a2query -M
+      check_mode: false
+      changed_when: false
+      register: apache_mpm_check
+
+    - name: Debug the enabled MPM
+      debug:
+        msg: "{{ apache_mpm_check.stdout }}"
+        verbosity: 2
+
+    - name: Set a fact for the enabled MPM
+      set_fact:
+        apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
+      when: apache_mpm_check.stdout != "invalid"
+
+    - name: Fail if non MPM loaded
+      fail:
+        msg: "No Apache MPM loaded"
+      when: apache_mpm_check.stdout == "invalid"
+
   tags:
     - apache
 

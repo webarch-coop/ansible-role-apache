@@ -162,6 +162,12 @@
     - name: Set a fact for the enabled MPM
       set_fact:
         apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
+      when: apache_mpm_check.stdout != "invalid"
+
+    - name: Set a fact for the enabled MPM
+      set_fact:
+        apache_mpm_loaded: "none"
+      when: apache_mpm_check.stdout == "invalid"
 
     - name: Debug the enabled MPM
       debug:
