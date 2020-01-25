@@ -82,7 +82,7 @@
   service:
     name: apache2
     state: restarted
-  when: apache_mpm_mpm_enabled.changed or apache_mpm_prefork_enabled.changed
+  when: apache_mpm_enabled.changed or apache_mpm_prefork_enabled.changed
   tags:
     - apache
 
