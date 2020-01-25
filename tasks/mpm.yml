@@ -10,7 +10,14 @@
         - apache_phpfpm_mod is defined
         - apache_phpfpm_mod in apache_modules_loaded
 
-    - name: "Disable Apache module mpm_prefork"
+    - name: Disable Apache module mpm_itk
+      apache2_module:
+        name: mpm_itk
+        state: absent
+      when:
+        - '"mpm_itk" in apache_modules_loaded'
+
+    - name: Disable Apache module mpm_prefork
       apache2_module:
         name: mpm_prefork
         state: absent
