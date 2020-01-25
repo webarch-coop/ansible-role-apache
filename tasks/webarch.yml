@@ -1,39 +1,31 @@
 ---
-- name: Webarchitects templates present
-  git:
-    repo: https://git.coop/webarch/website-templates.git
-    dest: /var/www/wsh
-    update: true
-    force: true
-  tags:
-    - apache
+- name: Config for webarch.coop
+  block:
 
-- name: Check if /etc/apache2/sites-available/000-default exists
-  stat:
-    path: /etc/apache2/sites-available/000-default
-  register: apache_default
-  tags:
-    - apache
+    - name: Webarchitects templates present
+      git:
+        repo: https://git.coop/webarch/website-templates.git
+        dest: /var/www/wsh
+        clone: true
+        update: true
+        force: true
+    
+    - name: Debian default site disabled
+      command: a2dissite 000-default
+      register: apache_a2dissite_default
+      changed_when: '"already disabled" not in apache_a2dissite_default.stdout'
+      when: '"000-default" in apache_sites_loaded' 
+    
+    - name: Debian default /var/www/html/index.html absent
+      file:
+        path: /var/www/html/index.html
+        state: absent
+    
+    - name: WSH Apache config in place
+      template:
+        src: templates/webarch.conf.j2
+        dest: /etc/apache2/conf-available/webarch.conf
 
-- name: Debian default site disabled
-  command: a2dissite 000-default
-  register: apache_a2dissite_default
-  changed_when: '"already disabled" not in apache_a2dissite_default.stdout'
-  when: apache_default is defined and apache_default.stat.exists
-  tags:
-    - apache
-
-- name: Debian default /var/www/html/index.html absent
-  file:
-    path: /var/www/html/index.html
-    state: absent
-  tags:
-    - apache
-
-- name: WSH Apache config in place
-  template:
-    src: templates/webarch.conf.j2
-    dest: /etc/apache2/conf-available/webarch.conf
   tags:
     - apache
 ...

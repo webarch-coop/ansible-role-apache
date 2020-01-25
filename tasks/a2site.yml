@@ -1,0 +1,33 @@
+---
+- name: Apache sites disabled and enabled
+  block:
+
+    - name: Apache sites disabled
+      command: "a2disconf {{ conf }}"
+      args:
+        removes: /etc/apache2/conf-enabled/{{ conf }}.conf
+      when:
+        - apache_sites_disabled is defined
+        - apache_sites_disabled != []
+        - site in apache_sites_loaded
+      loop: "{{ apache_sites_disabled }}"
+      loop_control:
+        loop_var: site
+        label: "{{ site }}"
+
+    - name: Apache sites enabled
+      command: "a2enconf {{ conf }}"
+      args:
+        creates: /etc/apache2/conf-enabled/{{ conf }}.conf
+      when:
+        - apache_sites_enabled is defined
+        - apache_sites_enabled != []
+        - site not in apache_sites_loaded
+      loop: "{{ apache_sites_enabled }}"
+      loop_control:
+        loop_var: site
+        label: "{{ site }}"
+
+  tags:
+    - apache
+...

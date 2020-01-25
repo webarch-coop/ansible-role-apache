@@ -1,317 +1,90 @@
 ---
-- name: Apache packages present from buster-backports
-  apt:
-    pkg:
-      - apache2
-    state: present
-    install_recommends: true
-    default_release: buster-backports
-    update_cache: false
-  when: ansible_distribution_release == "buster" 
-  tags:
-    - apache
-
-- name: Apache packages present
-  apt:
-    pkg:
-      - apache2
-    state: present
-    install_recommends: true
-    update_cache: false
-  when: ansible_distribution_release != "buster" 
-  tags:
-    - apache
-
-- name: Additional packages present
-  apt:
-    pkg:
-      - lynx
-    state: present
-    update_cache: false
-  tags:
-    - apache
-
-# Populate current enabled and loaded conf and mods arrays and variables
-- name: Include Apache checks 
-  include_tasks: checks.yml
-  tags:
-    - apache
-
-# If the MPM loaded isn't in the apache_mods_enabled array
-- name: Include MPM switching tasks
-  include_tasks: mpm.yml
-  when: apache_mpm_loaded not in apache_mods_enabled
-  tags:
-    - apache
-
-- name: Apache envars in place
-  template:
-    src: templates/envvars.j2
-    dest: /etc/apache2/envvars
-    mode: 0755
-    owner: root
-    group: root
-  tags:
-    - apache
-
-- name: Conditionally include Webarchitects config
-  include_tasks: webarch.yml
-  when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled )
-  tags:
-    - apache
-
-- name: Conditionally include mc3 config
-  include_tasks: mc3.yml
-  when: ( apache_conf_enabled is defined ) and ( "mc3" in apache_conf_enabled )
-  tags:
-    - apache
-
-- name: Let's Encrypt /.well-known/acme-challenge server-wide alias available
-  template:
-    src: templates/le.conf.j2
-    dest: /etc/apache2/conf-available/le.conf
-  tags:
-    - apache
-
-- name: Custom Apache ssl.conf available
-  template:
-    src: ssl.conf.j2
-    dest: /etc/apache2/mods-available/ssl.conf
-  tags:
-    - apache
-
-- name: Apache localhost and localhost.d directories in place
-  file:
-    path: "{{ dir }}"
-    state: directory
-  loop:
-    - /var/www/localhost
-    - /etc/apache2/localhost.d
-  loop_control:
-    loop_var: dir
-    label: "{{ dir }}"
-  tags:
-    - apache
-
-- name: Apache localhost site available
-  template:
-    src: "templates/localhost.conf.j2"
-    dest: "/etc/apache2/sites-available/localhost.conf"
-  tags:
-    - apache
-
-- name: Deny robots files in place
-  template:
-    src: robots.deny.txt.j2
-    dest: /var/www/html/robots.deny.txt
-  tags:
-    - apache
-
-- name: Expires and robots conf available
-  template:
-    src: "templates/{{ file }}.j2"
-    dest: "/etc/apache2/conf-available/{{ file }}"
-  loop:
-    - robots-deny.conf
-    - robots-deny-nextcloud.conf
-    - expires-strict.conf
-    - expires-medium.conf
-  loop_control:
-    loop_var: file
-    label: "{{ file }}"
-  tags:
-    - apache
-
-- name: Apache modules disabled
+- name: Install and configure Apache
   block:
 
-    - name: Apache ITK MPM package absent
+    - name: Apache packages present from buster-backports
       apt:
         pkg:
-          - libapache2-mpm-itk
-        state: absent
+          - apache2
+        state: present
+        install_recommends: true
+        default_release: buster-backports
         update_cache: false
-      when: '"mpm-itk" in apache_mods_disabled'
+      when: ansible_distribution_release is regex('^buster$')
 
-    - name: Apache FastCGI absent
+    - name: Apache packages present
       apt:
         pkg:
-          - libapache2-mod-fcgid
-        state: absent
+          - apache2
+        state: present
+        install_recommends: true
         update_cache: false
-      when: '"fcgid" in apache_mods_disabled'
+      when: ansible_distribution_release is not regex('^buster$')
 
-    - name: Apache suEXEC package absent
+    - name: Additional packages present
       apt:
         pkg:
-          - apache2-suexec-pristine
-        state: absent
-        update_cache: false
-      when: '"suexec" in apache_mods_disabled'
-
-    - name: "Apache php{{ apache_php_version }} package absent"
-      apt:
-        pkg:
-          - "libapache2-mod-php{{ apache_php_version }}"
-        state: absent
-        update_cache: false
-      when: ( "php7.0" in apache_mods_disabled ) or ( "php7.2" in apache_mods_disabled ) or ( "php7.3" in apache_mods_disabled )
-
-    - name: Disable modules
-      include_tasks: a2dismod.yml
-      when: mod in apache_modules_loaded
-      loop: "{{ apache_mods_disabled }}"
-      loop_control:
-        loop_var: mod
-        label: "{{ mod }}"
-
-  when: ( apache_mods_disabled is defined ) and ( apache_mods_disabled != [] )
-  tags:
-    - apache
-
-- name: Apache modules enabled
-  block:
-
-    - name: Apache ITK MPM package present
-      apt:
-        pkg:
-          - libapache2-mpm-itk
+          - lynx
         state: present
         update_cache: false
-      when: '"mpm-itk" in apache_mods_enabled'
 
-    - name: Apache mpm_prefork.conf in place
+    - name: Include Apache checks 
+      include_tasks: checks.yml
+
+    - name: Include MPM switching tasks
+      include_tasks: mpm.yml
+      when: apache_mpm_loaded not in apache_mods_enabled
+
+    - name: Apache config available
+      include_tasks: config.yml
+
+    - name: Apache envars in place
       template:
-        src: templates/mpm_prefork.conf.j2
-        dest: /etc/apache2/mods-available/mpm_prefork.conf
-      when: ( "mpm-itk" in apache_mods_enabled ) or ( "php7.0" in apache_mods_enabled ) or ( "php7.3" in apache_mods_enabled )
+        src: templates/envvars.j2
+        dest: /etc/apache2/envvars
+        mode: 0755
+        owner: root
+        group: root
 
-    - name: Apache Suexec package present
-      apt:
-        pkg:
-          - apache2-suexec-pristine
-        state: present
-        update_cache: false
-      when: '"suexec" in apache_mods_enabled'
+    - name: Apache modules disabled and enabled
+      include_tasks: a2mod.yml
+      when: ( apache_mods_disabled is defined ) or ( apache_mods_enabled is defined )
 
-    - name: Apache FastCGI package present
-      apt:
-        pkg:
-          - libapache2-mod-fcgid
-        state: present
-        update_cache: false
-      when: '"fcgid" in apache_mods_enabled'
+    - name: Apache conf disabled and enabled
+      include_tasks: a2conf.yml
+      when: ( apache_sites_disabled is defined ) or ( apache_conf_enabled is defined )
 
-    - name: Apache ratelimit conf present
-      template:
-        src: templates/ratelimit.conf.j2
-        dest: /etc/apache2/mods-available/ratelimit.conf
-      when: '"ratelimit" in apache_mods_enabled'
+    - name: Apache sites disabled and enabled
+      include_tasks: a2site.yml
+      when: ( apache_sites_disabled is defined ) or ( apache_sites_enabled is defined )
 
-    - name: Apache mod_php package present
-      apt:
-        pkg:
-          - "libapache2-mod-php{{ apache_php_version }}"
-        state: present
-        update_cache: false
-      when: ( "php7.0" in apache_mods_enabled ) or ( "php7.3" in apache_mods_enabled )
+    - name: Apache enabled for systemd servers
+      systemd:
+        name: apache2
+        enabled: true
+      when: ansible_distribution_release is regex('^buster|bullseye$')
 
-    - name: Cloudflare config available
-      include_tasks: cloudflare.yml
-      when: '"remoteip" in apache_mods_enabled'
+    - name: Apache configtest
+      command: apache2ctl configtest
+      register: apache_configtest
+      changed_when: '"Syntax OK" not in apache_configtest.stderr'
+      check_mode: false
 
-    - name: Apache modules enabled
-      include_tasks: a2enmod.yml
-      when: mod not in apache_modules_loaded
-      loop: "{{ apache_mods_enabled }}"
-      loop_control:
-        loop_var: mod
-        label: "{{ mod }}"
+    - debug:
+        msg: "{{ apache_configtest.stderr }}"
+        verbosity: 1
 
-  when: ( apache_mods_enabled is defined ) and ( apache_mods_enabled != [] )
-  tags:
-    - apache
+    - name: Fail if Apache configtest is not OK
+      fail:
+        msg: "{{ apache2ctl_configtest.stdout }}"
+      when: '"Syntax OK" not in apache_configtest.stderr'
 
-- name: Disable and enable Apache conf
-  block:
+    - name: Apache restarted
+      service:
+        name: apache2
+        state: restarted
+      when: '"Syntax OK" in apache_configtest.stderr'
 
-    - name: Apache conf disabled
-      include_tasks: a2disconf.yml
-      when: conf in apache_conf_loaded
-      loop: "{{ apache_conf_disabled }}"
-      loop_control:
-        loop_var: conf
-        label: "{{ conf }}"
-
-    - name: Apache conf enabled
-      include_tasks: a2enconf.yml
-      when: conf not in apache_conf_loaded
-      loop: "{{ apache_conf_enabled }}"
-      loop_control:
-        loop_var: conf
-        label: "{{ conf }}"
-
-  when: ( apache_conf_enabled is defined ) and ( apache_conf_enabled != [] )
-  tags:
-    - apache
-
-- name: Apache sites disabled and enabled
-  block:
-
-    - name: Apache sites disabled
-      include_tasks: a2dissite.yml
-      when: site in apache_sites_loaded
-      loop: "{{ apache_sites_disabled }}"
-      loop_control:
-        loop_var: site
-        label: "{{ site }}"
-
-    - name: Apache sites enabled
-      include_tasks: a2ensite.yml
-      when: site not in apache_sites_loaded
-      loop: "{{ apache_sites_enabled }}"
-      loop_control:
-        loop_var: site
-        label: "{{ site }}"
-
-  when: ( apache_sites_enabled is defined ) and ( apache_sites_enabled != [] )
-  tags:
-    - apache
-
-- name: Apache enabled for systemd servers
-  systemd:
-    name: apache2
-    enabled: true
-  when: apache_debian_version == "buster"
-  tags:
-    - apache
-
-- name: Apache configtest
-  command: apache2ctl configtest
-  register: apache_configtest
-  changed_when: '"Syntax OK" not in apache_configtest.stderr'
-  check_mode: false
-  tags:
-    - apache
-
-- debug:
-    msg: "{{ apache_configtest.stderr }}"
-    verbosity: 1
-  tags:
-    - apache
-
-- name: Fail if Apache configtest is not OK
-  fail:
-    msg: "{{ apache2ctl_configtest.stdout }}"
-  when: '"Syntax OK" not in apache_configtest.stderr'
-  tags:
-    - apache
-
-- name: Apache restarted
-  service:
-    name: apache2
-    state: restarted
-  when: '"Syntax OK" in apache_configtest.stderr'
   tags:
     - apache
 ...

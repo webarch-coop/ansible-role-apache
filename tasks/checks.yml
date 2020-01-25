@@ -1,13 +1,9 @@
 ---
-# TODO Check that the supplied variables are sane, for example we can't have 
-# no mpm or we can't have mpm_event and mpm_prefork 
-#
+# TODO Check that the supplied variables are sane, for example we can't have no
+# mpm or we can't have mpm_event and mpm_prefork
+
 - name: Check the Apache modules and conf loaded and enabled
   block:
-
-    - name: Set a fact for the Debian version
-      set_fact:
-        apache_debian_version: "{{ ansible_distribution_release }}"
 
     - name: Check if phpquery is installed
       shell: which phpquery || echo absent

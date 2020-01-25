@@ -1,0 +1,103 @@
+---
+- name: Apache modules disabled
+  block:
+
+    - name: Apache ITK MPM package absent
+      apt:
+        pkg:
+          - libapache2-mpm-itk
+        state: absent
+        update_cache: false
+      when: '"mpm-itk" in apache_mods_disabled'
+
+    - name: Apache FastCGI absent
+      apt:
+        pkg:
+          - libapache2-mod-fcgid
+        state: absent
+        update_cache: false
+      when: '"fcgid" in apache_mods_disabled'
+
+    - name: Apache suEXEC package absent
+      apt:
+        pkg:
+          - apache2-suexec-pristine
+        state: absent
+        update_cache: false
+      when: '"suexec" in apache_mods_disabled'
+
+    - name: "Apache {{ apache_phpfpm_mod }} package absent"
+      apt:
+        pkg:
+          - "libapache2-mod-php{{ apache_php_version }}"
+        state: absent
+        update_cache: false
+      when: apache_phpfpm_mod in apache_mods_disabled
+
+    - name: Disable modules
+      apache2_module:
+        name: "{{ mod }}"
+        state: absent
+      when: mod in apache_modules_loaded
+      loop: "{{ apache_mods_disabled }}"
+      loop_control:
+        loop_var: mod
+        label: "{{ mod }}"
+
+  when:
+    - apache_mods_disabled is defined
+    - apache_mods_disabled != []
+  tags:
+    - apache
+
+- name: Apache modules enabled
+  block:
+
+    - name: Apache ITK MPM package present
+      apt:
+        pkg:
+          - libapache2-mpm-itk
+        state: present
+        update_cache: false
+      when: '"mpm-itk" in apache_mods_enabled'
+
+    - name: Apache Suexec package present
+      apt:
+        pkg:
+          - apache2-suexec-pristine
+        state: present
+        update_cache: false
+      when: '"suexec" in apache_mods_enabled'
+
+    - name: Apache FastCGI package present
+      apt:
+        pkg:
+          - libapache2-mod-fcgid
+        state: present
+        update_cache: false
+      when: '"fcgid" in apache_mods_enabled'
+
+    - name: Apache mod_php package present
+      apt:
+        pkg:
+          - "libapache2-mod-php{{ apache_php_version }}"
+        state: present
+        update_cache: false
+      when: apache_phpfpm_mod in apache_mods_enabled
+
+    - name: Apache modules enabled
+      apache2_module:
+        name: "{{ mod }}"
+        state: present
+      when: mod not in apache_modules_loaded
+      loop: "{{ apache_mods_enabled }}"
+      loop_control:
+        loop_var: mod
+        label: "{{ mod }}"
+
+  when:
+    - apache_mods_enabled is defined
+    - apache_mods_enabled != []
+  tags:
+    - apache
+...

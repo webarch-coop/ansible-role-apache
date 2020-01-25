@@ -1,0 +1,33 @@
+---
+- name: Disable and enable Apache conf
+  block:
+
+    - name: Apache conf disabled
+      command: "a2disconf {{ conf }}"
+      args:
+        removes: /etc/apache2/conf-enabled/{{ conf }}.conf
+      when:
+        - apache_conf_disabled is defined
+        - apache_conf_disabled != [] )
+        - conf in apache_conf_loaded
+      loop: "{{ apache_conf_disabled }}"
+      loop_control:
+        loop_var: conf
+        label: "{{ conf }}"
+
+    - name: Apache conf enabled
+      command: "a2enconf {{ conf }}"
+      args:
+        creates: /etc/apache2/conf-enabled/{{ conf }}.conf
+      when:
+        - apache_conf_enabled is defined
+        - apache_conf_enabled != [] )
+        - conf not in apache_conf_loaded
+      loop: "{{ apache_conf_enabled }}"
+      loop_control:
+        loop_var: conf
+        label: "{{ conf }}"
+
+  tags:
+    - apache
+...
