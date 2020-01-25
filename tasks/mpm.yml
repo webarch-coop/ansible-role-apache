@@ -21,6 +21,7 @@
         name: mpm_event
         state: present
         ignore_configcheck: true
+      register: apache_mpm_event_enabled 
 
   when:
     - ( apache_mpm_loaded == "mpm_prefork" ) or ( apache_mpm_loaded == "none" )
@@ -42,6 +43,7 @@
         name: mpm_prefork
         state: present
         ignore_configcheck: true
+      register: apache_mpm_prefork_enabled 
 
   when:
     - ( apache_mpm_loaded == "mpm_event" ) or ( apache_mpm_loaded == "none" )
@@ -73,6 +75,14 @@
         msg: "No Apache MPM loaded"
       when: apache_mpm_check.stdout == "invalid"
 
+  tags:
+    - apache
+
+- name: Restart Apache if the MPM has changed
+  service:
+    name: apache2
+    state: restarted
+  when: apache_mpm_mpm_enabled.changed or apache_mpm_prefork_enabled.changed
   tags:
     - apache
 
