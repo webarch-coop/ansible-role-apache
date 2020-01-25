@@ -75,7 +75,7 @@
 
 - name: Custom Apache ssl.conf available
   template:
-    src: files/ssl.conf.j2
+    src: ssl.conf.j2
     dest: /etc/apache2/mods-available/ssl.conf
   tags:
     - apache
