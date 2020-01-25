@@ -1,4 +1,7 @@
 ---
+# TODO Check that the supplied variables are sane, for example we can't have 
+# no mpm or we can't have mpm_event and mpm_prefork 
+#
 - name: Check the Apache modules and conf loaded and enabled
   block:
 
@@ -85,6 +88,30 @@
     - name: Debug loaded conf
       debug:
         var: apache_conf_loaded
+        verbosity: 2
+
+    - name: Register the loaded sites
+      command: a2query -s
+      check_mode: false
+      changed_when: false
+      register: apache_sites_check
+
+    - name: Debug the loaded sites
+      debug:
+        var: apache_sites_check.stdout_lines
+        verbosity: 2
+
+    - name: Set an array of the loaded sites
+      set_fact:
+        apache_sites_loaded: "{{ apache_sites_loaded | default([]) + [ line.split(' ')[0] ] }}"
+      loop: "{{ apache_sites_check.stdout_lines }}"
+      loop_control:
+        loop_var: line
+        label: "{{ line }}"
+
+    - name: Debug loaded sites
+      debug:
+        var: apache_sites_loaded
         verbosity: 2
 
     - name: Check the enabled MPM

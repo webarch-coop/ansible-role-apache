@@ -1,21 +1,44 @@
 ---
+- name: Apache packages present from buster-backports
+  apt:
+    pkg:
+      - apache2
+    state: present
+    install_recommends: true
+    default_release: buster-backports
+    update_cache: false
+  when: ansible_distribution_release == "buster" 
+  tags:
+    - apache
+
 - name: Apache packages present
   apt:
     pkg:
       - apache2
-      - apache2-utils
+    state: present
+    install_recommends: true
+    update_cache: false
+  when: ansible_distribution_release != "buster" 
+  tags:
+    - apache
+
+- name: Additional packages present
+  apt:
+    pkg:
       - lynx
     state: present
     update_cache: false
   tags:
     - apache
 
-- name: Include Apache checks to populate current enabled and loaded conf and mods arrays and variables
+# Populate current enabled and loaded conf and mods arrays and variables
+- name: Include Apache checks 
   include_tasks: checks.yml
   tags:
     - apache
 
-- name: Include MPM switching tasks if the MPM loaded isn't in the apache_mods_enabled array
+# If the MPM loaded isn't in the apache_mods_enabled array
+- name: Include MPM switching tasks
   include_tasks: mpm.yml
   when: apache_mpm_loaded not in apache_mods_enabled
   tags:
@@ -43,16 +66,16 @@
   tags:
     - apache
 
-- name: Let's Encrypt /.well-known/acme-challenge server-wide alias in place
+- name: Let's Encrypt /.well-known/acme-challenge server-wide alias available
   template:
     src: templates/le.conf.j2
     dest: /etc/apache2/conf-available/le.conf
   tags:
     - apache
 
-- name: Custom Apache ssl.conf in place
-  copy:
-    src: files/ssl.conf
+- name: Custom Apache ssl.conf available
+  template:
+    src: files/ssl.conf.j2
     dest: /etc/apache2/mods-available/ssl.conf
   tags:
     - apache
@@ -70,7 +93,7 @@
   tags:
     - apache
 
-- name: Apache localhost site available in place
+- name: Apache localhost site available
   template:
     src: "templates/localhost.conf.j2"
     dest: "/etc/apache2/sites-available/localhost.conf"
@@ -237,6 +260,7 @@
 
     - name: Apache sites disabled
       include_tasks: a2dissite.yml
+      when: site in apache_sites_loaded
       loop: "{{ apache_sites_disabled }}"
       loop_control:
         loop_var: site
@@ -244,6 +268,7 @@
 
     - name: Apache sites enabled
       include_tasks: a2ensite.yml
+      when: site not in apache_sites_loaded
       loop: "{{ apache_sites_enabled }}"
       loop_control:
         loop_var: site

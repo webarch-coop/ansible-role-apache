@@ -43,7 +43,7 @@ The other repo should also contain a (for example) `apache.yml` file that contai
       - mpm_event
     apache_mods_disabled:
       - suexec
-      - mpm-itk
+      - mpm_itk
       - mpm_prefork
       - php7.3
     apache_conf_enabled:
