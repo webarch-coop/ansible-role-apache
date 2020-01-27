@@ -5,7 +5,7 @@
     - name: Directories present
       file:
         path: "{{ path }}"
-        state: dir
+        state: directory
       loop:
         - "{{ apache_document_root }}"
         - "{{ apache_document_root }}/.well-known/acme-challenge"
