@@ -102,6 +102,7 @@
         - ( apache_conf_disabled is defined ) and ( apache_conf_disabled[0] is defined )
 
     - name: apache_sites_enabled and apache_sites_disabled array checks
+      block:
 
         - name: Debug site arrays
           debug:
