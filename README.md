@@ -4,7 +4,7 @@ This repository contains an Ansible role for installing Apache on Debian Stretch
 
 On Buster [Apache](https://packages.debian.org/buster-backports/apache2) is installed from [backports](https://backports.debian.org/) as this allows for the use of TLSv1.3, support for [mod_md](https://httpd.apache.org/docs/trunk/mod/mod_md.html) on Buster still needs to be added see [this issue](https://git.coop/webarch/apache/issues/5).
 
-See the [defaults/main.yml](defaults/main.yml) for the default settings.
+See the [defaults/main.yml](defaults/main.yml) file for the default settings.
 
 To use this role you need to use Ansible Galaxy to install it into another repository by adding a `requirements.yml` file in that repo that contains:
 
