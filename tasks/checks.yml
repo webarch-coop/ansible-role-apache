@@ -1,5 +1,5 @@
 ---
-- name: Check that only one of mpm_prefork or mpm_events is enabled or disabled
+- name: Check that mistakes haven't been made in the variables and arrays
   block:
 
     - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
@@ -22,6 +22,24 @@
           - ( "mpm_event" not in apache_mods_enabled )
           - ( "mpm_prefork" not in apache_mods_disabled )
       when: ( "mpm_prefork" in apache_mods_enabled )
+
+    - name: Check that there are no duplicates in the mods arrays
+      assert:
+        that:
+          - apache_mods_enabled | unique | count == apache_mods_enabled | unique
+          - apache_mods_disabled | unique | count == apache_mods_disabled | unique
+
+    - name: Check that there are no duplicates in the conf arrays
+      assert:
+        that:
+          - apache_conf_enabled | unique | count == apache_conf_enabled | unique
+          - apache_conf_disabled | unique | count == apache_conf_disabled | unique
+
+    - name: Check that there are no duplicates in the sites arrays
+      assert:
+        that:
+          - apache_sites_enabled | unique | count == apache_sites_enabled | unique
+          - apache_sites_disabled | unique | count == apache_sites_disabled | unique
 
 - name: Check the Apache version, modules and conf, loaded and enabled
   block:
