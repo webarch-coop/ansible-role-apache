@@ -1,6 +1,8 @@
 # Ansible Apache Role
 
-Currently this repository contains an Ansible role for installing Apache on Debian Stretch and Buster. 
+Currently this repository contains an Ansible role for installing Apache on Debian Stretch and Buster (Ubuntu support should be added at some point). 
+
+On Buster [Apache](https://packages.debian.org/buster-backports/apache2) is installed from [backports](https://backports.debian.org/) as this allows for the use of TLSv1.3, support for [mod_md](https://httpd.apache.org/docs/trunk/mod/mod_md.html) on Buster still need to be added.
 
 To use this role you need to use Ansible Galaxy to install it into another repository by adding a `requirements.yml` file in that repo that contains:
 
@@ -136,4 +138,4 @@ Then it can be run as follows:
 
 ```bash
 ansible-playbook apache.yml -i hosts.yml
-``` 
+```
