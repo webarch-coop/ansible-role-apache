@@ -1,6 +1,6 @@
 # Ansible Apache Role
 
-Currently this repository contains an Ansible role for installing Apache on Debian Stretch and Buster (Ubuntu support should be added at some point). 
+This repository contains an Ansible role for installing Apache on Debian Stretch and Buster (Ubuntu support should be added at some point). 
 
 On Buster [Apache](https://packages.debian.org/buster-backports/apache2) is installed from [backports](https://backports.debian.org/) as this allows for the use of TLSv1.3, support for [mod_md](https://httpd.apache.org/docs/trunk/mod/mod_md.html) on Buster still need to be added.
 
