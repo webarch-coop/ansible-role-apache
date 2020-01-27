@@ -41,42 +41,48 @@
           - apache_sites_enabled | unique | count == apache_sites_enabled | count
           - apache_sites_disabled | unique | count == apache_sites_disabled | count
 
-    - name: Debug mods enabled
-      debug:
-        var: mod
-        verbosity: 2
-      loop_control:
-        loop_var: mod
-        label: "{{ mod }}"
-      when: apache_mods_enabled[0] is defined
+    - name: apache_mods_enabled array checks
+      block:
 
-    - name: Debug mods disabled
-      debug:
-        var: mod
-        verbosity: 2
-      loop: apache_mods_disabled
-      loop_control:
-        loop_var: mod
-        label: "{{ mod }}"
-      when: apache_mods_disabled[0] is defined
+        - name: Debug mods enabled
+          debug:
+            var: mod
+            verbosity: 2
+          loop_control:
+            loop_var: mod
+            label: "{{ mod }}"
+    
+        - name: Check that no mods are enabled and disabled
+          assert:
+            that: "{{ mod }} not in apache_mods_disabled"
+          loop: apache_mods_enabled
+          loop_control:
+            loop_var: mod
+            label: "{{ mod }}"
 
-    - name: Check that no mods are enabled and disabled
-      assert:
-        that: "{{ mod }} not in apache_mods_disabled"
-      loop: apache_mods_enabled
-      loop_control:
-        loop_var: mod
-        label: "{{ mod }}"
-      when: apache_mods_enabled[0] is defined
+      when: ( apache_mods_enabled is defined ) and ( apache_mods_enabled[0] is defined )
 
-    - name: Check that no mods are disabled and enabled
-      assert:
-        that: mod not in apache_mods_enabled
-      loop: apache_mods_disabled
-      loop_control:
-        loop_var: mod
-        label: "{{ mod }}"
-      when: apache_mods_disabled[0] is defined
+    - name: apache_mods_disabled array checks
+      block:
+
+        - name: Debug mods disabled
+          debug:
+            var: mod
+            verbosity: 2
+          loop: apache_mods_disabled
+          loop_control:
+            loop_var: mod
+            label: "{{ mod }}"
+    
+        - name: Check that no mods are disabled and enabled
+          assert:
+            that: mod not in apache_mods_enabled
+          loop: apache_mods_disabled
+          loop_control:
+            loop_var: mod
+            label: "{{ mod }}"
+
+      when: ( apache_mods_disabled is defined ) and ( apache_mods_disabled[0] is defined )
 
     - name: Check that no conf are enabled and disabled
       assert:
