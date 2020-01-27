@@ -1,34 +1,27 @@
 ---
-# TODO Check that the supplied variables are sane, for example we can't have no
-# mpm or we can't have mpm_event and mpm_prefork
-
 - name: Check that only one of mpm_prefork or mpm_events is enabled or disabled
   block:
 
-    - name: Check that a mpm is enabled
+    - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
       assert:
         that:
+          - ( apache_mods_enabled is defined ) and ( apache_mods_enabled[0] is defined )
           - ( "mpm_prefork" in apache_mods_enabled ) or ( "mpm_event" in apache_mods_enabled )
 
     - name: Checks when mpm_event enabled
       assert:
         that:
           - ( "mpm_prefork" not in apache_mods_enabled )
-          - ( "mpm_event" not in apache_mods_diabled )
-          - ( "mpm_itk" not in apache_mods_diabled )
+          - ( "mpm_event" not in apache_mods_disabled )
+          - ( "mpm_itk" not in apache_mods_disabled )
       when: ( "mpm_event" in apache_mods_enabled )
 
     - name: Checks when mpm_prefork enabled
       assert:
         that:
           - ( "mpm_event" not in apache_mods_enabled )
-          - ( "mpm_prefork" not in apache_mods_diabled )
+          - ( "mpm_prefork" not in apache_mods_disabled )
       when: ( "mpm_prefork" in apache_mods_enabled )
-
-    - name: Check that a mpm is enabled
-      assert:
-        that:
-          - ( "mpm_prefork" in apache_mods_enabled ) or ( "mpm_event" in apache_mods_enabled )
 
 - name: Check the Apache version, modules and conf, loaded and enabled
   block:
