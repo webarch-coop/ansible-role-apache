@@ -84,10 +84,10 @@
       loop_control:
         loop_var: site
         label: "{{ site }}"
-      apache_sites_enabled[0] is defined
+      when: apache_sites_enabled[0] is defined
 
     - name: Check that no sites are disabled and enabled
-       assert:
+      assert:
         that: site not in apache_sites_enabled
       loop: apache_sites_disabled
       loop_control:
