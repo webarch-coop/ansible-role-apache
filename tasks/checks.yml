@@ -16,6 +16,7 @@
     - name: Debug Apache version check
       debug:
         msg: "{{ apache_version_check.stdout_lines[0] }}"
+        verbosity: 2
 
     - name: Set a fact for the Apache version
       set_fact:
@@ -24,6 +25,22 @@
     - name: Debug Apache version
       debug:
         var: apache_version 
+        verbosity: 1
+
+    - name: TLS versions
+      block:
+
+        - name: Set facts for TLS versions
+          set_fact:
+            apache_tls1_3: True
+          when: apache_version is version('2.4.41', '>=')
+
+        - name: Debug TLS 1.3 variable
+          debug:
+            var: apache_tls1_3
+            verbosity: 1
+
+      when: apache_version is version('2.4.41', '>=')
 
     - name: Check if phpquery is installed
       shell: which phpquery || echo absent
