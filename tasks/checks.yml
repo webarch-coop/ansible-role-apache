@@ -2,8 +2,28 @@
 # TODO Check that the supplied variables are sane, for example we can't have no
 # mpm or we can't have mpm_event and mpm_prefork
 
-- name: Check the Apache modules and conf loaded and enabled
+  
+
+- name: Check the Apache version, modules and conf, loaded and enabled
   block:
+
+    - name: Check the Apache version
+      command: apache2ctl -v
+      check_mode: false
+      changed_when: false
+      register: apache_version_check
+
+    - name: Debug Apache version check
+      debug:
+        msg: "{{ apache_version_check.stdout_lines[0] }}"
+
+    - name: Set a fact for the Apache version
+      set_fact:
+        apache_version: "{{ apache_version_check.stdout_lines[0].split(' ')[3] }}"
+
+    - name: Debug Apache version
+      debug:
+        var: apache_version 
 
     - name: Check if phpquery is installed
       shell: which phpquery || echo absent
