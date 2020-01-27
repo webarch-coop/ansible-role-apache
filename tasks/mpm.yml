@@ -1,5 +1,5 @@
 ---
-- name: Switch from mpm_prefork to mpm_event
+- name: Enable Apache mpm_event if mpm_prefork or no MPM loaded
   block:
 
     - name: "Disable Apache module {{ apache_phpfpm_mod }}"
@@ -22,6 +22,7 @@
         name: mpm_prefork
         state: absent
         ignore_configcheck: true
+      when: '"mpm_prefork" in apache_modules_loaded'
 
     - name: "Enable Apache mpm_event"
       apache2_module:
@@ -42,7 +43,7 @@
   tags:
     - apache
 
-- name: Switch from mpm_event to mpm_prefork
+- name: Enable Apache mpm_prefork if mpm_event or no MPM loaded
   block:
 
     - name: "Disable Apache module mpm_event"
@@ -50,6 +51,7 @@
         name: mpm_event
         state: absent
         ignore_configcheck: true
+      when: '"mpm_event" in apache_modules_loaded'
 
     - name: "Enable Apache mpm_prefork"
       apache2_module:
@@ -89,7 +91,7 @@
         apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
       when: apache_mpm_check.stdout != "invalid"
 
-    - name: Fail if non MPM loaded
+    - name: Fail if no Apache MPM loaded
       fail:
         msg: "No Apache MPM loaded"
       when: apache_mpm_check.stdout == "invalid"
