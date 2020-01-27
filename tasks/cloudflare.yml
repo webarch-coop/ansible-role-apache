@@ -20,7 +20,7 @@
     - name: Debug Cloudflare IP array
       debug:
         msg: "apache_cloudflare_ips: {{ apache_cloudflare_ips }}"
-        verbosity: 1
+        verbosity: 2
 
     - name: Apache Cloudflare config generated
       template:

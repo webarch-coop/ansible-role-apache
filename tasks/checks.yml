@@ -1,0 +1,221 @@
+---
+# TODO Check that the supplied variables are sane, for example we can't have no
+# mpm or we can't have mpm_event and mpm_prefork
+
+- name: Check the Apache version, modules and conf, loaded and enabled
+  block:
+
+    - name: Check the Apache version
+      command: apache2ctl -v
+      check_mode: false
+      changed_when: false
+      register: apache_version_check
+
+    - name: Debug Apache version check
+      debug:
+        msg: "{{ apache_version_check.stdout_lines[0] }}"
+        verbosity: 2
+
+    - name: Set a fact for the Apache version
+      set_fact:
+        apache_version: "{{ apache_version_check.stdout_lines[0].split(' ')[2] | regex_replace('^Apache[/]') }}"
+
+    - name: Debug Apache version
+      debug:
+        var: apache_version
+        verbosity: 1
+
+    - name: TLS versions
+      block:
+
+        - name: Set facts for TLS versions
+          set_fact:
+            apache_tls1_3: true
+          when: apache_version is version('2.4.41', '>=')
+
+        - name: Debug TLS 1.3 variable
+          debug:
+            var: apache_tls1_3
+            verbosity: 1
+
+      when: apache_version is version('2.4.41', '>=')
+
+    - name: Check if phpquery is installed
+      shell: which phpquery || echo absent
+      check_mode: false
+      register: apache_phpquery_path
+      changed_when: '"phpquery" not in apache_phpquery_path.stdout'
+
+    - name: Check PHP version
+      block:
+
+        - name: Run phpquery to get the PHP version
+          command: phpquery -V
+          register: apache_phpquery_version
+          check_mode: false
+          changed_when: false
+
+        - name: Set a fact for the PHP version
+          set_fact:
+            apache_php_version: "{{ apache_phpquery_version.stdout }}"
+
+        - name: Set a fact for the PHP FPM module and conf names
+          set_fact:
+            apache_phpfpm_mod: "php{{ apache_php_version }}"
+            apache_phpfpm_conf: "php{{ apache_php_version }}-fpm"
+
+        - name: Debug PHP FPM module and conf names
+          debug:
+            var:
+              - apache_phpfpm_mod
+              - apache_phpfpm_conf
+            verbosity: 2
+
+      when: ( apache_phpquery_path is defined ) and ( apache_phpquery_path.stdout == "/usr/sbin/phpquery" )
+
+    - name: Check loaded modules
+      block:
+
+        - name: Register the loaded modules
+          command: a2query -m
+          check_mode: false
+          changed_when: false
+          register: apache_modules_check
+
+      rescue:
+
+        - name: No mod enabled
+          set_fact:
+            apache_modules_loaded: []
+          when: '"No module matches" in apache_modules_check.stderr'
+
+    - name: Debug the loaded modules
+      debug:
+        var: apache_modules_check.stdout_lines
+        verbosity: 2
+      when: apache_modules_check.stdout is defined
+
+    - name: Set an array of the loaded modules
+      set_fact:
+        apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ line.split(' ')[0] ] }}"
+      when: apache_modules_check.stdout is defined
+      loop: "{{ apache_modules_check.stdout_lines }}"
+      loop_control:
+        loop_var: line
+        label: "{{ line }}"
+
+    - name: Debug loaded modules
+      debug:
+        var: apache_modules_loaded
+        verbosity: 2
+      when: apache_modules_loaded is defined
+
+    - name: Check loaded conf
+      block:
+
+        - name: Register the loaded conf
+          command: a2query -c
+          check_mode: false
+          changed_when: false
+          register: apache_conf_check
+
+      rescue:
+
+        - name: No conf enabled
+          set_fact:
+            apache_conf_loaded: []
+          when: '"No conf matches" in apache_conf_check.stderr'
+
+    - name: Debug the loaded conf
+      debug:
+        var: apache_conf_check.stdout_lines
+        verbosity: 2
+      when: apache_conf_check.stdout is defined
+
+    - name: Set an array of the loaded conf
+      set_fact:
+        apache_conf_loaded: "{{ apache_conf_loaded | default([]) + [ line.split(' ')[0] ] }}"
+      when: apache_conf_check.stdout is defined
+      loop: "{{ apache_conf_check.stdout_lines }}"
+      loop_control:
+        loop_var: line
+        label: "{{ line }}"
+
+    - name: Debug loaded conf
+      debug:
+        var: apache_conf_loaded
+        verbosity: 2
+
+    - name: Check loaded sites
+      block:
+
+        - name: Register the loaded sites
+          command: a2query -s
+          check_mode: false
+          changed_when: false
+          register: apache_sites_check
+
+      rescue:
+
+        - name: No sites enabled
+          set_fact:
+            apache_sites_loaded: []
+          when: '"No site matches" in apache_sites_check.stderr'
+
+    - name: Debug the loaded sites
+      debug:
+        var: apache_sites_check.stdout_lines
+        verbosity: 2
+      when: apache_sites_check.stdout is defined
+
+    - name: Set an array of the loaded sites
+      set_fact:
+        apache_sites_loaded: "{{ apache_sites_loaded | default([]) + [ line.split(' ')[0] ] }}"
+      when: apache_sites_check.stdout is defined
+      loop: "{{ apache_sites_check.stdout_lines }}"
+      loop_control:
+        loop_var: line
+        label: "{{ line }}"
+
+    - name: Debug loaded sites
+      debug:
+        var: apache_sites_loaded
+        verbosity: 2
+      when: apache_sites_loaded is defined
+
+    - name: Check the enabled MPM
+      command: a2query -M
+      check_mode: false
+      changed_when: false
+      register: apache_mpm_check
+
+    - name: Debug the enabled MPM
+      debug:
+        msg: "{{ apache_mpm_check.stdout }}"
+        verbosity: 2
+
+    - name: Set a fact for the enabled MPM
+      set_fact:
+        apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
+      when: apache_mpm_check.stdout != "invalid"
+
+    - name: Set a fact for the enabled MPM
+      set_fact:
+        apache_mpm_loaded: "none"
+      when: apache_mpm_check.stdout == "invalid"
+
+    - name: Debug the enabled MPM
+      debug:
+        var: apache_mpm_loaded
+        verbosity: 2
+      when: apache_mpm_loaded is defined
+
+    - name: "Check if a Let's Encrypt HTTPS cert is present for {{ inventory_hostname }}"
+      stat:
+        path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
+      check_mode: false
+      register: apache_cert
+
+  tags:
+    - apache
+...
