@@ -2,8 +2,6 @@
 # TODO Check that the supplied variables are sane, for example we can't have no
 # mpm or we can't have mpm_event and mpm_prefork
 
-  
-
 - name: Check the Apache version, modules and conf, loaded and enabled
   block:
 
@@ -24,7 +22,7 @@
 
     - name: Debug Apache version
       debug:
-        var: apache_version 
+        var: apache_version
         verbosity: 1
 
     - name: TLS versions
@@ -32,7 +30,7 @@
 
         - name: Set facts for TLS versions
           set_fact:
-            apache_tls1_3: True
+            apache_tls1_3: true
           when: apache_version is version('2.4.41', '>=')
 
         - name: Debug TLS 1.3 variable
