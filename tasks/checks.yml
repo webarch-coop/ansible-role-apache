@@ -48,7 +48,7 @@
           debug:
             var:
               - apache_mods_enabled
-              - apache_mods_disbled
+              - apache_mods_disabled
             verbosity: 2
 
         - name: Check that no mods are enabled and disabled
@@ -78,7 +78,7 @@
           debug:
             var:
               - apache_conf_enabled
-              - apache_conf_disbled
+              - apache_conf_disabled
             verbosity: 2
 
         - name: Check that no conf are enabled and disabled
@@ -108,7 +108,7 @@
           debug:
             var:
               - apache_sites_enabled
-              - apache_sites_disbled
+              - apache_sites_disabled
             verbosity: 2
 
         - name: Check that no sites are enabled and disabled
