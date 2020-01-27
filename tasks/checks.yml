@@ -26,20 +26,20 @@
     - name: Check that there are no duplicates in the mods arrays
       assert:
         that:
-          - apache_mods_enabled | unique | count == apache_mods_enabled | unique
-          - apache_mods_disabled | unique | count == apache_mods_disabled | unique
+          - apache_mods_enabled | unique | count == apache_mods_enabled | count
+          - apache_mods_disabled | unique | count == apache_mods_disabled | count
 
     - name: Check that there are no duplicates in the conf arrays
       assert:
         that:
-          - apache_conf_enabled | unique | count == apache_conf_enabled | unique
-          - apache_conf_disabled | unique | count == apache_conf_disabled | unique
+          - apache_conf_enabled | unique | count == apache_conf_enabled | count
+          - apache_conf_disabled | unique | count == apache_conf_disabled | count
 
     - name: Check that there are no duplicates in the sites arrays
       assert:
         that:
-          - apache_sites_enabled | unique | count == apache_sites_enabled | unique
-          - apache_sites_disabled | unique | count == apache_sites_disabled | unique
+          - apache_sites_enabled | unique | count == apache_sites_enabled | count
+          - apache_sites_disabled | unique | count == apache_sites_disabled | count
 
 - name: Check the Apache version, modules and conf, loaded and enabled
   block:
