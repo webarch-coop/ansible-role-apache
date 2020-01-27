@@ -43,15 +43,22 @@
 
     - name: Debug mods enabled
       debug:
-        var:
-          - apache_mods_enabled
+        var: mod
         verbosity: 2
+      loop_control:
+        loop_var: mod
+        label: "{{ mod }}"
+      when: apache_mods_enabled[0] is defined
 
     - name: Debug mods disabled
       debug:
-        var:
-          - apache_mods_disabled
+        var: mod
         verbosity: 2
+      loop: apache_mods_disabled
+      loop_control:
+        loop_var: mod
+        label: "{{ mod }}"
+      when: apache_mods_disabled[0] is defined
 
     - name: Check that no mods are enabled and disabled
       assert:
