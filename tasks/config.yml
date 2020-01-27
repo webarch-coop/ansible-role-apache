@@ -2,6 +2,14 @@
 - name: Apache config available
   block:
 
+    - name: Directories present
+      file:
+        path: "{{ path }}"
+        state: dir
+      loop:
+        - "{{ apache_document_root }}"
+        - "{{ apache_document_root }}/.well-known/acme-challenge"
+
     - name: Conditionally include Webarchitects config
       include_tasks: webarch.yml
       when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled )
