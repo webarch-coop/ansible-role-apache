@@ -9,6 +9,9 @@
       loop:
         - "{{ apache_document_root }}"
         - "{{ apache_document_root }}/.well-known/acme-challenge"
+      loop_control:
+        loop_var: path
+        label: "{{ path }}"
 
     - name: Conditionally include Webarchitects config
       include_tasks: webarch.yml
