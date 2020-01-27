@@ -19,7 +19,7 @@
 
     - name: Set a fact for the Apache version
       set_fact:
-        apache_version: "{{ apache_version_check.stdout_lines[0].split(' ')[3] }}"
+        apache_version: "{{ apache_version_check.stdout_lines[0].split(' ')[2] | regex_findall('[1-9.]*$]' }}"
 
     - name: Debug Apache version
       debug:
