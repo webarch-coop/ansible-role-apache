@@ -42,44 +42,49 @@
           - apache_sites_disabled | unique | count == apache_sites_disabled | count
 
     - name: Check that no mods are enabled and disabled
-       assert:
+      assert:
         that: mod not in apache_mods_disabled
       loop: apache_mods_enabled
       loop_control:
         loop_var: mod
         label: "{{ mod }}"
+      when: apache_mods_enabled[0] is defined
 
     - name: Check that no mods are disabled and enabled
-       assert:
+      assert:
         that: mod not in apache_mods_enabled
       loop: apache_mods_disabled
       loop_control:
         loop_var: mod
         label: "{{ mod }}"
+      when: apache_mods_disabled[0] is defined
 
     - name: Check that no conf are enabled and disabled
-       assert:
+      assert:
         that: conf not in apache_conf_disabled
       loop: apache_conf_enabled
       loop_control:
         loop_var: conf
         label: "{{ conf }}"
+      when: apache_conf_disabled[0] is defined
 
     - name: Check that no conf are disabled and enabled
-       assert:
+      assert:
         that: conf not in apache_conf_enabled
       loop: apache_conf_disabled
       loop_control:
         loop_var: conf
         label: "{{ conf }}"
+      when: apache_conf_disabled[0] is defined
 
     - name: Check that no sites are enabled and disabled
-       assert:
+      assert:
         that: site not in apache_sites_disabled
       loop: apache_sites_enabled
       loop_control:
         loop_var: site
         label: "{{ site }}"
+      apache_sites_enabled[0] is defined
 
     - name: Check that no sites are disabled and enabled
        assert:
@@ -88,6 +93,7 @@
       loop_control:
         loop_var: site
         label: "{{ site }}"
+      when: apache_sites_disabled[0] is defined
 
 - name: Check the Apache version, modules and conf, loaded and enabled
   block:
