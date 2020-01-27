@@ -44,35 +44,24 @@
     - name: apache_mods_enabled and apache_mods_disabled array checks
       block:
 
-        - name: Debug mods enabled
+        - name: Debug mod arrays 
           debug:
-            var: apache_mods_enabled
+            var:
+              - apache_mods_enabled
+              - apache_mods_disbled
             verbosity: 2
-          #loop: "{{ apache_mods_enabled }}"
-          #loop_control:
-          #  loop_var: mod
-          #  label: "{{ mod }}"
     
         - name: Check that no mods are enabled and disabled
           assert:
-            that: "{{ mod }} not in apache_mods_disabled"
+            that: mod not in apache_mods_disabled
           loop: "{{ apache_mods_enabled }}"
-          loop_control:
-            loop_var: mod
-            label: "{{ mod }}"
-
-        - name: Debug mods disabled
-          debug:
-            var: mod
-            verbosity: 2
-          loop: "{{ apache_mods_disabled }}"
           loop_control:
             loop_var: mod
             label: "{{ mod }}"
     
         - name: Check that no mods are disabled and enabled
           assert:
-            that: "{{ mod }} not in apache_mods_enabled"
+            that: mod not in apache_mods_enabled
           loop: "{{ apache_mods_disabled }}"
           loop_control:
             loop_var: mod
@@ -82,24 +71,34 @@
         - ( apache_mods_enabled is defined ) and ( apache_mods_enabled[0] is defined )
         - ( apache_mods_disabled is defined ) and ( apache_mods_disabled[0] is defined )
 
-    - name: Check that no conf are enabled and disabled
-      assert:
-        that: conf not in apache_conf_disabled
-      loop: apache_conf_enabled
-      loop_control:
-        loop_var: conf
-        label: "{{ conf }}"
-      when: apache_conf_abled[0] is defined
+    - name: apache_conf_enabled and apache_conf_disabled array checks
+      block:
 
-    - name: Check that no conf are disabled and enabled
-      assert:
-        that: conf not in apache_conf_enabled
-      loop: apache_conf_disabled
-      loop_control:
-        loop_var: conf
-        label: "{{ conf }}"
+        - name: Debug conf arrays 
+          debug:
+            var:
+              - apache_conf_enabled
+              - apache_conf_disbled
+            verbosity: 2
+
+        - name: Check that no conf are enabled and disabled
+          assert:
+            that: conf not in apache_conf_disabled
+          loop: apache_conf_enabled
+          loop_control:
+            loop_var: conf
+            label: "{{ conf }}"
+    
+        - name: Check that no conf are disabled and enabled
+          assert:
+            that: conf not in apache_conf_enabled
+          loop: apache_conf_disabled
+          loop_control:
+            loop_var: conf
+            label: "{{ conf }}"
 
       when:
+        - ( apache_conf_enabled is defined ) and ( apache_conf_enabled[0] is defined )
         - ( apache_conf_disabled is defined ) and ( apache_conf_disabled[0] is defined )
 
     - name: Check that no sites are enabled and disabled
