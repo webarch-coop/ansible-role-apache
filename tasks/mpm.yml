@@ -37,7 +37,7 @@
       when: apache_mpm_event_enabled.changed
 
   when:
-    - ( apache_mpm_loaded == "mpm_prefork" ) or ( apache_mpm_loaded == "none" )
+    - ( apache_mpm_loaded == "mpm_prefork" ) or ( apache_mpm_loaded == "mpm_none" )
     - ( "mpm_event" in apache_mods_enabled )
   tags:
     - apache
@@ -65,7 +65,7 @@
       when: apache_mpm_prefork_enabled.changed
 
   when:
-    - ( apache_mpm_loaded == "mpm_event" ) or ( apache_mpm_loaded == "none" )
+    - ( apache_mpm_loaded == "mpm_event" ) or ( apache_mpm_loaded == "mpm_none" )
     - ( "mpm_prefork" in apache_mods_enabled )
   tags:
     - apache
