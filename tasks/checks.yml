@@ -205,9 +205,9 @@
 
         - name: Debug PHP FPM module and conf names
           debug:
-            var:
-              - apache_phpfpm_mod
-              - apache_phpfpm_conf
+            msg:
+              - "apache_phpfpm_mod: {{ apache_phpfpm_mod }}"
+              - "apache_phpfpm_conf: {{ apache_phpfpm_conf }}"
             verbosity: 2
 
       when: ( apache_phpquery_path is defined ) and ( apache_phpquery_path.stdout == "/usr/sbin/phpquery" )
