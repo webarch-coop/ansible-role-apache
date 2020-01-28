@@ -30,8 +30,8 @@
                 #   If both key and certificate are stored in the same file, only the
                 #   SSLCertificateFile directive is needed.
 {% if apache_cert.stat.exists %}
-                SSLCertificateFile    {{ /etc/ssl/le/{{ inventory_hostname }}.cert.pem }} 
-                SSLCertificateKeyFile {{ /etc/ssl/le/{{ inventory_hostname }}.key.pem }}
+                SSLCertificateFile    /etc/ssl/le/{{ inventory_hostname }}.cert.pem
+                SSLCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
 {% else %}
                 SSLCertificateFile      /etc/ssl/certs/ssl-cert-snakeoil.pem
                 SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
