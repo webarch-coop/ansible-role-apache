@@ -13,6 +13,18 @@
         loop_var: path
         label: "{{ path }}"
 
+    - name: Conditional update 000-default.conf
+      template:
+        src: 000-default.conf.j2
+        dest: /etc/apache2/sites-available/000-default.conf
+      when: ( apache_sites_enabled is defined ) and ( "000-default" in apache_sites_enabled )
+
+    - name: Conditional update default-ssl.conf
+      template:
+        src: default-ssl.conf.j2
+        dest: /etc/apache2/sites-available/default-ssl.conf
+      when: ( apache_sites_enabled is defined ) and ( "default-ssl" in apache_sites_enabled )
+
     - name: Conditionally include Webarchitects config
       include_tasks: webarch.yml
       when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled )
@@ -30,6 +42,18 @@
       template:
         src: ssl.conf.j2
         dest: /etc/apache2/mods-available/ssl.conf
+
+    - name: Provision a Let's Encrypt cert
+      include_role:
+        name: acmesh
+        tasks_from: letsencrypt
+      vars:
+        common_name: "{{ inventory_hostname }}" 
+      when:
+        - ( apache_cert.stat.exists == False )
+        - ( "ssl" in apache_mods_enabled )
+        - ( "le" in apache_conf_enabled )
+        - ( common_name is defined ) and ( common_name == inventory_hostname )
 
     - name: Apache localhost and localhost.d directories in place
       file:
