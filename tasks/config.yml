@@ -43,12 +43,16 @@
         src: ssl.conf.j2
         dest: /etc/apache2/mods-available/ssl.conf
 
-    - name: Provision a Let's Encrypt cert
-      include_role:
-        name: acmesh
-        tasks_from: letsencrypt
-      vars:
-        common_name: "{{ inventory_hostname }}" 
+    - name: Conditionally provision a Let's Encrypt cert using acmesh role
+      block:
+
+        - name: "Provision a Let's Encrypt cert for {{ inventory_hostname }}"
+          include_role:
+            name: acmesh
+            tasks_from: letsencrypt
+          vars:
+            common_name: "{{ inventory_hostname }}" 
+
       when:
         - ( apache_cert.stat.exists == False )
         - ( "ssl" in apache_mods_enabled )
