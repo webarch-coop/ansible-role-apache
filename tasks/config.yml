@@ -51,7 +51,7 @@
             name: acmesh
             tasks_from: letsencrypt
           vars:
-            common_name: "{{ inventory_hostname }}" 
+            common_name: "{{ inventory_hostname }}"
 
       when:
         - ( apache_cert.stat.exists == False )
