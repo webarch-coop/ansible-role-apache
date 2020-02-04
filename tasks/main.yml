@@ -6,10 +6,10 @@
       apt:
         pkg:
           - apache2
-        state: present
+        state: latest
         install_recommends: true
         default_release: buster-backports
-        update_cache: false
+        update_cache: true
       when: ansible_distribution_release is regex('^buster$')
 
     - name: Apache packages present
