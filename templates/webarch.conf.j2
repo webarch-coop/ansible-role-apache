@@ -119,7 +119,7 @@ ErrorDocument 403 /wsh/403.shtml
   {% if matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
-  {% else %}
+  {% elif matomo_user is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   {% endif %}
@@ -154,7 +154,7 @@ ErrorDocument 403 /wsh/403.shtml
   {% if matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
-  {% else %}
+  {% elif matomo_user is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   {% endif %}

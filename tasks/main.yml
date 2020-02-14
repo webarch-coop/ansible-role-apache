@@ -31,6 +31,14 @@
     - name: Include Apache checks
       include_tasks: checks.yml
 
+    - name: Apache DocumentRoot present
+      file:
+        path: "{{ apache_document_root }}"
+        state: directory
+        mode: 0755
+        owner: root
+        group: root
+
     - name: Include MPM switching tasks
       include_tasks: mpm.yml
       when: ( apache_mpm_loaded not in apache_mods_enabled ) or ( apache_mpm_loaded == "" )
