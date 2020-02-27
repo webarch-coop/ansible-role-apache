@@ -32,7 +32,7 @@
           - "libapache2-mod-php{{ apache_php_version }}"
         state: absent
         update_cache: false
-      when: apache_phpfpm_mod in apache_mods_disabled
+      when: '"apache_phpfpm_mod" in apache_mods_disabled'
 
     - name: Disable modules
       apache2_module:
