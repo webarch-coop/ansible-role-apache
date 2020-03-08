@@ -40,9 +40,9 @@
         group: root
 
     - name: Apache DHParameters file present
-      command: openssl dhparam -out /etc/apache2/dhparam.pem 4096
+      command: "openssl dhparam -out {{ apache_dhparam_path }} {{ apache_dhparam_bits }}"
       args:
-        creates: /etc/apache2/dhparam.pem
+        creates: "{{ apache_dhparam_path }}"
 
     - name: Include MPM switching tasks
       include_tasks: mpm.yml

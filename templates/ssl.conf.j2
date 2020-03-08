@@ -94,7 +94,7 @@
 	SSLStaplingCache        shmcb:/var/run/ocsp(128000)
 
 	# https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslopensslconfcmd 
-	SSLOpenSSLConfCmd DHParameters ${APACHE_RUN_DIR}/dhparam.pem
+	SSLOpenSSLConfCmd DHParameters {{ apache_dhparam_path }}
 
 </IfModule>
 
