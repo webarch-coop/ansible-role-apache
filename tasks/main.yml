@@ -43,6 +43,7 @@
       openssl_dhparam:
         path: "{{ apache_dhparam_path }}"
         size: "{{ apache_dhparam_size }}"
+      poll: 2
 
     - name: Include MPM switching tasks
       include_tasks: mpm.yml
