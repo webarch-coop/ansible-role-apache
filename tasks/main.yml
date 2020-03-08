@@ -39,10 +39,10 @@
         owner: root
         group: root
 
-    - name: Apache DHParameters file present
-      command: "openssl dhparam -out {{ apache_dhparam_path }} {{ apache_dhparam_bits }}"
-      args:
-        creates: "{{ apache_dhparam_path }}"
+    - name: Apache DH parameters file present
+      openssl_dhparam:
+        path: "{{ apache_dhparam_path }}"
+        size: "{{ apache_dhparam_size }}"
 
     - name: Include MPM switching tasks
       include_tasks: mpm.yml
