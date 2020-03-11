@@ -7,6 +7,8 @@ apache_document_root: /var/www/html
 apache_tls1_2_cipher_suites: ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
 # Debian Debian Bullseye and Debian Buster Backports Apache 2.4.41 supports TLSv1.3
 apache_tls1_3_cipher_suites: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+apache_dhparam_path: /etc/apache2/dhparam.pem
+apache_dhparam_size: 2048
 apache_sites_enabled:
   - localhost
   - 000-default
