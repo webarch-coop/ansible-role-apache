@@ -5,6 +5,8 @@ Alias "/.well-known/acme-challenge" "{{ apache_document_root }}/.well-known/acme
   AllowOverride None
   ForceType text/plain
   Allow from All
-  H2Upgrade off
+  <IfModule http2_module>
+    H2Upgrade off
+  </IfModule>
 </Directory>
 # vi:syntax=apache
