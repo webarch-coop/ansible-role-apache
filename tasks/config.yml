@@ -43,6 +43,11 @@
         src: ssl.conf.j2
         dest: /etc/apache2/mods-available/ssl.conf
 
+    - name: Custom Apache ports.conf available
+      template:
+        src: ports.conf.j2
+        dest: /etc/apache2/ports.conf
+
     - name: Conditionally provision a Let's Encrypt cert using acmesh role
       block:
 
