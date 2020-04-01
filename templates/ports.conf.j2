@@ -3,7 +3,7 @@
 # /etc/apache2/sites-enabled/000-default.conf
 
 Listen 80
-{%- if apache_localhost_port != "80" %}
+{% if apache_localhost_port != "80" %}
 Listen {{ apache_localhost_port }}
 {%- endif %}
 
