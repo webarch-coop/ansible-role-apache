@@ -2,7 +2,7 @@
 - name: Install and configure Apache
   block:
 
-    - name: Apache packages present from buster-backports
+    - name: Apache present from buster-backports
       apt:
         pkg:
           - apache2
@@ -12,7 +12,7 @@
         update_cache: true
       when: ansible_distribution_release is regex('^buster$')
 
-    - name: Apache packages present
+    - name: Apache present
       apt:
         pkg:
           - apache2
@@ -23,10 +23,10 @@
 
     - name: Additional packages present
       apt:
-        pkg:
-          - lynx
+        pkg: "{{ apache_packages_present }}"
         state: present
         update_cache: false
+      when: ( apache_packages_present is defined ) and ( apache_packages_present != [] )
 
     - name: Include Apache checks
       include_tasks: checks.yml

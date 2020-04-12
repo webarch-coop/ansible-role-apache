@@ -10,6 +10,9 @@ apache_tls1_3_cipher_suites: TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_C
 apache_dhparam_path: /etc/apache2/dhparam.pem
 apache_dhparam_size: 2048
 apache_localhost_port: 80
+apache_packages_present:
+  - lynx
+  # - libapache2-mod-geoip
 apache_sites_enabled:
   - localhost
   - 000-default
