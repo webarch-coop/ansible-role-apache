@@ -15,18 +15,27 @@
         loop_var: site
         label: "{{ site }}"
 
-    - name: Apache sites enabled
-      command: "a2ensite {{ site }}"
-      args:
-        creates: "/etc/apache2/sites-enabled/{{ site }}.conf"
-      when:
-        - apache_sites_enabled is defined
-        - apache_sites_enabled != []
-        - site not in apache_sites_loaded
-      loop: "{{ apache_sites_enabled }}"
-      loop_control:
-        loop_var: site
-        label: "{{ site }}"
+    - name: Apache site enabled
+      block:
+
+        - name: Apache sites enabled
+          command: "a2ensite {{ site }}"
+          args:
+            creates: "/etc/apache2/sites-enabled/{{ site }}.conf"
+          when:
+            - apache_sites_enabled is defined
+            - apache_sites_enabled != []
+            - site not in apache_sites_loaded
+          loop: "{{ apache_sites_enabled }}"
+          loop_control:
+            loop_var: site
+            label: "{{ site }}"
+
+      rescue:
+
+        - name: Site enable failed
+          debug:
+            msg: Enabing an Apache site failde, check that the files exists in /etc/apache2/sites-available
 
   tags:
     - apache
