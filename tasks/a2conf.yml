@@ -3,7 +3,7 @@
   block:
 
     - name: Check loaded conf
-      include_tasks: a2conf_check.yml
+      include_tasks: a2conf_checks.yml
 
     - name: Apache conf disabled
       command: "a2disconf {{ conf }}"

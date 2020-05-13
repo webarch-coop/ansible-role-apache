@@ -1,6 +1,6 @@
 ---
 - name: Check loaded modules
-  include_tasks: a2mod_check.yml
+  include_tasks: a2mod_checks.yml
   tags:
     - apache
 
