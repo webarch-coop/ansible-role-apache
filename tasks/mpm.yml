@@ -2,13 +2,20 @@
 - name: Enable Apache mpm_event if mpm_prefork or no MPM loaded
   block:
 
+    - name: Debug Apache modules loaded
+      debug:
+        mag: "Apache modules loaded: {{ apache_modules_loaded }}"
+        verbosity: 1
+      when:
+        - ( apache_modules_loaded is defined ) and ( apache_modules_loaded | length > 0 )
+
     - name: "Disable Apache module {{ apache_phpfpm_mod }}"
       apache2_module:
         name: "{{ apache_phpfpm_mod }}"
         state: absent
       when:
-        - apache_phpfpm_mod is defined
-        - apache_phpfpm_mod in apache_modules_loaded
+        - ( apache_modules_loaded is defined ) and ( apache_modules_loaded | length > 0 )
+        - ( apache_phpfpm_mod is defined ) and ( apache_phpfpm_mod in apache_modules_loaded )
 
     - name: Disable Apache module mpm_itk
       apache2_module:
