@@ -3,7 +3,7 @@
   block:
 
     - name: Check loaded sites
-      include_tasks: a2sites_checks.yml
+      include_tasks: a2site_checks.yml
 
     - name: Apache sites disabled
       command: "a2dissite {{ site }}"
