@@ -4,7 +4,7 @@
 
     - name: Debug Apache modules loaded
       debug:
-        mag: "Apache modules loaded: {{ apache_modules_loaded }}"
+        msg: "Apache modules loaded: {{ apache_modules_loaded }}"
         verbosity: 1
       when:
         - ( apache_modules_loaded is defined ) and ( apache_modules_loaded | length > 0 )
