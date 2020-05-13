@@ -22,14 +22,15 @@
         name: mpm_itk
         state: absent
       when:
-        - '"mpm_itk" in apache_modules_loaded'
+        - ( apache_modules_loaded is defined ) and ( "mpm_itk" in apache_modules_loaded )
 
     - name: Disable Apache module mpm_prefork
       apache2_module:
         name: mpm_prefork
         state: absent
         ignore_configcheck: true
-      when: '"mpm_prefork" in apache_modules_loaded'
+      when:
+        - ( apache_modules_loaded is defined ) and ( "mpm_prefork" in apache_modules_loaded )
 
     - name: "Enable Apache mpm_event"
       apache2_module:
@@ -45,7 +46,7 @@
       when: apache_mpm_event_enabled.changed
 
   when:
-    - ( apache_mpm_loaded == "mpm_prefork" ) or ( apache_mpm_loaded == "" )
+    - ( apache_mpm_loaded == "mpm_prefork" ) or ( apache_mpm_loaded | lenght <= 0 )
     - ( "mpm_event" in apache_mods_enabled )
   tags:
     - apache
@@ -58,7 +59,8 @@
         name: mpm_event
         state: absent
         ignore_configcheck: true
-      when: '"mpm_event" in apache_modules_loaded'
+      when:
+        - ( apache_modules_loaded is defined ) and  ( "mpm_event" in apache_modules_loaded )
 
     - name: "Enable Apache mpm_prefork"
       apache2_module:
