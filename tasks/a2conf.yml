@@ -3,40 +3,7 @@
   block:
 
     - name: Check loaded conf
-      block:
-
-        - name: Register the loaded conf
-          command: a2query -c
-          check_mode: false
-          changed_when: false
-          register: apache_conf_check
-
-      rescue:
-
-        - name: No conf enabled
-          set_fact:
-            apache_conf_loaded: []
-          when: '"No conf matches" in apache_conf_check.stderr'
-
-    - name: Debug the loaded conf
-      debug:
-        var: apache_conf_check.stdout_lines
-        verbosity: 2
-      when: apache_conf_check.stdout is defined
-
-    - name: Set an array of the loaded conf
-      set_fact:
-        apache_conf_loaded: "{{ apache_conf_loaded | default([]) + [ line.split(' ')[0] ] }}"
-      when: apache_conf_check.stdout is defined
-      loop: "{{ apache_conf_check.stdout_lines }}"
-      loop_control:
-        loop_var: line
-        label: "{{ line }}"
-
-    - name: Debug loaded conf
-      debug:
-        var: apache_conf_loaded
-        verbosity: 2
+      include_tasks: a2conf_check.yml
 
     - name: Apache conf disabled
       command: "a2disconf {{ conf }}"

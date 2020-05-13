@@ -249,6 +249,15 @@
       check_mode: false
       register: apache_cert
 
+    - name: Include mod checks
+      include_tasks: a2mod_checks.yml
+
+    - name: Include conf checks
+      include_tasks: a2conf_checks.yml
+
+    - name: Include site checks
+      include_tasks: a2site_checks.yml
+
   tags:
     - apache
 ...
