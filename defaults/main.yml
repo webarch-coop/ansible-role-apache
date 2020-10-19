@@ -49,6 +49,10 @@ apache_mods_enabled:
   - mpm_event
   - negotiation
   - proxy
+  - proxy_html
+  - proxy_fcgi
+  - proxy_http2
+  - proxy_http
   - reqtimeout
   - remoteip
   - rewrite
@@ -113,13 +117,9 @@ apache_mods_disabled:
   - proxy_balancer
   - proxy_connect
   - proxy_express
-  - proxy_fcgi
   - proxy_fdpass
   - proxy_ftp
   - proxy_hcheck
-  - proxy_html
-  - proxy_http2
-  - proxy_http
   - proxy_scgi
   - proxy_uwsgi
   - proxy_wstunnel
