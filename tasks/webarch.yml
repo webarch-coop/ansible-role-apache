@@ -6,6 +6,7 @@
       git:
         repo: https://git.coop/webarch/website-templates.git
         dest: /var/www/wsh
+        version: master
         clone: true
         update: true
         force: true
