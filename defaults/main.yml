@@ -23,6 +23,7 @@ apache_conf_enabled:
   - localized-error-pages
   - other-vhosts-access-log
   - security
+  - version-control
 apache_conf_disabled:
   - mc3
   - serve-cgi-bin

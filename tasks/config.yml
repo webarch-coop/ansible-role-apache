@@ -6,6 +6,9 @@
       file:
         path: "{{ path }}"
         state: directory
+        owner: root
+        group: root
+        mode: 0755
       loop:
         - "{{ apache_document_root }}"
         - "{{ apache_document_root }}/.well-known/acme-challenge"
@@ -17,12 +20,18 @@
       template:
         src: 000-default.conf.j2
         dest: /etc/apache2/sites-available/000-default.conf
+        owner: root
+        group: root
+        mode: 0644
       when: ( apache_sites_enabled is defined ) and ( "000-default" in apache_sites_enabled )
 
     - name: Conditional update default-ssl.conf
       template:
         src: default-ssl.conf.j2
         dest: /etc/apache2/sites-available/default-ssl.conf
+        owner: root
+        group: root
+        mode: 0644
       when: ( apache_sites_enabled is defined ) and ( "default-ssl" in apache_sites_enabled )
 
     - name: Conditionally include Webarchitects config
@@ -37,16 +46,33 @@
       template:
         src: templates/le.conf.j2
         dest: /etc/apache2/conf-available/le.conf
+        owner: root
+        group: root
+        mode: 0644
 
     - name: Custom Apache ssl.conf available
       template:
         src: ssl.conf.j2
         dest: /etc/apache2/mods-available/ssl.conf
+        owner: root
+        group: root
+        mode: 0644
 
     - name: Custom Apache ports.conf available
       template:
         src: ports.conf.j2
         dest: /etc/apache2/ports.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Conf available to deny access to version control directories in place
+      template:
+        src: version-control.conf.j2
+        dest: /etc/apache2/conf-available/version-control.conf
+        owner: root
+        group: root
+        mode: 0644
 
     - name: Conditionally provision a Let's Encrypt cert using acmesh role
       block:
