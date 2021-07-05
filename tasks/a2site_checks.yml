@@ -18,26 +18,35 @@
             apache_sites_loaded: []
           when: ( "No site matches" in apache_sites_check.stderr )
 
-    - name: Debug the loaded sites
-      debug:
-        var: apache_sites_check.stdout_lines
-        verbosity: 2
-      when: apache_sites_check.stdout is defined
+    - name: Set an array of loaded Apache sites
+      block:
 
-    - name: Set an array of the loaded sites
-      set_fact:
-        apache_sites_loaded: "{{ apache_sites_loaded | default([]) + [ line.split(' ')[0] ] }}"
-      when: apache_sites_check.stdout is defined
-      loop: "{{ apache_sites_check.stdout_lines }}"
-      loop_control:
-        loop_var: line
-        label: "{{ line }}"
+        - name: Debug the loaded sites
+          debug:
+            var: apache_sites_check.stdout_lines
+            verbosity: 2
+
+        - name: Set apache_sites_loaded to an empty array
+          set_fact:
+            apache_sites_loaded: [] 
+
+        - name: Set an array of the loaded sites
+          set_fact:
+            apache_sites_loaded: "{{ apache_sites_loaded | default([]) + [ line.split(' ')[0] ] }}"
+          when: apache_sites_check.stdout is defined
+          loop: "{{ apache_sites_check.stdout_lines }}"
+          loop_control:
+            loop_var: line
+            label: "{{ line }}"
+
+      when:
+        - apache_sites_check.stdout is defined
+        - apache_sites_check.stderr | length == 0
 
     - name: Debug loaded sites
       debug:
         var: apache_sites_loaded
-        verbosity: 2
-      when: apache_sites_loaded is defined
+        verbosity: 1
 
   tags:
     - apache

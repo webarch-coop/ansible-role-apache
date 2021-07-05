@@ -26,7 +26,7 @@
             var: apache_conf_check.stdout_lines
             verbosity: 2
 
-        - name: Set apache_conf_loaded to an ampty array
+        - name: Set apache_conf_loaded to an empty array
           set_fact:
             apache_conf_loaded: []
 
@@ -40,7 +40,7 @@
 
       when:
         - apache_conf_check.stdout is defined
-        - apache_conf_check.stderr is not defined
+        - apache_conf_check.stderr | length == 0
 
     - name: Debug loaded conf
       debug:
