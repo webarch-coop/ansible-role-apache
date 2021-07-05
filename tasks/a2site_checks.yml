@@ -28,7 +28,7 @@
 
         - name: Set apache_sites_loaded to an empty array
           set_fact:
-            apache_sites_loaded: [] 
+            apache_sites_loaded: []
 
         - name: Set an array of the loaded sites
           set_fact:
