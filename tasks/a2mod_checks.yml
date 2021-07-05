@@ -18,26 +18,34 @@
             apache_modules_loaded: []
           when: ( "No module matches" in apache_modules_check.stderr )
 
-    - name: Debug the loaded modules
-      debug:
-        var: apache_modules_check.stdout_lines
-        verbosity: 2
-      when: apache_modules_check.stdout is defined
+    - name: Set an array of loaded Apache modules
+      block:
 
-    - name: Set an array of the loaded modules
-      set_fact:
-        apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ line.split(' ')[0] ] }}"
-      when: apache_modules_check.stdout is defined
-      loop: "{{ apache_modules_check.stdout_lines }}"
-      loop_control:
-        loop_var: line
-        label: "{{ line }}"
+        - name: Debug the loaded modules
+          debug:
+            var: apache_modules_check.stdout_lines
+            verbosity: 2
+
+        - name: Set apache_modules_loaded to an ampty array
+          set_fact:
+            apache_modules_loaded: []
+
+        - name: Set an array of the loaded modules
+          set_fact:
+            apache_modules_loaded: "{{ apache_modules_loaded + [ line.split(' ')[0] ] }}"
+          loop: "{{ apache_modules_check.stdout_lines }}"
+          loop_control:
+            loop_var: line
+            label: "{{ line }}"
+
+      when:
+        - apache_modules_check.stdout is defined
+        - apache_modules_check.stderr is not defined
 
     - name: Debug loaded modules
       debug:
         var: apache_modules_loaded
-        verbosity: 2
-      when: apache_modules_loaded is defined
+        verbosity: 1
 
   tags:
     - apache

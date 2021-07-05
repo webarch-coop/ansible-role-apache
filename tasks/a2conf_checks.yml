@@ -18,25 +18,34 @@
             apache_conf_loaded: []
           when: '"No conf matches" in apache_conf_check.stderr'
 
-    - name: Debug the loaded conf
-      debug:
-        var: apache_conf_check.stdout_lines
-        verbosity: 2
-      when: apache_conf_check.stdout is defined
+    - name: Set an array of loaded Apache conf
+      block:
 
-    - name: Set an array of the loaded conf
-      set_fact:
-        apache_conf_loaded: "{{ apache_conf_loaded | default([]) + [ line.split(' ')[0] ] }}"
-      when: apache_conf_check.stdout is defined
-      loop: "{{ apache_conf_check.stdout_lines }}"
-      loop_control:
-        loop_var: line
-        label: "{{ line }}"
+        - name: Debug the loaded conf
+          debug:
+            var: apache_conf_check.stdout_lines
+            verbosity: 2
+
+        - name: Set apache_conf_loaded to an ampty array
+          set_fact:
+            apache_conf_loaded: []
+
+        - name: Set an array of the loaded conf
+          set_fact:
+            apache_conf_loaded: "{{ apache_conf_loaded | default([]) + [ line.split(' ')[0] ] }}"
+          loop: "{{ apache_conf_check.stdout_lines }}"
+          loop_control:
+            loop_var: line
+            label: "{{ line }}"
+
+      when:
+        - apache_conf_check.stdout is defined
+        - apache_conf_check.stderr is not defined
 
     - name: Debug loaded conf
       debug:
         var: apache_conf_loaded
-        verbosity: 2
+        verbosity: 1
 
   tags:
     - apache
