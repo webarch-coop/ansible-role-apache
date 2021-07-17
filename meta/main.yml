@@ -5,11 +5,11 @@ galaxy_info:
   description: Ansible role for installing Apache
   company: Webarchitects Co-operative
   license: license (GPLv3)
-  # 2.5 identifier added to apache2_module and openssl_dhparam_module added
-  min_ansible_version: 2.5
+  min_ansible_version: 2.9
   platforms:
     - name: debian
       versions:
+        - bullseye
         - buster
         - stretch
   galaxy_tags: []

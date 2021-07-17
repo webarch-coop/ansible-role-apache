@@ -180,27 +180,31 @@
       when: apache_version is version('2.4.41', '>=')
 
     - name: Check if phpquery is installed
-      shell: which phpquery || echo ABSENT
+      command: which phpquery
       check_mode: false
-      register: apache_phpquery_path
-      changed_when: '"phpquery" not in apache_phpquery_path.stdout'
+      changed_when: false
+      register: apache_which_phpquery
+      failed_when: apache_which_phpquery.rc is not regex('^0|1$')
 
     - name: Set the apache_php variable to true or false
       set_fact:
-        apache_php: "{% if apache_phpquery_path.stdout == 'ABSENT' %}false{% else %}true{% endif %}"
+        apache_php: "{% if apache_phpquery_path.rc == '1' %}false{% else %}true{% endif %}"
 
     - name: Check PHP version
       block:
 
         - name: Run phpquery to get the PHP version
           command: phpquery -V
-          register: apache_phpquery_version
           check_mode: false
           changed_when: false
+          register: apache_phpquery_version
+          failed_when: >
+            ( apache_which_phpquery.stdout_lines | count > 1 ) or
+            ( apache_which_phpquery.stdout is not version('7.0', '>=') )
 
         - name: Set a fact for the PHP version
           set_fact:
-            apache_php_version: "{{ apache_phpquery_version.stdout }}"
+            apache_php_version: "{{ apache_phpquery_version.stdout | trim }}"
 
         - name: Set a fact for the PHP FPM module and conf names
           set_fact:

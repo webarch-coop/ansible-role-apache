@@ -10,7 +10,7 @@
         install_recommends: true
         default_release: buster-backports
         update_cache: true
-      when: ansible_distribution_release is regex('^buster$')
+      when: ansible_distribution_release == "buster"
 
     - name: Apache present
       apt:
@@ -19,7 +19,7 @@
         state: present
         install_recommends: true
         update_cache: false
-      when: ansible_distribution_release is not regex('^buster$')
+      when: ansible_distribution_release != "buster"
 
     - name: Additional packages present
       apt:
@@ -75,7 +75,7 @@
       systemd:
         name: apache2
         enabled: true
-      when: ansible_distribution_release is regex('^buster|bullseye$')
+      when: ansible_distribution_release != "stretch"
 
     - name: Apache configtest
       command: apache2ctl configtest
