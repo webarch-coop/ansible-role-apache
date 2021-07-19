@@ -50,6 +50,14 @@
         group: root
         mode: 0644
 
+    - name: Custom Apache http2 config available
+      template:
+        src: http2.conf.j2
+        dest: /etc/apache2/mods-available/http2.conf
+        owner: root
+        group: root
+        mode: 0644
+
     - name: Custom Apache ssl.conf available
       template:
         src: ssl.conf.j2
