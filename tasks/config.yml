@@ -101,7 +101,7 @@
             common_name: "{{ inventory_hostname }}"
 
       when:
-        - ( "md" not in apache_mods_enabled ) or ( apache_cert is defined and not apache_cert.stat.exists )
+        - ( "md" not in apache_mods_enabled ) or ( apache_cert.stat is defined and not apache_cert.stat.exists )
         - ( "ssl" in apache_mods_enabled )
         - ( "le" in apache_conf_enabled )
         - ( common_name is defined ) and ( common_name == inventory_hostname )
