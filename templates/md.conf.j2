@@ -1,5 +1,6 @@
 # {{ ansible_managed }}
 <IfModule md_module>
+	MDContactEmail "{{ apache_server_admin }}"
 	MDCertificateAgreement accepted
 	MDRenewMode always
 	MDRequireHttps permanent
