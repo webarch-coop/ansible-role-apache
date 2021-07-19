@@ -3,6 +3,7 @@
 	MDContactEmail "{{ apache_server_admin }}"
 	MDCertificateAgreement accepted
 	MDRenewMode always
+    MDRenewWindow {{ apache_md_renew_window | default('33%') }}
 	MDRequireHttps permanent
 	MDStapleOthers on
 	Protocols h2 h2c http/1.1 acme-tls/1
