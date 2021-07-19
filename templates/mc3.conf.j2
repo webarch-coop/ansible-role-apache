@@ -110,7 +110,17 @@ ErrorDocument 403 /mc3/403.shtml
   CustomLog ${APACHE_LOG_DIR}/mc3-access.log combined
 </VirtualHost>
 
-{% if apache_cert.stat.exists %}
+{% if "md" in apache_mods_enabled or apache_cert.stat.exists %}
+  {% if "md" in apache_mods_enabled %}
+<IfModule md_module>
+  <MDomain "{{ inventory_hostname }}">
+    MDStapling on
+    MDRequireHttps permanent
+    MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.cert.pem
+    MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
+  </MDomain>
+</IfModule>
+  {% endif %}
 # The default virtual host for port 443
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
@@ -126,15 +136,16 @@ ErrorDocument 403 /mc3/403.shtml
   #SetEnv PIWIK_SITE_ID "1"
   #SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   SSLEngine on
-  {% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
-  # https://httpd.apache.org/docs/trunk/mod/mod_http2.html
-  Protocols h2 http/1.1
-  H2Direct on
+  {% if "md" not in apache_mods_enabled %}
+  <IfModule !md_module>
+    SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
+    SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
+    SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
+  </IfModule>
+  <IfModule headers_module>
+    Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
+  </IfModule>
   {% endif %}
-  SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
-  SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
-  SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
-  Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
   DocumentRoot "/var/www/mc3"
   <FilesMatch "\.(cgi|shtml|phtml|php)$">
     SSLOptions +StdEnvVars

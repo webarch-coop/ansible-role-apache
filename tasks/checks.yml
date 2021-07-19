@@ -254,6 +254,7 @@
         path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
       check_mode: false
       register: apache_cert
+      when: ( "md" not in apache_mods_enabled )
 
     - name: Include mod checks
       include_tasks: a2mod_checks.yml

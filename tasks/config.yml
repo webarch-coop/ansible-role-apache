@@ -50,6 +50,14 @@
         group: root
         mode: 0644
 
+    - name: Custom Apache md config available
+      template:
+        src: md.conf.j2
+        dest: /etc/apache2/mods-available/md.conf
+        owner: root
+        group: root
+        mode: 0644
+
     - name: Custom Apache http2 config available
       template:
         src: http2.conf.j2
