@@ -116,7 +116,7 @@ ErrorDocument 403 /mc3/403.shtml
   <MDomain {{ inventory_hostname }}>
     MDStapling on
     MDRequireHttps permanent
-    MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.cert.pem
+    MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
     MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
     MDContactEmail graham@mc3.coop
   </MDomain>
