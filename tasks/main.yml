@@ -80,7 +80,7 @@
     - name: Apache configtest
       command: apache2ctl configtest
       register: apache_configtest
-      changed_when: '"Syntax OK" not in apache_configtest.stderr'
+      failed_when: apache_configtest.rc is not ('^0|1$')
       check_mode: false
 
     - debug:
@@ -89,14 +89,14 @@
 
     - name: Fail if Apache configtest is not OK
       fail:
-        msg: "{{ apache2ctl_configtest.stdout }}"
-      when: '"Syntax OK" not in apache_configtest.stderr'
+        msg: "{{ apache_configtest.stdout_lines }}"
+      when: ( "Syntax OK" not in apache_configtest.stderr ) or ( apache_configtest.rc == 1 )
 
     - name: Apache restarted
       service:
         name: apache2
         state: restarted
-      when: '"Syntax OK" in apache_configtest.stderr'
+      when: ( "Syntax OK" in apache_configtest.stderr ) or ( apache_configtest.rc == 0 )
 
   tags:
     - apache
