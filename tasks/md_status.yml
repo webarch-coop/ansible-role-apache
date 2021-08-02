@@ -1,0 +1,20 @@
+---
+- name: Check the status of a mod_md cert
+  block:
+
+    - name: Query the status
+      uri:
+        url: "http://localhost/md-status/{{ apache_mdomain }}"
+        return_content: true
+        status_code:
+          - 200
+          - 404
+        register: apache_mdomain_status
+
+     - name: Debug the status
+       debug:
+         var: apache_mdomain_status.content
+
+  tags:
+    - apache
+...
