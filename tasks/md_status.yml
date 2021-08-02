@@ -9,6 +9,7 @@
         status_code:
           - 200
           - 404
+        check_mode: false
       register: apache_mdomain_status
 
     - name: "Debug the mdomain status for {{ apache_mdomain }}"
