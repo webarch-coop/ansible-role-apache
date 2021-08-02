@@ -9,9 +9,9 @@
         status_code:
           - 200
           - 404
-      register: "Debug the mdomain status for {{ apache_mdomain }}"
+      register: apache_mdomain_status
 
-    - name: Debug the status
+    - name: "Debug the mdomain status for {{ apache_mdomain }}"
       debug:
         var: apache_mdomain_status
         verbosity: 2
