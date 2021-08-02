@@ -12,10 +12,11 @@
       check_mode: false
       register: apache_mdomain_status
 
-    - name: "Debug the mdomain status for {{ apache_mdomain }}"
+    - name: "Debug the mdomain RSA status for {{ apache_mdomain }}"
       debug:
-        var: apache_mdomain_status
+        var: apache_mdomain_status.json.cert.rsa.ocsp.renewal.last.status
         verbosity: 2
+      when: apache_mdomain_status.json.cert.rsa is defined
 
   tags:
     - apache
