@@ -11,9 +11,9 @@
           - 404
         register: apache_mdomain_status
 
-     - name: Debug the status
-       debug:
-         var: apache_mdomain_status.content
+    - name: Debug the status
+      debug:
+        var: apache_mdomain_status.content
 
   tags:
     - apache
