@@ -2,7 +2,7 @@
 <IfModule md_module>
 	MDContactEmail "{{ apache_server_admin }}"
 	MDCertificateAgreement accepted
-    MDPrivateKeys secp256r1 rsa3072
+    MDPrivateKeys secp384r1 secp256r1 prime256v1 rsa3072
 	MDRenewMode always
     MDRenewWindow {{ apache_md_renew_window | default('33%') }}
 	MDRequireHttps permanent
