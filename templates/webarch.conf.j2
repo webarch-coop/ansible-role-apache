@@ -87,6 +87,7 @@ SetEnv PAGE_DESC  ""
     ExpiresByType text/javascript "now plus 1 week"
     ExpiresByType text/css "now plus 1 week"
   </IfModule>
+  RedirectMatch 404 /\\.(svn|git|hg|bzr|cvs)(/|$)
 </Directory>
 <Directory "/var/www/html/.well-known">
   Options None
@@ -132,13 +133,13 @@ ErrorDocument 506 /wsh/506.shtml
     SuexecUserGroup www-data www-data 
   </IfModule>
   ServerAdmin support@webarch.net
-  {% if matomo_domain is defined %}
+  {%- if matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
-  {% elif matomo_user is defined %}
+  {%- elif matomo_user is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
-  {% endif %}
+  {%- endif %}
   DocumentRoot "/var/www/wsh"
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
@@ -149,6 +150,9 @@ ErrorDocument 506 /wsh/506.shtml
   RedirectPermanent /phpmyadmin https://{{ phpmyadmin_domain }}
 {% endif %}
 {% endif %}
+  <IfModule ssl_module>
+    RedirectMatch 301 ^(?!/\.well-known/acme-challenge/).* https://{{ inventory_hostname }}$0
+  </IfModule>
   ErrorLog ${APACHE_LOG_DIR}/wsh-error.log
   LogLevel warn
   CustomLog ${APACHE_LOG_DIR}/wsh-access.log combined
@@ -160,12 +164,15 @@ ErrorDocument 506 /wsh/506.shtml
   <MDomain {{ inventory_hostname }}>
     MDStapling on
     MDRequireHttps permanent
+    MDPrivateKeys rsa3072 secp384r1
+    {%- if "rsa3072" not in apache_md_private_keys_present or "secp384r1" not in apache_md_private_keys_present %}
     MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
     MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
+    {%- endif %}
     MDContactEmail "{{ apache_server_admin }}"
   </MDomain>
 </IfModule>
-  {% endif %}
+  {%- endif %}
 # The default virtual host for port 443
 <IfModule ssl_module>
 <VirtualHost *:443>
@@ -178,20 +185,19 @@ ErrorDocument 506 /wsh/506.shtml
     SuexecUserGroup www-data www-data 
   </IfModule>
   ServerAdmin "{{ apache_server_admin }}"
-  {% if matomo_domain is defined %}
+  {%- if matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
-  {% elif matomo_user is defined %}
+  {%- elif matomo_user is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
-  {% endif %}
+  {%- endif %}
   SSLEngine on
-  {# if "md" not in apache_mods_enabled #}
-  # <IfModule !md_module>
-    SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
-    SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
-    SSLCertificateChainFile /etc/ssl/le/{{ inventory_hostname }}.ca.pem
-  # </IfModule>
+  {%- if apache_md_private_keys_present is not defined or "rsa3072" not in apache_md_private_keys_present or "secp384r1" not in apache_md_private_keys_present %} 
+  SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
+  SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
+  SSLCertificateChainFile   /etc/ssl/le/{{ inventory_hostname }}.ca.pem
+  {%- endif %}
   <IfModule headers_module>
     Header set Strict-Transport-Security "max-age=63072000" env=HTTPS
   </IfModule>
