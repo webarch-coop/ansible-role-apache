@@ -16,6 +16,12 @@
         path: /var/www/html/index.html
         state: absent
 
+    - name: "Check the mdomain status for {{ inventory_hostname }}"
+      include_tasks: md_status.yml
+      vars:
+        apache_mdomain: "{{ inventory_hostname }}"
+      when: ( "md" in apache_mods_enabled )
+
     - name: WSH Apache config in place
       template:
         src: templates/webarch.conf.j2
