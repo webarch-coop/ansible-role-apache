@@ -2,6 +2,9 @@
 - name: Enable Apache mpm_event if mpm_prefork or no MPM loaded
   block:
 
+    - name: Include Apache checks
+      include_tasks: checks.yml
+
     - name: Debug Apache modules loaded
       debug:
         msg: "Apache modules loaded: {{ apache_modules_loaded }}"
