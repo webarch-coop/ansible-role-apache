@@ -4,7 +4,7 @@
 
     - name: Requirements present
       apt:
-        pgk:
+        pkg:
           - apache2-dev
         state: present
 
