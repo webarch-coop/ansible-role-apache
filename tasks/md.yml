@@ -1,0 +1,34 @@
+---
+- name: Install mod_md from https://github.com/icing/mod_md
+  block:
+
+    - name: Requirements present
+      apt:
+        pgk:
+          - apache2-dev
+        state: present
+
+    # TODO add code to check instaled version and latset version
+
+    - name: Source code present
+      git:
+        repo: https://github.com/icing/mod_md.git
+        dest: /usr/local/src/mod_md
+        version: "{{ apache_mod_md_version }}"
+        depth: 1
+        force: true
+        update: true
+    
+     - name: Configure mod_md
+       command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
+       args:
+         chdir: /usr/local/src/mod_md
+
+     - name: Make install mod_md
+       make:
+         chdir: /usr/local/src/mod_md
+         target: install
+
+  tags:
+    - apache
+...

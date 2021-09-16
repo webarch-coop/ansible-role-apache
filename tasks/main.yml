@@ -59,6 +59,12 @@
         owner: root
         group: root
 
+    - name: Install specific version of mod_md
+      include_tasks: md.yml
+      when:
+        - apache_mod_md_version is defined
+        - apache_mod_md_version != default
+
     - name: Apache modules disabled and enabled
       include_tasks: a2mod.yml
       when: ( apache_mods_disabled is defined ) or ( apache_mods_enabled is defined )
