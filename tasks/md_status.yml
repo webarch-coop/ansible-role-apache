@@ -66,12 +66,12 @@
     - name: Set a fact to indicate the key and cert status is good
       set_fact:
         apache_md_certs: true
-      when: apache_md_private_keys | difference(apache_md_certs_present ) | length == 0
+      when: apache_md_private_keys | difference(apache_md_certs_present ) == []
 
     - name: Set a fact to indicate the key and cert status is bad
       set_fact:
         apache_md_certs: false
-      when: apache_md_private_keys | difference(apache_md_certs_present ) | length == 0
+      when: apache_md_private_keys | difference(apache_md_certs_present ) != []
 
   tags:
     - apache
