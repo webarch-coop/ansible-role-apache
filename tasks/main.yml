@@ -47,8 +47,8 @@
     - name: Install specific version of mod_md
       include_tasks: md.yml
       when:
-        - apache_mod_md_version is defined
-        - apache_mod_md_version != "default"
+        - apache_md_version is defined
+        - apache_md_version != "default"
 
     - name: Include MPM switching tasks
       include_tasks: mpm.yml

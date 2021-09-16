@@ -164,7 +164,7 @@ ErrorDocument 506 /wsh/506.shtml
   <MDomain {{ inventory_hostname }}>
     MDStapling on
     MDRequireHttps permanent
-    MDPrivateKeys {% for key in apache_mod_md_private_keys %} {{key }}{% endfor %}
+    MDPrivateKeys {% for key in apache_md_private_keys %} {{key }}{% endfor %}
     {%- if not apache_md_certs %}
     MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
     MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
