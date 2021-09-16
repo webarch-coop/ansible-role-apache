@@ -48,10 +48,20 @@
         - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.last.status is defined )
         - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.last.status == 0 )
 
+    - name: Debug apache_md_private_keys array
+      debug:
+        var: apache_md_private_keys
+        verbosity: 2
+
     - name: Debug apache_md_certs_present array
       debug:
         var: apache_md_certs_present
         verbosity: 2
+
+    - name: Debug the difference between apache_md_private_keys and apache_md_certs_present
+      debug:
+        msg:
+          - "{{ apache_md_private_keys | difference(apache_md_certs_present ) }}"
 
     - name: Set a fact to indicate the key and cert status is good
       set_fact:
