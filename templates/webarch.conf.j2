@@ -6,13 +6,13 @@ LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" c
 LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedioproxy
 LogFormat "%I %O" bandwidth
 
-{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
 # HTTP/2 https://httpd.apache.org/docs/trunk/mod/mod_http2.html
-Protocols h2 h2c http/1.1 
-ProtocolsHonorOrder Off
-{% elif apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" in apache_mods_enabled %}
+{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" in apache_mods_enabled %}
 Protocols h2 h2c http/1.1 acme-tls/1
 ProtocolsHonorOrder On
+{% elif apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" not in apache_mods_enabled %}
+Protocols h2 h2c http/1.1 
+ProtocolsHonorOrder Off
 {% endif %}
 # Let's Encrypt
 # Alias "/.well-known/acme-challenge" "/var/www/html/.well-known/acme-challenge"
@@ -170,6 +170,7 @@ ErrorDocument 506 /wsh/506.shtml
     MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
     {%- endif %}
     MDContactEmail "{{ apache_server_admin }}"
+    MDCertificateAgreement accepted
   </MDomain>
 </IfModule>
   {%- endif %}
