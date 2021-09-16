@@ -6,6 +6,7 @@
       apt:
         pkg:
           - apache2-dev
+          - libcurl4
         state: present
 
     - name: Find the latest version of mod_md
