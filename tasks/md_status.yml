@@ -6,7 +6,9 @@
       uri:
         url: "http://localhost/md-status/{{ apache_mdomain }}"
         return_content: true
-        status_code: 200
+        status_code:
+          - 200
+          - 404
       check_mode: false
       register: apache_mdomain_status
 
@@ -24,6 +26,7 @@
       set_fact:
         apache_md_private_keys_present: "{{ apache_md_private_keys_present }} + [ 'rsa3072' ]"
       when:
+        - ( apache_mdomain_status.status != 404 )
         - ( apache_mdomain_status.json.name is defined )
         - ( apache_mdomain_status.json.name | regex_replace('^"') | regex_replace('"$') ) == apache_mdomain
         - ( apache_mdomain_status.json.cert is defined )
@@ -34,6 +37,7 @@
       set_fact:
         apache_md_private_keys_present: "{{ apache_md_private_keys_present }} + [ 'secp384r1' ]"
       when:
+        - ( apache_mdomain_status.status != 404 )
         - ( apache_mdomain_status.json.name is defined )
         - ( apache_mdomain_status.json.name | regex_replace('^"') | regex_replace('"$') ) == apache_mdomain
         - ( apache_mdomain_status.json.cert is defined )
