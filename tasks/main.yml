@@ -50,9 +50,6 @@
         - apache_mod_md_version is defined
         - apache_mod_md_version != "default"
 
-    - fail:
-        msg: debug
-
     - name: Include MPM switching tasks
       include_tasks: mpm.yml
       when: ( apache_mpm_loaded not in apache_mods_enabled ) or ( apache_mpm_loaded | length == 0 )

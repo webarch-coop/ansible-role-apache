@@ -7,6 +7,7 @@
         pkg:
           - apache2-dev
           - libcurl4-openssl-dev
+          - libjansson-dev
         state: present
 
     - name: Find the latest version of mod_md
