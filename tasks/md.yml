@@ -8,7 +8,23 @@
           - apache2-dev
         state: present
 
-    # TODO add code to check instaled version and latset version
+    - name: Find the latest version of mod_md
+      block:
+
+        - name: Use a HEAD request to get the latest redirect URL
+          uri:
+            url: https://github.com/icing/mod_md/releases/latest
+            method: HEAD
+            status_code: 302
+            follow_redirects: none
+          check_mode: false
+          register: apache_md_latest_headers
+
+        - name: Set a fact for the latest version of Apache mod_md
+          set_fact:
+            apache_mod_md_version: "{{ apache_md_latest_headers.location | urlsplit('path') | basename }}"
+
+      when: apache_mod_md_version == "latest"
 
     - name: Source code present
       git:

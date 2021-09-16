@@ -151,5 +151,5 @@ apache_mod_md_private_keys:
 # Specify a version from here https://github.com/icing/mod_md/releases
 # TODO add support to use latest for the latest release or default for the
 # packaged version
-apache_mod_md_version: master
+apache_mod_md_version: latest
 ...
