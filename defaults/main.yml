@@ -144,4 +144,8 @@ apache_mods_disabled:
   - usertrack
   - vhost_alias
   - xml2enc
+# See this issue https://github.com/icing/mod_md/issues/260
+apache_mod_md_private_keys:
+  - rsa3072
+  # - secp384r1
 ...

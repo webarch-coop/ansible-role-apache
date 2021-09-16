@@ -26,6 +26,8 @@
       set_fact:
         apache_md_private_keys_present: "{{ apache_md_private_keys_present }} + [ 'rsa3072' ]"
       when:
+        - ( apache_md_private_keys is defined )
+        - ( "rsa3072" in apache_md_private_keys )
         - ( apache_mdomain_status.status != 404 )
         - ( apache_mdomain_status.json.name is defined )
         - ( apache_mdomain_status.json.name | regex_replace('^"') | regex_replace('"$') ) == apache_mdomain
@@ -37,6 +39,8 @@
       set_fact:
         apache_md_private_keys_present: "{{ apache_md_private_keys_present }} + [ 'secp384r1' ]"
       when:
+        - ( apache_md_private_keys is defined )
+        - ( "secp384r1" in apache_md_private_keys )
         - ( apache_mdomain_status.status != 404 )
         - ( apache_mdomain_status.json.name is defined )
         - ( apache_mdomain_status.json.name | regex_replace('^"') | regex_replace('"$') ) == apache_mdomain
