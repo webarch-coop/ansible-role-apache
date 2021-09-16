@@ -164,8 +164,8 @@ ErrorDocument 506 /wsh/506.shtml
   <MDomain {{ inventory_hostname }}>
     MDStapling on
     MDRequireHttps permanent
-    MDPrivateKeys rsa3072
-    {%- if "rsa3072" not in apache_md_private_keys_present %}
+    MDPrivateKeys {% for key in apache_mod_md_private_keys %} {{key }}{% endfor %}
+    {%- if not apache_md_certs %}
     MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
     MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
     {%- endif %}
@@ -195,7 +195,7 @@ ErrorDocument 506 /wsh/506.shtml
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   {%- endif %}
   SSLEngine on
-  {%- if apache_md_private_keys_present is not defined or "rsa3072" not in apache_md_private_keys_present %} 
+  {%- if not apache_md_certs %}
   SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
   SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
   SSLCertificateChainFile   /etc/ssl/le/{{ inventory_hostname }}.ca.pem

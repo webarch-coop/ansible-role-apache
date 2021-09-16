@@ -147,7 +147,7 @@ apache_mods_disabled:
 # See this issue https://github.com/icing/mod_md/issues/260
 apache_mod_md_private_keys:
   - rsa3072
-  # - secp384r1
+  - secp384r1
 # Specify a version from here https://github.com/icing/mod_md/releases
 # Use latest for the latest release or default for the packaged version
 apache_mod_md_version: default
