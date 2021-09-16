@@ -164,7 +164,7 @@ ErrorDocument 506 /wsh/506.shtml
   <MDomain {{ inventory_hostname }}>
     MDStapling on
     MDRequireHttps permanent
-    MDPrivateKeys rsa3072 secp384r1
+    MDPrivateKeys rsa3072
     {%- if "rsa3072" not in apache_md_private_keys_present %}
     MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
     MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
