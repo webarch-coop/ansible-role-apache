@@ -38,21 +38,27 @@
         depth: 1
         force: true
         update: true
+      register: apache_md_repo
 
-    - name: Buildconf mod_md
-      command: ./buildconf
-      args:
-        chdir: /usr/local/src/mod_md
+    - name: Build and install mod_md
+      block:
 
-    - name: Configure mod_md
-      command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
-      args:
-        chdir: /usr/local/src/mod_md
+        - name: Buildconf mod_md
+          command: ./buildconf
+          args:
+            chdir: /usr/local/src/mod_md
 
-    - name: Make install mod_md
-      make:
-        chdir: /usr/local/src/mod_md
-        target: install
+        - name: Configure mod_md
+          command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
+          args:
+            chdir: /usr/local/src/mod_md
+
+        - name: Make install mod_md
+          make:
+            chdir: /usr/local/src/mod_md
+            target: install
+
+      when: apache_md_repo.changed
 
   tags:
     - apache
