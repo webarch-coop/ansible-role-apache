@@ -18,16 +18,16 @@
         depth: 1
         force: true
         update: true
-    
-     - name: Configure mod_md
-       command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
-       args:
-         chdir: /usr/local/src/mod_md
 
-     - name: Make install mod_md
-       make:
-         chdir: /usr/local/src/mod_md
-         target: install
+    - name: Configure mod_md
+      command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
+      args:
+        chdir: /usr/local/src/mod_md
+
+    - name: Make install mod_md
+      make:
+        chdir: /usr/local/src/mod_md
+        target: install
 
   tags:
     - apache
