@@ -6,6 +6,7 @@
       apt:
         pkg:
           - apache2-dev
+          - apache2-ssl-dev
           - libcurl4-openssl-dev
           - libjansson-dev
         state: present
