@@ -26,15 +26,15 @@
 
         - name: Set a fact for the latest version of Apache mod_md
           set_fact:
-            apache_mod_md_version: "{{ apache_md_latest_headers.location | urlsplit('path') | basename }}"
+            apache_md_version: "{{ apache_md_latest_headers.location | urlsplit('path') | basename }}"
 
-      when: apache_mod_md_version == "latest"
+      when: apache_md_version == "latest"
 
     - name: Source code present
       git:
         repo: https://github.com/icing/mod_md.git
         dest: /usr/local/src/mod_md
-        version: "{{ apache_mod_md_version }}"
+        version: "{{ apache_md_version }}"
         depth: 1
         force: true
         update: true
