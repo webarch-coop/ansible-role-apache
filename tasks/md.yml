@@ -36,6 +36,11 @@
         force: true
         update: true
 
+    - name: Buildconf mod_md
+      command: ./buildconf
+      args:
+        chdir: /usr/local/src/mod_md
+
     - name: Configure mod_md
       command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
       args:
