@@ -60,6 +60,7 @@
 
       when: apache_md_repo.changed
 
+  when: apache_md_version != "default"
   tags:
     - apache
 ...
