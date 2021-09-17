@@ -15,7 +15,7 @@
     - name: "Debug the mdomain status for {{ apache_mdomain }}"
       debug:
         var: apache_mdomain_status.json
-        verbosity: 2
+        verbosity: 1
       when: apache_mdomain_status.json is defined
 
     - name: Set apache_md_certs_present to an empty array
@@ -51,12 +51,12 @@
     - name: Debug apache_md_private_keys array
       debug:
         var: apache_md_private_keys
-        verbosity: 2
+        verbosity: 1
 
     - name: Debug apache_md_certs_present array
       debug:
         var: apache_md_certs_present
-        verbosity: 2
+        verbosity: 1
 
     - name: Debug the difference between apache_md_private_keys and apache_md_certs_present
       debug:
