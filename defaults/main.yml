@@ -150,5 +150,5 @@ apache_md_private_keys:
   - secp384r1
 # Specify a version from here https://github.com/icing/mod_md/releases
 # Use latest for the latest release or default for the packaged version
-apache_md_version: default 
+apache_md_version: latest
 ...
