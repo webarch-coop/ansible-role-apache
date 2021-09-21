@@ -16,6 +16,49 @@
         loop_var: path
         label: "{{ path }}"
 
+    - name: Custom Apache config in place
+      template:
+        src: "{{ file }}.j2"
+        dest: "/etc/apache2/{{ file }}"
+        owner: root
+        group: root
+        mode: 0644
+      loop:
+        - apache.conf
+        - ports.conf
+      loop_control:
+        loop_var: file
+        label: "{{ file }}"
+
+    - name: Custom Apache mods available in place
+      template:
+        src: "{{ file }}.j2"
+        dest: "/etc/apache2/mods-available/{{ file }}"
+        owner: root
+        group: root
+        mode: 0644
+      loop:
+        - http2.conf
+        - md.conf
+        - ssl.conf
+      loop_control:
+        loop_var: file
+        label: "{{ file }}"
+
+    - name: Custom Apache conf available in place
+      template:
+        src: "{{ file }}.j2"
+        dest: "/etc/apache2/conf-available/{{ file }}"
+        owner: root
+        group: root
+        mode: 0644
+      loop:
+        - le.conf
+        - version-control.conf
+      loop_control:
+        loop_var: file
+        label: "{{ file }}"
+
     - name: Conditional update 000-default.conf
       template:
         src: 000-default.conf.j2
@@ -34,6 +77,14 @@
         mode: 0644
       when: ( apache_sites_enabled is defined ) and ( "default-ssl" in apache_sites_enabled )
 
+    - name: Apache localhost site available
+      template:
+        src: "templates/localhost.conf.j2"
+        dest: "/etc/apache2/sites-available/localhost.conf"
+        owner: root
+        group: root
+        mode: 0644
+
     - name: Conditionally include Webarchitects config
       include_tasks: webarch.yml
       when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled )
@@ -42,53 +93,65 @@
       include_tasks: mc3.yml
       when: ( apache_conf_enabled is defined ) and ( "mc3" in apache_conf_enabled )
 
-    - name: Let's Encrypt /.well-known/acme-challenge server-wide alias available
+    - name: Apache localhost and localhost.d directories in place
+      file:
+        path: "{{ dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      loop:
+        - /var/www/localhost
+        - /etc/apache2/localhost.d
+      loop_control:
+        loop_var: dir
+        label: "{{ dir }}"
+
+    - name: Deny robots files in place
       template:
-        src: templates/le.conf.j2
-        dest: /etc/apache2/conf-available/le.conf
+        src: robots.deny.txt.j2
+        dest: /var/www/html/robots.deny.txt
         owner: root
         group: root
         mode: 0644
 
-    - name: Custom Apache md config available
+    - name: Expires and robots conf available
       template:
-        src: md.conf.j2
-        dest: /etc/apache2/mods-available/md.conf
+        src: "templates/{{ file }}.j2"
+        dest: "/etc/apache2/conf-available/{{ file }}"
         owner: root
         group: root
         mode: 0644
+      loop:
+        - robots-deny.conf
+        - robots-deny-nextcloud.conf
+        - expires-strict.conf
+        - expires-medium.conf
+      loop_control:
+        loop_var: file
+        label: "{{ file }}"
 
-    - name: Custom Apache http2 config available
+    - name: Apache mpm_prefork.conf in place
       template:
-        src: http2.conf.j2
-        dest: /etc/apache2/mods-available/http2.conf
+        src: templates/mpm_prefork.conf.j2
+        dest: /etc/apache2/mods-available/mpm_prefork.conf
         owner: root
         group: root
         mode: 0644
+      when: ( "mpm_itk" in apache_mods_enabled ) or ( "mpm_prefork" in apache_mods_enabled )
 
-    - name: Custom Apache ssl.conf available
+    - name: Apache ratelimit conf present
       template:
-        src: ssl.conf.j2
-        dest: /etc/apache2/mods-available/ssl.conf
+        src: templates/ratelimit.conf.j2
+        dest: /etc/apache2/mods-available/ratelimit.conf
         owner: root
         group: root
         mode: 0644
+      when: '"ratelimit" in apache_mods_enabled'
 
-    - name: Custom Apache ports.conf available
-      template:
-        src: ports.conf.j2
-        dest: /etc/apache2/ports.conf
-        owner: root
-        group: root
-        mode: 0644
-
-    - name: Conf available to deny access to version control directories in place
-      template:
-        src: version-control.conf.j2
-        dest: /etc/apache2/conf-available/version-control.conf
-        owner: root
-        group: root
-        mode: 0644
+    - name: Cloudflare config available
+      include_tasks: cloudflare.yml
+      when: ( "remoteip" in apache_mods_enabled )
 
     - name: Conditionally provision a Let's Encrypt cert using acmesh role
       block:
@@ -105,56 +168,6 @@
         - ( "ssl" in apache_mods_enabled )
         - ( "le" in apache_conf_enabled )
         - ( common_name is defined ) and ( common_name == inventory_hostname )
-
-    - name: Apache localhost and localhost.d directories in place
-      file:
-        path: "{{ dir }}"
-        state: directory
-      loop:
-        - /var/www/localhost
-        - /etc/apache2/localhost.d
-      loop_control:
-        loop_var: dir
-        label: "{{ dir }}"
-
-    - name: Apache localhost site available
-      template:
-        src: "templates/localhost.conf.j2"
-        dest: "/etc/apache2/sites-available/localhost.conf"
-
-    - name: Deny robots files in place
-      template:
-        src: robots.deny.txt.j2
-        dest: /var/www/html/robots.deny.txt
-
-    - name: Expires and robots conf available
-      template:
-        src: "templates/{{ file }}.j2"
-        dest: "/etc/apache2/conf-available/{{ file }}"
-      loop:
-        - robots-deny.conf
-        - robots-deny-nextcloud.conf
-        - expires-strict.conf
-        - expires-medium.conf
-      loop_control:
-        loop_var: file
-        label: "{{ file }}"
-
-    - name: Apache mpm_prefork.conf in place
-      template:
-        src: templates/mpm_prefork.conf.j2
-        dest: /etc/apache2/mods-available/mpm_prefork.conf
-      when: ( "mpm_itk" in apache_mods_enabled ) or ( "mpm_prefork" in apache_mods_enabled )
-
-    - name: Apache ratelimit conf present
-      template:
-        src: templates/ratelimit.conf.j2
-        dest: /etc/apache2/mods-available/ratelimit.conf
-      when: '"ratelimit" in apache_mods_enabled'
-
-    - name: Cloudflare config available
-      include_tasks: cloudflare.yml
-      when: '"remoteip" in apache_mods_enabled'
 
   tags:
     - apache

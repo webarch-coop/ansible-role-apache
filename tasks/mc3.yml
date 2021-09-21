@@ -20,6 +20,9 @@
       template:
         src: templates/mc3.conf.j2
         dest: /etc/apache2/conf-available/mc3.conf
+        owner: root
+        group: root
+        mode: 0644
 
   tags:
     - apache

@@ -6,6 +6,9 @@
       get_url:
         url: "https://www.cloudflare.com/ips-v4"
         dest: "/root/cloudflare_ips_v4.txt"
+        owner: root
+        group: root
+        mode: 0644
         force: true
 
     - name: Slurp Cloudflare IPv4 list
@@ -26,6 +29,9 @@
       template:
         src: cloudflare.conf.j2
         dest: /etc/apache2/conf-available/cloudflare.conf
+        owner: root
+        group: root
+        mode: 0644
 
   tags:
     - apache
