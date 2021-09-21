@@ -89,7 +89,7 @@ PidFile ${APACHE_PID_FILE}
 #
 # Timeout: The number of seconds before receives and sends time out.
 #
-Timeout {{ apache_timeout }}
+Timeout {{ apache_timeout | default('300') }}
 
 #
 # KeepAlive: Whether or not to allow persistent connections (more than
