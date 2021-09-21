@@ -32,8 +32,8 @@
         - ( apache_mdomain_status.json.name is defined )
         - ( apache_mdomain_status.json.name | regex_replace('^"') | regex_replace('"$') ) == apache_mdomain
         - ( apache_mdomain_status.json.cert is defined )
-        - ( apache_mdomain_status.json.cert.rsa.ocsp.renewal.last.status is defined )
-        - ( apache_mdomain_status.json.cert.rsa.ocsp.renewal.last.status == 0 )
+        - ( apache_mdomain_status.json.cert.rsa.ocsp.renewal.finished is defined )
+        - ( apache_mdomain_status.json.cert.rsa.ocsp.renewal.finished )
 
     - name: "Set a fact for the mdomain EC status for {{ apache_mdomain_status }}"
       set_fact:
@@ -45,8 +45,8 @@
         - ( apache_mdomain_status.json.name is defined )
         - ( apache_mdomain_status.json.name | regex_replace('^"') | regex_replace('"$') ) == apache_mdomain
         - ( apache_mdomain_status.json.cert is defined )
-        - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.last.status is defined )
-        - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.last.status == 0 )
+        - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.finished is defined )
+        - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.finished )
 
     - name: Debug apache_md_private_keys array
       debug:
