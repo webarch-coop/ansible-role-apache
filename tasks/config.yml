@@ -24,7 +24,7 @@
         group: root
         mode: 0644
       loop:
-        - apache.conf
+        - apache2.conf
         - ports.conf
       loop_control:
         loop_var: file
