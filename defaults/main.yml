@@ -4,14 +4,14 @@ apache_server_admin: "root@{{ inventory_hostname }}"
 # The apache_timeout might need to be set as high as 1200
 # for Nextcloud updates
 apache_timeout: 300
-# The apache_disable_root variable is used in the 
+# The apache_disable_root variable is used in the
 # conf-available/security.conf file to disable access to /
 apache_disable_root: true
-# The apache_disable_dot variable is used in the 
+# The apache_disable_dot variable is used in the
 # conf-available/security.conf file to disable access to
 # directories and files starting with a dot
 apache_disable_dot: true
-# The apache_server_tokens variable is used in the 
+# The apache_server_tokens variable is used in the
 # conf-available/security.conf file
 apache_server_tokens: OS
 # https://wiki.mozilla.org/Security/Server_Side_TLS
