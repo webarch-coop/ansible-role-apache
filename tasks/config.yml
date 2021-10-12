@@ -125,6 +125,7 @@
       loop:
         - robots-deny.conf
         - robots-deny-nextcloud.conf
+        - expires-forever.conf
         - expires-strict.conf
         - expires-medium.conf
       loop_control:
