@@ -1,6 +1,7 @@
 ---
 galaxy_info:
   role_name: apache
+  namespace: chriscroome
   author: Chris Croome
   description: Ansible role for installing Apache
   company: Webarchitects Co-operative
