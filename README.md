@@ -13,7 +13,8 @@ To use this role you need to use Ansible Galaxy to install it into another repos
 ```yml
 ---
 - name: apache
-  src: https://git.coop/webarch/apache.git
+  # src: https://git.coop/webarch/apache.git
+  src: https://github.com/webarch-coop/ansible-role-apache.git
   version: master
   scm: git
 ```
