@@ -1,6 +1,8 @@
 # Ansible Apache Role
 
-This repository contains an Ansible role for installing Apache on Debian Stretch and Buster (Ubuntu support should be added at some point). 
+This repository contains an Ansible role for installing Apache on Debian Stretch, Buster and Bullseye (Ubuntu support should be added at some point). 
+
+The primary URL of this repo is [`https://git.coop/webarch/apache`](https://git.coop/webarch/apache) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-apache) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/apache).
 
 On Buster [Apache](https://packages.debian.org/buster-backports/apache2) is installed from [backports](https://backports.debian.org/) as this allows for the use of TLSv1.3, support for [mod_md](https://httpd.apache.org/docs/trunk/mod/mod_md.html) on Buster still needs to be added see [this issue](https://git.coop/webarch/apache/issues/5).
 
