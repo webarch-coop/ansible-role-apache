@@ -87,7 +87,8 @@
       failed_when: apache_configtest.rc is not regex('^0|1$')
       check_mode: false
 
-    - debug:
+    - name: Print the apache2ctl configtest standard error
+      debug:
         msg: "{{ apache_configtest.stderr }}"
         verbosity: 1
 
