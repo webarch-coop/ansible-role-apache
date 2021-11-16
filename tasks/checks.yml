@@ -188,7 +188,7 @@
 
     - name: Set the apache_php variable to true or false
       set_fact:
-        apache_php: "{% if apache_which_phpquery.rc == '0' %}true{% else %}false{% endif %}"
+        apache_php: "{% if apache_which_phpquery.rc == 0 %}true{% else %}false{% endif %}"
 
     - name: Check PHP version
       block:
