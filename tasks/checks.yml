@@ -193,16 +193,14 @@
     - name: Check PHP version
       block:
 
-        - name: Run phpquery to get the PHP version
+        - name: Run phpquery to get the PHP version NOTE that currently having one one version installed is supported
           command: phpquery -V
           args:
             strip_empty_ends: true
           check_mode: false
           changed_when: false
           register: apache_phpquery_version
-          failed_when: >
-            ( apache_which_phpquery.stdout_lines | count > 1 ) or
-            ( apache_which_phpquery.stdout | int is not version('7.0', '>=') )
+          failed_when: apache_which_phpquery.stdout_lines | count > 1
 
         - name: Set a fact for the PHP version
           set_fact:
