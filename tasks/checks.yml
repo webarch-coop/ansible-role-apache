@@ -193,7 +193,7 @@
     - name: Check PHP version
       block:
 
-        - name: Run phpquery to get the PHP version NOTE that currently having one one version installed is supported
+        - name: Run phpquery to get the PHP version NOTE that currently having only one PHP version installed is supported
           command: phpquery -V
           args:
             strip_empty_ends: true
