@@ -44,6 +44,10 @@
         path: "{{ apache_dhparam_path }}"
         size: "{{ apache_dhparam_size }}"
 
+    - name: Include suEXEC tasks
+      include_tasks: suexec.yml
+      when: ( apache_suexec is defined ) and ( apache_suexec )
+
     - name: Install specific version of mod_md
       include_tasks: md.yml
       when: ( "md" in apache_mods_enabled ) and ( apache_md_version is defined ) and ( apache_md_version != "default" )

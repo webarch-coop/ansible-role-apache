@@ -1,0 +1,13 @@
+---
+- name: Install and configure Apache suEXEC
+  block:
+
+    - name: suEXEC present
+      apt:
+        pkg:
+          - apache2-suexec-custom
+        state: present
+
+  tags:
+    - apache
+...
