@@ -92,7 +92,7 @@ PidFile ${APACHE_PID_FILE}
 {%- if apache_chroot is defined and apache_chroot %}
 ChrootDir {{ apache_chroot_dir }}
 {%- else %}
-# ChrootDir /var/www
+# ChrootDir {{ apache_chroot_dir | default('/var/www') }}
 {%- endif %}
 
 #
