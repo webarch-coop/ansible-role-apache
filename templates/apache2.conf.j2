@@ -87,6 +87,15 @@ DefaultRuntimeDir ${APACHE_RUN_DIR}
 PidFile ${APACHE_PID_FILE}
 
 #
+# ChrootDir: Directory for apache to run chroot(8) after startup.
+#
+{%- if apache_chroot is defined and apache_chroot %}
+ChrootDir {{ apache_chroot_dir }}
+{%- else %}
+# ChrootDir /var/www
+{%- endif %}
+
+#
 # Timeout: The number of seconds before receives and sends time out.
 #
 Timeout {{ apache_timeout | default('300') }}
