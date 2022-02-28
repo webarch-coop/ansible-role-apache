@@ -4,7 +4,7 @@ apache_group: www-data
 apache_document_root: /var/www/html
 apache_server_admin: "root@{{ inventory_hostname }}"
 apache_chroot: false
-apache_chroot_dir: /users/www-data
+apache_chroot_dir: /chroots/www-data
 apache_suexec: false
 # The apache_timeout might need to be set as high as 1200
 # for Nextcloud updates
@@ -30,6 +30,7 @@ apache_localhost_port: 80
 apache_ulimit: 65536
 apache_packages_present:
   - lynx
+  # - libapache2-mod-fcgid
   # - libapache2-mod-geoip
 apache_sites_enabled:
   - localhost
