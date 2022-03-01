@@ -4,7 +4,7 @@ apache_group: www-data
 apache_document_root: /var/www/html
 apache_server_admin: "root@{{ inventory_hostname }}"
 apache_chroot: false
-apache_chroot_dir: /chroots/www-data
+apache_chroot_dir: "/chroots/{{ apache_user }}"
 apache_suexec: false
 # The apache_timeout might need to be set as high as 1200
 # for Nextcloud updates
