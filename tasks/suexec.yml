@@ -2,11 +2,17 @@
 - name: Install and configure Apache suEXEC
   block:
 
-    - name: suEXEC present
+    - name: Apache suEXEC package present
       apt:
         pkg:
           - apache2-suexec-custom
         state: present
+
+    - name: Apache suEXEC config directory only readable by root
+      file:
+        path: /etc/apache2/suexec
+        state: directory
+        mode: 0700
 
   tags:
     - apache
