@@ -177,18 +177,20 @@ Include ports.conf
 </Directory>
 
 <Directory "/var/www/">
-	Options Indexes FollowSymLinks
+	Options FollowSymLinks
 	AllowOverride None
 	Require all granted
 </Directory>
 
+{% if apache_chroot is defined and apache_chroot %}
 <IfFile "{{ apache_chroot_dir }}/var/www">
 	<Directory "{{ apache_chroot_dir }}/var/www/">
-	 	Options Indexes FollowSymLinks
+	 	Options FollowSymLinks
 		AllowOverride None
 		Require all granted
 	</Directory>
 </IfFile>
+{% endif %}
 
 #<Directory /srv/>
 #	Options Indexes FollowSymLinks
