@@ -182,16 +182,6 @@ Include ports.conf
 	Require all granted
 </Directory>
 
-{% if apache_chroot is defined and apache_chroot %}
-<IfFile "{{ apache_chroot_dir }}/var/www">
-	<Directory "{{ apache_chroot_dir }}/var/www/">
-	 	Options FollowSymLinks
-		AllowOverride None
-		Require all granted
-	</Directory>
-</IfFile>
-{% endif %}
-
 #<Directory /srv/>
 #	Options Indexes FollowSymLinks
 #	AllowOverride None
