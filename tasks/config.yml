@@ -40,6 +40,7 @@
       loop:
         - http2.conf
         - md.conf
+        - mime.conf
         - ssl.conf
       loop_control:
         loop_var: file
