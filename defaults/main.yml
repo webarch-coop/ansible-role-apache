@@ -28,6 +28,7 @@ apache_dhparam_path: /etc/apache2/dhparam.pem
 apache_dhparam_size: 2048
 apache_localhost_port: 80
 apache_ulimit: 65536
+apache_a2query: /usr/sbin/a2query
 apache_packages_present:
   - lynx
   # - libapache2-mod-fcgid

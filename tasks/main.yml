@@ -28,6 +28,9 @@
         update_cache: false
       when: ( apache_packages_present is defined ) and ( apache_packages_present != [] )
 
+    - name: Include local facts tasks
+      include_tasks: local_facts.yml
+
     - name: Include Apache checks
       include_tasks: checks.yml
 
