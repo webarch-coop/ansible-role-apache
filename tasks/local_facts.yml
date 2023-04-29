@@ -27,10 +27,10 @@
         group: root
 
     - name: Ansible a2query local facts script present
-      ansible.builtin.template:
-        src: a2query.fact.j2
+      ansible.builtin.copy:
+        src: a2query.fact
         dest: /etc/ansible/facts.d/a2query.fact
-        mode: "0700"
+        mode: "0755"
         owner: root
         group: root
       register: apache_a2query_facts

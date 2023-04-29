@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# {{ ansible_managed }}
+
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+
+set -euo pipefail
+IFS=$'\n'
+
+a2query_path="$(type -p a2query)"
+jo_path="$(type -p jo)"
+gawk_path="$(type -p gawk)"
+sort_path="$(type -p sort)"
+
+if [[ -e "${jo_path}" ]]
+then
+  if [[ -f "${a2query_path}" ]]
+  then
+    # shellcheck disable=SC2016,SC2046
+    "${jo_path}" state=present version=$("${a2query_path}" -v) mpm=$("${a2query_path}" -M) \
+       conf_enabled=$("${a2query_path}" -c | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a) \
+       modules_enabled=$("${a2query_path}" -m | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a) \
+       sites_enabled=$("${a2query_path}" -s | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a)
+  else
+    jo state=absent
+  fi
+else
+  echo '{"state":"absent"}'
+fi
+
+# vim: syntax=bash
