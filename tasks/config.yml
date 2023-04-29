@@ -8,7 +8,7 @@
         state: directory
         owner: root
         group: root
-        mode: 0755
+        mode: "0755"
       loop:
         - "{{ apache_document_root }}"
         - "{{ apache_document_root }}/.well-known/acme-challenge"
@@ -22,7 +22,7 @@
         dest: "/etc/apache2/{{ file }}"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       loop:
         - apache2.conf
         - ports.conf
@@ -36,7 +36,7 @@
         dest: "/etc/apache2/mods-available/{{ file }}"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       loop:
         - http2.conf
         - md.conf
@@ -52,7 +52,7 @@
         dest: "/etc/apache2/conf-available/{{ file }}"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       loop:
         - le.conf
         - version-control.conf
@@ -66,7 +66,7 @@
         dest: /etc/apache2/sites-available/000-default.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       when: ( apache_sites_enabled is defined ) and ( "000-default" in apache_sites_enabled )
 
     - name: Conditional update default-ssl.conf
@@ -75,7 +75,7 @@
         dest: /etc/apache2/sites-available/default-ssl.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       when: ( apache_sites_enabled is defined ) and ( "default-ssl" in apache_sites_enabled )
 
     - name: Apache localhost site available
@@ -84,7 +84,7 @@
         dest: "/etc/apache2/sites-available/localhost.conf"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Conditionally include Webarchitects config
       include_tasks: webarch.yml
@@ -100,7 +100,7 @@
         state: directory
         owner: root
         group: root
-        mode: 0755
+        mode: "0755"
       loop:
         - /var/www/localhost
         - /etc/apache2/localhost.d
@@ -114,7 +114,7 @@
         dest: /var/www/html/robots.deny.txt
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Expires and robots conf available
       template:
@@ -122,7 +122,7 @@
         dest: "/etc/apache2/conf-available/{{ file }}"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       loop:
         - robots-deny.conf
         - robots-deny-nextcloud.conf
@@ -139,7 +139,7 @@
         dest: /etc/apache2/mods-available/mpm_prefork.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       when: ( "mpm_itk" in apache_mods_enabled ) or ( "mpm_prefork" in apache_mods_enabled )
 
     - name: Apache ratelimit conf present
@@ -148,7 +148,7 @@
         dest: /etc/apache2/mods-available/ratelimit.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       when: '"ratelimit" in apache_mods_enabled'
 
     - name: Cloudflare config available

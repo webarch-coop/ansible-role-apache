@@ -8,7 +8,7 @@
         dest: "/root/cloudflare_ips_v4.txt"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
         force: true
 
     - name: Slurp Cloudflare IPv4 list
@@ -31,7 +31,7 @@
         dest: /etc/apache2/conf-available/cloudflare.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
   tags:
     - apache

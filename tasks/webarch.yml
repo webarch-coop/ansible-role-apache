@@ -28,7 +28,7 @@
         dest: /etc/apache2/conf-available/webarch.conf
         trim_blocks: false
         lstrip_blocks: true
-        mode: 0644
+        mode: "0644"
         owner: root
         group: root
 

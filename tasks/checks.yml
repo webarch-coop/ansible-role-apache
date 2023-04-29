@@ -3,13 +3,13 @@
   block:
 
     - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
-      assert:
+      ansible.builtin.assert:
         that:
           - ( apache_mods_enabled is defined ) and ( apache_mods_enabled[0] is defined )
           - ( "mpm_prefork" in apache_mods_enabled ) or ( "mpm_event" in apache_mods_enabled )
 
     - name: Checks when mpm_event enabled
-      assert:
+      ansible.builtin.assert:
         that:
           - ( "mpm_prefork" not in apache_mods_enabled )
           - ( "mpm_event" not in apache_mods_disabled )
@@ -17,26 +17,26 @@
       when: ( "mpm_event" in apache_mods_enabled )
 
     - name: Checks when mpm_prefork enabled
-      assert:
+      ansible.builtin.assert:
         that:
           - ( "mpm_event" not in apache_mods_enabled )
           - ( "mpm_prefork" not in apache_mods_disabled )
       when: ( "mpm_prefork" in apache_mods_enabled )
 
     - name: Check that there are no duplicates in the mods arrays
-      assert:
+      ansible.builtin.assert:
         that:
           - apache_mods_enabled | unique | count == apache_mods_enabled | count
           - apache_mods_disabled | unique | count == apache_mods_disabled | count
 
     - name: Check that there are no duplicates in the conf arrays
-      assert:
+      ansible.builtin.assert:
         that:
           - apache_conf_enabled | unique | count == apache_conf_enabled | count
           - apache_conf_disabled | unique | count == apache_conf_disabled | count
 
     - name: Check that there are no duplicates in the sites arrays
-      assert:
+      ansible.builtin.assert:
         that:
           - apache_sites_enabled | unique | count == apache_sites_enabled | count
           - apache_sites_disabled | unique | count == apache_sites_disabled | count
@@ -45,17 +45,17 @@
       block:
 
         - name: Debug apache_mods_enabled array
-          debug:
+          ansible.builtin.debug:
             var: apache_mods_enabled
             verbosity: 2
 
         - name: Debug apache_mods_disabled array
-          debug:
+          ansible.builtin.debug:
             var: apache_mods_disabled
             verbosity: 2
 
         - name: Check that no mods are enabled and disabled
-          assert:
+          ansible.builtin.assert:
             that: mod not in apache_mods_disabled
           loop: "{{ apache_mods_enabled }}"
           loop_control:
@@ -63,7 +63,7 @@
             label: "{{ mod }}"
 
         - name: Check that no mods are disabled and enabled
-          assert:
+          ansible.builtin.assert:
             that: mod not in apache_mods_enabled
           loop: "{{ apache_mods_disabled }}"
           loop_control:
@@ -78,18 +78,18 @@
       block:
 
         - name: Debug apache_conf_enabled arrays
-          debug:
+          ansible.builtin.debug:
             var: apache_conf_enabled
             verbosity: 2
 
         - name: Debug apache_conf_disabled arrays
-          debug:
+          ansible.builtin.debug:
             var:
               - apache_conf_disabled
             verbosity: 2
 
         - name: Check that no conf are enabled and disabled
-          assert:
+          ansible.builtin.assert:
             that: conf not in apache_conf_disabled
           loop: "{{ apache_conf_enabled }}"
           loop_control:
@@ -97,7 +97,7 @@
             label: "{{ conf }}"
 
         - name: Check that no conf are disabled and enabled
-          assert:
+          ansible.builtin.assert:
             that: conf not in apache_conf_enabled
           loop: "{{ apache_conf_disabled }}"
           loop_control:
@@ -112,17 +112,17 @@
       block:
 
         - name: Debug apache_sites_enabled arrays
-          debug:
+          ansible.builtin.debug:
             var: apache_sites_enabled
             verbosity: 2
 
         - name: Debug apache_sites_disabled arrays
-          debug:
+          ansible.builtin.debug:
             var: apache_sites_disabled
             verbosity: 2
 
         - name: Check that no sites are enabled and disabled
-          assert:
+          ansible.builtin.assert:
             that: site not in apache_sites_disabled
           loop: "{{ apache_sites_enabled }}"
           loop_control:
@@ -130,7 +130,7 @@
             label: "{{ site }}"
 
         - name: Check that no sites are disabled and enabled
-          assert:
+          ansible.builtin.assert:
             that: site not in apache_sites_enabled
           loop: "{{ apache_sites_disabled }}"
           loop_control:
@@ -145,22 +145,22 @@
   block:
 
     - name: Check the Apache version
-      command: apache2ctl -v
+      ansible.builtin.command: apache2ctl -v
       check_mode: false
       changed_when: false
       register: apache_version_check
 
     - name: Debug Apache version check
-      debug:
+      ansible.builtin.debug:
         msg: "{{ apache_version_check.stdout_lines[0] }}"
         verbosity: 2
 
     - name: Set a fact for the Apache version
-      set_fact:
+      ansible.builtin.set_fact:
         apache_version: "{{ apache_version_check.stdout_lines[0].split(' ')[2] | regex_replace('^Apache[/]') }}"
 
     - name: Debug Apache version
-      debug:
+      ansible.builtin.debug:
         var: apache_version
         verbosity: 1
 
@@ -168,51 +168,62 @@
       block:
 
         - name: Set facts for TLS versions
-          set_fact:
+          ansible.builtin.set_fact:
             apache_tls1_3: true
           when: apache_version is version('2.4.41', '>=')
 
         - name: Debug TLS 1.3 variable
-          debug:
+          ansible.builtin.debug:
             var: apache_tls1_3
             verbosity: 1
 
       when: apache_version is version('2.4.41', '>=')
 
     - name: Check if phpquery is installed
-      command: which phpquery
+      ansible.builtin.command: which phpquery
       check_mode: false
       changed_when: false
       register: apache_which_phpquery
       failed_when: apache_which_phpquery.rc is not regex('^0|1$')
 
     - name: Set the apache_php variable to true or false
-      set_fact:
+      ansible.builtin.set_fact:
         apache_php: "{% if apache_which_phpquery.rc == 0 %}true{% else %}false{% endif %}"
 
     - name: Check PHP version
       block:
 
-        - name: Run phpquery to get the PHP version NOTE that currently having only one PHP version installed is supported
-          command: phpquery -V
+        - name: Run phpquery to get the PHP versions
+          ansible.builtin.command: phpquery -V
           args:
             strip_empty_ends: true
           check_mode: false
           changed_when: false
-          register: apache_phpquery_version
-          failed_when: apache_which_phpquery.stdout_lines | count >= 2
+          register: apache_phpquery_versions
 
-        - name: Set a fact for the PHP version
-          set_fact:
-            apache_php_version: "{{ apache_phpquery_version.stdout | trim }}"
+        - name: Set a fact for the PHP versions
+          ansible.builtin.set_fact:
+            apache_php_versions: "{{ apache_phpquery_versions.stdout_lines }}"
 
-        - name: Set a fact for the PHP FPM module and conf names
-          set_fact:
+        - name: Run update-alternatives to find the default version of PHP
+          ansible.builtin.command: update-alternatives --query php
+          args:
+            strip_empty_ends: true
+          check_mode: false
+          changed_when: false
+          register: apache_update_alternatives_query_php
+
+        - name: Set a fact for the default version of PHP
+          ansible.builtin.ansible.builtin.set_fact:
+            apache_php_version: "{{ apache_update_alternatives_query_php.stdout | string | community.general.jc('update_alt_q') | community.general.json_query('default') | regex_replace('^/usr/bin/php') }}"
+
+        - name: Set facts for the PHP FPM module and conf names
+          ansible.builtin.set_fact:
             apache_phpfpm_mod: "php{{ apache_php_version }}"
             apache_phpfpm_conf: "php{{ apache_php_version }}-fpm"
 
         - name: Debug PHP FPM module and conf names
-          debug:
+          ansible.builtin.debug:
             msg:
               - "apache_phpfpm_mod: {{ apache_phpfpm_mod }}"
               - "apache_phpfpm_conf: {{ apache_phpfpm_conf }}"
@@ -221,47 +232,47 @@
       when: ( apache_php is defined ) and ( apache_php )
 
     - name: Check the enabled MPM
-      command: a2query -M
+      ansible.builtin.command: a2query -M
       check_mode: false
       changed_when: false
       register: apache_mpm_check
 
     - name: Debug the enabled MPM
-      debug:
+      ansible.builtin.debug:
         msg: "{{ apache_mpm_check.stdout }}"
         verbosity: 2
 
     - name: Set a fact for the enabled MPM
-      set_fact:
+      ansible.builtin.set_fact:
         apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
       when: apache_mpm_check.stdout != "invalid"
 
     - name: Set a fact for the enabled MPM
-      set_fact:
+      ansible.builtin.set_fact:
         apache_mpm_loaded: ""
       when: apache_mpm_check.stdout == "invalid"
 
     - name: Debug the enabled MPM
-      debug:
+      ansible.builtin.debug:
         var: apache_mpm_loaded
         verbosity: 2
       when: apache_mpm_loaded is defined
 
     - name: "Check if a Let's Encrypt HTTPS cert is present for {{ inventory_hostname }}"
-      stat:
+      ansible.builtin.stat:
         path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
       check_mode: false
       register: apache_cert
       when: ( "md" not in apache_mods_enabled )
 
     - name: Include mod checks
-      include_tasks: a2mod_checks.yml
+      ansible.builtin.include_tasks: a2mod_checks.yml
 
     - name: Include conf checks
-      include_tasks: a2conf_checks.yml
+      ansible.builtin.include_tasks: a2conf_checks.yml
 
     - name: Include site checks
-      include_tasks: a2site_checks.yml
+      ansible.builtin.include_tasks: a2site_checks.yml
 
   tags:
     - apache
