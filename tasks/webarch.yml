@@ -1,9 +1,18 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Config for webarch.coop
   block:
 
     - name: Webarchitects templates present
-      git:
+      ansible.builtin.git:
         repo: https://git.coop/webarch/website-templates.git
         dest: /var/www/wsh
         version: master
@@ -12,18 +21,18 @@
         force: true
 
     - name: Debian default /var/www/html/index.html absent
-      file:
+      ansible.builtin.file:
         path: /var/www/html/index.html
         state: absent
 
     - name: "Check the mdomain status for {{ inventory_hostname }}"
-      include_tasks: md_status.yml
+      ansible.builtin.include_tasks: md_status.yml
       vars:
         apache_mdomain: "{{ inventory_hostname }}"
       when: ( "md" in apache_mods_enabled )
 
     - name: WSH Apache config in place
-      template:
+      ansible.builtin.template:
         src: templates/webarch.conf.j2
         dest: /etc/apache2/conf-available/webarch.conf
         trim_blocks: false

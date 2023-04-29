@@ -1,3 +1,12 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Check that mistakes haven't been made in the variables and arrays
   block:
@@ -41,7 +50,7 @@
           - apache_sites_enabled | unique | count == apache_sites_enabled | count
           - apache_sites_disabled | unique | count == apache_sites_disabled | count
 
-    - name: apache_mods_enabled and apache_mods_disabled array checks
+    - name: Check apache_mods_enabled and apache_mods_disabled arrays
       block:
 
         - name: Debug apache_mods_enabled array
@@ -74,7 +83,7 @@
         - ( apache_mods_enabled is defined ) and ( apache_mods_enabled[0] is defined )
         - ( apache_mods_disabled is defined ) and ( apache_mods_disabled[0] is defined )
 
-    - name: apache_conf_enabled and apache_conf_disabled array checks
+    - name: Check apache_conf_enabled and apache_conf_disabled arrays
       block:
 
         - name: Debug apache_conf_enabled arrays
@@ -108,7 +117,7 @@
         - ( apache_conf_enabled is defined ) and ( apache_conf_enabled[0] is defined )
         - ( apache_conf_disabled is defined ) and ( apache_conf_disabled[0] is defined )
 
-    - name: apache_sites_enabled and apache_sites_disabled array checks
+    - name: Check apache_sites_enabled and apache_sites_disabled arrays
       block:
 
         - name: Debug apache_sites_enabled arrays
@@ -214,7 +223,7 @@
           register: apache_update_alternatives_query_php
 
         - name: Set a fact for the default version of PHP
-          ansible.builtin.ansible.builtin.set_fact:
+          ansible.builtin.set_fact:
             apache_php_version: "{{ apache_update_alternatives_query_php.stdout | string | community.general.jc('update_alt_q') | community.general.json_query('default') | regex_replace('^/usr/bin/php') }}"
 
         - name: Set facts for the PHP FPM module and conf names

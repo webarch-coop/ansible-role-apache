@@ -1,6 +1,15 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Check loaded modules
-  include_tasks: a2mod_checks.yml
+  ansible.builtin.include_tasks: a2mod_checks.yml
   tags:
     - apache
 
@@ -8,7 +17,7 @@
   block:
 
     - name: Apache ITK MPM package absent
-      apt:
+      ansible.builtin.apt:
         pkg:
           - libapache2-mpm-itk
         state: absent
@@ -16,7 +25,7 @@
       when: '"mpm_itk" in apache_mods_disabled'
 
     - name: Apache FastCGI absent
-      apt:
+      ansible.builtin.apt:
         pkg:
           - libapache2-mod-fcgid
         state: absent
@@ -24,15 +33,15 @@
       when: '"fcgid" in apache_mods_disabled'
 
     - name: Apache suEXEC package absent
-      apt:
+      ansible.builtin.apt:
         pkg:
           - apache2-suexec-pristine
         state: absent
         update_cache: false
       when: '"suexec" in apache_mods_disabled'
 
-    - name: "Apache {{ apache_phpfpm_mod }} package absent"
-      apt:
+    - name: "Apache package absent {{ apache_phpfpm_mod }}"
+      ansible.builtin.apt:
         pkg:
           - "libapache2-mod-php{{ apache_php_version }}"
         state: absent
@@ -40,7 +49,7 @@
       when: ( apache_php ) and ( "apache_phpfpm_mod" in apache_mods_disabled )
 
     - name: Disable modules
-      apache2_module:
+      community.general.apache2_module:
         name: "{{ mod }}"
         state: absent
       when: mod in apache_modules_loaded
@@ -59,7 +68,7 @@
   block:
 
     - name: Apache ITK MPM package present
-      apt:
+      ansible.builtin.apt:
         pkg:
           - libapache2-mpm-itk
         state: present
@@ -67,7 +76,7 @@
       when: '"mpm_itk" in apache_mods_enabled'
 
     - name: Apache Suexec package present
-      apt:
+      ansible.builtin.apt:
         pkg:
           - apache2-suexec-pristine
         state: present
@@ -75,7 +84,7 @@
       when: '"suexec" in apache_mods_enabled'
 
     - name: Apache FastCGI package present
-      apt:
+      ansible.builtin.apt:
         pkg:
           - libapache2-mod-fcgid
         state: present
@@ -83,7 +92,7 @@
       when: '"fcgid" in apache_mods_enabled'
 
     - name: Apache mod_php package present
-      apt:
+      ansible.builtin.apt:
         pkg:
           - "libapache2-mod-php{{ apache_php_version }}"
         state: present
@@ -91,7 +100,7 @@
       when: ( apache_php ) and ( "apache_phpfpm_mod" in apache_mods_enabled )
 
     - name: Apache modules enabled
-      apache2_module:
+      community.general.apache2_module:
         name: "{{ mod }}"
         state: present
       when: mod not in apache_modules_loaded

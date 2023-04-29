@@ -11,7 +11,7 @@ LogFormat "%I %O" bandwidth
 Protocols h2 h2c http/1.1 acme-tls/1
 ProtocolsHonorOrder On
 {% elif apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" not in apache_mods_enabled %}
-Protocols h2 h2c http/1.1 
+Protocols h2 h2c http/1.1
 ProtocolsHonorOrder Off
 {% endif %}
 # Let's Encrypt
@@ -23,7 +23,7 @@ Alias /wsh.shtml /var/www/wsh/wsh.shtml
 Alias /icons /usr/share/apache2/icons
 # env vars for the default index page, wsh.shtml
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
-SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}" 
+SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}"
 SetEnv PHPMYADMIN_PATH "/phpmyadmin/"
 {% elif phpmyadmin_domain is defined %}
 SetEnv PHPMYADMIN_DOMAIN "{{ phpmyadmin_domain }}"
@@ -41,7 +41,7 @@ SetEnv SITE_TITLE "Webarchitects Shared Hosting"
 SetEnv STATIC_DIR "/wsh/"
 SetEnv STATIC_TOP "top.shtml"
 SetEnv STATIC_BOT "bot.shtml"
-# default page title 
+# default page title
 SetEnv PAGE_TITLE "Directory Listing"
 SetEnv PAGE_DESC  ""
 <Directory "/">
@@ -50,14 +50,14 @@ SetEnv PAGE_DESC  ""
   Require all denied
 </Directory>
 <Directory "/var/www/wsh">
-  Options IncludesNoExec 
+  Options IncludesNoExec
   DirectoryIndex wsh.shtml
   AddOutputFilter Includes shtml
-  SSILegacyExprParser on 
-  SSILastModified on 
+  SSILegacyExprParser on
+  SSILastModified on
   HeaderName /wsh/top.shtml
   ReadmeName /wsh/bot.shtml
-  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
+  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=*
   IndexOptions Charset=UTF-8 SuppressHTMLPreamble XHTML TrackModified IconsAreLinks
   IndexOptions SuppressDescription
   AllowOverride None
@@ -91,16 +91,16 @@ SetEnv PAGE_DESC  ""
 </Directory>
 <Directory "/var/www/html/.well-known">
   Options None
-  AllowOverride None 
+  AllowOverride None
   ForceType text/plain
 </Directory>
 <Directory "/home/*/sites/*">
   DirectoryIndex wsh.shtml
   AddOutputFilter Includes shtml
-  SSILegacyExprParser on 
+  SSILegacyExprParser on
   HeaderName /wsh/top.shtml
   ReadmeName /wsh/bot.shtml
-  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
+  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=*
   IndexOptions Charset=UTF-8 SuppressHTMLPreamble XHTML TrackModified IconsAreLinks
   IndexOptions SuppressDescription
 </Directory>
@@ -124,13 +124,13 @@ ErrorDocument 506 /wsh/506.shtml
 
 # The default virtual host for port 80
 <VirtualHost *:80>
-  ServerName {{ inventory_hostname }} 
+  ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
   <IfModule mpm_itk_module>
-    AssignUserID www-data www-data 
+    AssignUserID www-data www-data
   </IfModule>
   <IfModule suexec_module>
-    SuexecUserGroup www-data www-data 
+    SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin support@webarch.net
   {%- if matomo_domain is defined %}
@@ -178,13 +178,13 @@ ErrorDocument 506 /wsh/506.shtml
 # The default virtual host for port 443
 <IfModule ssl_module>
 <VirtualHost *:443>
-  ServerName {{ inventory_hostname }} 
+  ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
   <IfModule mpm_itk_module>
-    AssignUserID www-data www-data 
+    AssignUserID www-data www-data
   </IfModule>
   <IfModule suexec_module>
-    SuexecUserGroup www-data www-data 
+    SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin "{{ apache_server_admin }}"
   {%- if matomo_domain is defined %}

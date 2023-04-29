@@ -1,0 +1,159 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+argument_specs:
+  main:
+    author: Chris Croome
+    description: An Ansible role for installing and configurinag the Apache HTTP server.
+    short_description: The main entry point for the Apache role.
+    options:
+      apache_a2query:
+        type: str
+        required: true
+        description: The path for /usr/sbin/a2query.
+      apache_chroot_dir:
+        type: str
+        required: false
+        description: The directory to chroot Apache into when it is set to be chrooted.
+      apache_chroot:
+        type: bool
+        required: false
+        description: Chroot Apache.
+      apache_conf_disabled:
+        type: list
+        elements: str
+        required: true
+        description: A list of Apache conf that should be disabled.
+      apache_conf_enabled:
+        type: list
+        elements: str
+        required: true
+        description: A list of Apache conf that should be enabled.
+      apache_dhparam_path:
+        type: str
+        required: true
+        description: The path to the dhparam file.
+      apache_dhparam_size:
+        type: int
+        required: true
+        description: The size for the dhparam.
+      apache_disable_dot:
+        type: int
+        required: false
+        description: Deny access to file and directory names that start with a dot.
+      apache_disable_root:
+        type: int
+        required: false
+        description: Deny access to the root files system.
+      apache_document_root:
+        type: str
+        required: true
+        description: The default DocumentRoot.
+      apache_group:
+        type: str
+        required: true
+        description: The group that the Apache process should run as.
+      apache_localhost_port:
+        type: int
+        required: true
+        description: The port that Apache should listen on the localhost.
+      apache_md_private_keys:
+        type: list
+        elements: str
+        description: A list of of key tryes for MDPrivateKeys.
+        choices:
+          - rsa3072
+          - secp256r1
+          - secp384r1
+      apache_md_renew_window:
+        type: str
+        required: false
+        description: Apache MDRenewWindow.
+      apache_md_version:
+        type: str
+        required: false
+        description: The version of mod_md to install.
+      apache_mods_disabled:
+        type: list
+        elements: str
+        required: true
+        description: Apache mods that should be disabled.
+      apache_mods_enabled:
+        type: list
+        elements: str
+        required: true
+        description: Apache mods that should be enabled.
+      apache_mpm_max_connections_per_child:
+        type: int
+        required: false
+        description: Apache MPM MaxConnectionsPerChild.
+      apache_mpm_max_request_workers:
+        type: int
+        required: false
+        description: Apache MPM MaxRequestWorkers.
+      apache_packages_present:
+        type: list
+        elements: str
+        required: false
+        description: A list of Apache packages that should be present.
+      apache_server_admin:
+        type: str
+        required: true
+        description: An email address for ServerAdmin and MDContactEmail.
+      apache_server_tokens:
+        type: str
+        required: true
+        description: What information should be returned inn the Server HTTP response Header.
+        choices:
+          - Full
+          - Major
+          - Minimal
+          - Minor
+          - OS
+          - Prod
+      apache_sites_disabled:
+        type: list
+        elements: str
+        required: true
+        description: A list of Apache sites that should be disabled.
+      apache_sites_enabled:
+        type: list
+        elements: str
+        required: true
+        description: A list of Apache sites that should be enabled.
+      apache_suexec:
+        type: bool
+        required: false
+        description: Install Apache suEXEC.
+      apache_timeout:
+        type: int
+        required: true
+        description: Apache Timeout value.
+      apache_tls1_2_cipher_suites:
+        type: str
+        required: true
+        description: A list of colon seperate TLSv1.2 ciphers for SSLCipherSuite.
+      apache_tls1_3_cipher_suites:
+        type: str
+        required: true
+        description: A list of colon seperate TLSv1.3 ciphers for SSLCipherSuite.
+      apache_ulimit:
+        type: int
+        required: true
+        description: The maximun number of files Apache can open, used for the APACHE_ULIMIT_MAX_FILES env var.
+      apache_user:
+        type: str
+        required: true
+        description: The user that the Apache process should run as.
+      apache_verify:
+        type: bool
+        required: false
+        description: Verify all variables that start with apache_.
+...

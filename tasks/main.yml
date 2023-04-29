@@ -1,9 +1,24 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Install and configure Apache
   block:
 
+    - name: Verify variables that start with apache_
+      ansible.builtin.include_tasks: verify.yml
+      when:
+        - apache_verify is defined
+        - apache_verify | bool
+
     - name: Apache present from buster-backports
-      apt:
+      ansible.builtin.apt:
         pkg:
           - apache2
         state: latest
@@ -13,7 +28,7 @@
       when: ansible_distribution_release == "buster"
 
     - name: Apache present
-      apt:
+      ansible.builtin.apt:
         pkg:
           - apache2
         state: present
@@ -22,20 +37,20 @@
       when: ansible_distribution_release != "buster"
 
     - name: Additional packages present
-      apt:
+      ansible.builtin.apt:
         pkg: "{{ apache_packages_present }}"
         state: present
         update_cache: false
       when: ( apache_packages_present is defined ) and ( apache_packages_present != [] )
 
     - name: Include local facts tasks
-      include_tasks: local_facts.yml
+      ansible.builtin.include_tasks: local_facts.yml
 
     - name: Include Apache checks
-      include_tasks: checks.yml
+      ansible.builtin.include_tasks: checks.yml
 
     - name: Apache DocumentRoot present
-      file:
+      ansible.builtin.file:
         path: "{{ apache_document_root }}"
         state: directory
         mode: "0755"
@@ -43,27 +58,27 @@
         group: root
 
     - name: Apache DH parameters file present
-      openssl_dhparam:
+      community.crypto.openssl_dhparam:
         path: "{{ apache_dhparam_path }}"
         size: "{{ apache_dhparam_size }}"
 
     - name: Include suEXEC tasks
-      include_tasks: suexec.yml
+      ansible.builtin.include_tasks: suexec.yml
       when: ( apache_suexec is defined ) and ( apache_suexec )
 
     - name: Install specific version of mod_md
-      include_tasks: md.yml
+      ansible.builtin.include_tasks: md.yml
       when: ( "md" in apache_mods_enabled ) and ( apache_md_version is defined ) and ( apache_md_version != "default" )
 
     - name: Include MPM switching tasks
-      include_tasks: mpm.yml
+      ansible.builtin.include_tasks: mpm.yml
       when: ( apache_mpm_loaded not in apache_mods_enabled ) or ( apache_mpm_loaded | length == 0 )
 
     - name: Apache config available
-      include_tasks: config.yml
+      ansible.builtin.include_tasks: config.yml
 
     - name: Apache envars in place
-      template:
+      ansible.builtin.template:
         src: templates/envvars.j2
         dest: /etc/apache2/envvars
         mode: "0755"
@@ -71,41 +86,41 @@
         group: root
 
     - name: Apache modules disabled and enabled
-      include_tasks: a2mod.yml
+      ansible.builtin.include_tasks: a2mod.yml
       when: ( apache_mods_disabled is defined ) or ( apache_mods_enabled is defined )
 
     - name: Apache conf disabled and enabled
-      include_tasks: a2conf.yml
+      ansible.builtin.include_tasks: a2conf.yml
       when: ( apache_sites_disabled is defined ) or ( apache_conf_enabled is defined )
 
     - name: Apache sites disabled and enabled
-      include_tasks: a2site.yml
+      ansible.builtin.include_tasks: a2site.yml
       when: ( apache_sites_disabled is defined ) or ( apache_sites_enabled is defined )
 
     - name: Apache enabled for systemd servers
-      systemd:
+      ansible.builtin.systemd:
         name: apache2
         enabled: true
       when: ansible_distribution_release != "stretch"
 
     - name: Apache configtest
-      command: apache2ctl configtest
+      ansible.builtin.command: apache2ctl configtest
       register: apache_configtest
       failed_when: apache_configtest.rc is not regex('^0|1$')
       check_mode: false
 
     - name: Print the apache2ctl configtest standard error
-      debug:
+      ansible.builtin.debug:
         msg: "{{ apache_configtest.stderr }}"
         verbosity: 1
 
     - name: Fail if Apache configtest is not OK
-      fail:
+      ansible.builtin.fail:
         msg: "{{ apache_configtest.stdout_lines }}"
       when: ( "Syntax OK" not in apache_configtest.stderr ) or ( apache_configtest.rc == 1 )
 
     - name: Apache restarted
-      service:
+      ansible.builtin.service:
         name: apache2
         state: restarted
       when: ( "Syntax OK" in apache_configtest.stderr ) or ( apache_configtest.rc == 0 )

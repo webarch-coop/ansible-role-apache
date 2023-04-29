@@ -1,12 +1,21 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Apache sites checked, disabled and enabled
   block:
 
     - name: Check loaded sites
-      include_tasks: a2site_checks.yml
+      ansible.builtin.include_tasks: a2site_checks.yml
 
     - name: Apache sites disabled
-      command: "a2dissite {{ site }}"
+      ansible.builtin.command: "a2dissite {{ site }}"
       args:
         removes: "/etc/apache2/sites-enabled/{{ site }}.conf"
       when:
@@ -22,7 +31,7 @@
       block:
 
         - name: Apache sites enabled
-          command: "a2ensite {{ site }}"
+          ansible.builtin.command: "a2ensite {{ site }}"
           args:
             creates: "/etc/apache2/sites-enabled/{{ site }}.conf"
           when:
@@ -37,7 +46,7 @@
       rescue:
 
         - name: Site enable failed
-          debug:
+          ansible.builtin.debug:
             msg: Enabing an Apache site failed, check that the files exists in /etc/apache2/sites-available
 
   tags:

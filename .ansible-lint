@@ -10,12 +10,7 @@
 ---
 # https://ansible-lint.readthedocs.io/rules/
 skip_list:
-  - fqcn[action-core]
-  - fqcn[action]
-  - jinja[spacing]
   - key-order[task]
-  - name[casing]
-  - name[template]
   - no-changed-when
   - no-handler
   - package-latest

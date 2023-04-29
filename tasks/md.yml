@@ -1,9 +1,18 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Install mod_md from https://github.com/icing/mod_md
   block:
 
     - name: Requirements present
-      apt:
+      ansible.builtin.apt:
         pkg:
           - apache2-dev
           - apache2-ssl-dev
@@ -15,7 +24,7 @@
       block:
 
         - name: Use a HEAD request to get the latest redirect URL
-          uri:
+          ansible.builtin.uri:
             url: https://github.com/icing/mod_md/releases/latest
             method: HEAD
             status_code: 302
@@ -25,13 +34,13 @@
           register: apache_md_latest_headers
 
         - name: Set a fact for the latest version of Apache mod_md
-          set_fact:
+          ansible.builtin.set_fact:
             apache_md_version: "{{ apache_md_latest_headers.location | urlsplit('path') | basename }}"
 
       when: apache_md_version == "latest"
 
     - name: Source code present
-      git:
+      ansible.builtin.git:
         repo: https://github.com/icing/mod_md.git
         dest: /usr/local/src/mod_md
         version: "{{ apache_md_version }}"
@@ -44,17 +53,17 @@
       block:
 
         - name: Buildconf mod_md
-          command: ./buildconf
+          ansible.builtin.command: ./buildconf
           args:
             chdir: /usr/local/src/mod_md
 
         - name: Configure mod_md
-          command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
+          ansible.builtin.command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
           args:
             chdir: /usr/local/src/mod_md
 
         - name: Make install mod_md
-          make:
+          community.general.make:
             chdir: /usr/local/src/mod_md
             target: install
 

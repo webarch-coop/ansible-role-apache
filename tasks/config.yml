@@ -1,9 +1,18 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Apache config available
   block:
 
     - name: Directories present
-      file:
+      ansible.builtin.file:
         path: "{{ path }}"
         state: directory
         owner: root
@@ -17,7 +26,7 @@
         label: "{{ path }}"
 
     - name: Custom Apache config in place
-      template:
+      ansible.builtin.template:
         src: "{{ file }}.j2"
         dest: "/etc/apache2/{{ file }}"
         owner: root
@@ -31,7 +40,7 @@
         label: "{{ file }}"
 
     - name: Custom Apache mods available in place
-      template:
+      ansible.builtin.template:
         src: "{{ file }}.j2"
         dest: "/etc/apache2/mods-available/{{ file }}"
         owner: root
@@ -47,7 +56,7 @@
         label: "{{ file }}"
 
     - name: Custom Apache conf available in place
-      template:
+      ansible.builtin.template:
         src: "{{ file }}.j2"
         dest: "/etc/apache2/conf-available/{{ file }}"
         owner: root
@@ -61,7 +70,7 @@
         label: "{{ file }}"
 
     - name: Conditional update 000-default.conf
-      template:
+      ansible.builtin.template:
         src: 000-default.conf.j2
         dest: /etc/apache2/sites-available/000-default.conf
         owner: root
@@ -70,7 +79,7 @@
       when: ( apache_sites_enabled is defined ) and ( "000-default" in apache_sites_enabled )
 
     - name: Conditional update default-ssl.conf
-      template:
+      ansible.builtin.template:
         src: default-ssl.conf.j2
         dest: /etc/apache2/sites-available/default-ssl.conf
         owner: root
@@ -79,7 +88,7 @@
       when: ( apache_sites_enabled is defined ) and ( "default-ssl" in apache_sites_enabled )
 
     - name: Apache localhost site available
-      template:
+      ansible.builtin.template:
         src: "templates/localhost.conf.j2"
         dest: "/etc/apache2/sites-available/localhost.conf"
         owner: root
@@ -87,15 +96,15 @@
         mode: "0644"
 
     - name: Conditionally include Webarchitects config
-      include_tasks: webarch.yml
+      ansible.builtin.include_tasks: webarch.yml
       when: ( apache_conf_enabled is defined ) and ( "webarch" in apache_conf_enabled )
 
     - name: Conditionally include mc3 config
-      include_tasks: mc3.yml
+      ansible.builtin.include_tasks: mc3.yml
       when: ( apache_conf_enabled is defined ) and ( "mc3" in apache_conf_enabled )
 
     - name: Apache localhost and localhost.d directories in place
-      file:
+      ansible.builtin.file:
         path: "{{ dir }}"
         state: directory
         owner: root
@@ -109,7 +118,7 @@
         label: "{{ dir }}"
 
     - name: Deny robots files in place
-      template:
+      ansible.builtin.template:
         src: robots.deny.txt.j2
         dest: /var/www/html/robots.deny.txt
         owner: root
@@ -117,7 +126,7 @@
         mode: "0644"
 
     - name: Expires and robots conf available
-      template:
+      ansible.builtin.template:
         src: "templates/{{ file }}.j2"
         dest: "/etc/apache2/conf-available/{{ file }}"
         owner: root
@@ -134,7 +143,7 @@
         label: "{{ file }}"
 
     - name: Apache mpm_prefork.conf in place
-      template:
+      ansible.builtin.template:
         src: templates/mpm_prefork.conf.j2
         dest: /etc/apache2/mods-available/mpm_prefork.conf
         owner: root
@@ -143,7 +152,7 @@
       when: ( "mpm_itk" in apache_mods_enabled ) or ( "mpm_prefork" in apache_mods_enabled )
 
     - name: Apache ratelimit conf present
-      template:
+      ansible.builtin.template:
         src: templates/ratelimit.conf.j2
         dest: /etc/apache2/mods-available/ratelimit.conf
         owner: root
@@ -152,14 +161,14 @@
       when: '"ratelimit" in apache_mods_enabled'
 
     - name: Cloudflare config available
-      include_tasks: cloudflare.yml
+      ansible.builtin.include_tasks: cloudflare.yml
       when: ( "remoteip" in apache_mods_enabled )
 
     - name: Conditionally provision a Let's Encrypt cert using acmesh role
       block:
 
         - name: "Provision a Let's Encrypt cert for {{ inventory_hostname }}"
-          include_role:
+          ansible.builtin.include_role:
             name: acmesh
             tasks_from: letsencrypt
           vars:

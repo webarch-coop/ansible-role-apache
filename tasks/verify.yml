@@ -8,21 +8,26 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Install and configure Apache suEXEC
+- name: Verify variables starting with apache_
   block:
 
-    - name: Apache suEXEC package present
-      ansible.builtin.apt:
-        pkg:
-          - apache2-suexec-custom
-        state: present
+    - name: Debug the hostvars variable names that start with apache_
+      ansible.builtin.debug:
+        var: apachevarnames
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
 
-    - name: Apache suEXEC config directory only readable by root
-      ansible.builtin.file:
-        path: /etc/apache2/suexec
-        state: directory
-        mode: "0700"
+    - name: Debug the hostvars variable names that start with apache_
+      ansible.builtin.debug:
+        var: apachehostvars
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
 
+    - name: Check apache_ variables using meta/argument_specs.yml
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
+        provided_arguments: "{{ apachehostvars }}"
+
+
+  when: apache_verify | bool
   tags:
     - apache
 ...

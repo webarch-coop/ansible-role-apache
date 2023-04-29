@@ -1,3 +1,12 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 apache_user: www-data
 apache_group: www-data
@@ -171,4 +180,8 @@ apache_md_private_keys:
 # Specify a version from here https://github.com/icing/mod_md/releases
 # Use latest for the latest release or default for the packaged version
 apache_md_version: latest
+apache_md_renew_window: 33%
+apache_mpm_max_connections_per_child: 10000
+apache_mpm_max_request_workers: 128
+apache_verify: true
 ...

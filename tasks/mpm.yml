@@ -1,19 +1,28 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Enable Apache mpm_event if mpm_prefork or no MPM loaded
   block:
 
     - name: Include Apache checks
-      include_tasks: checks.yml
+      ansible.builtin.include_tasks: checks.yml
 
     - name: Debug Apache modules loaded
-      debug:
+      ansible.builtin.debug:
         msg: "Apache modules loaded: {{ apache_modules_loaded }}"
         verbosity: 1
       when:
         - ( apache_modules_loaded is defined ) and ( apache_modules_loaded | length > 0 )
 
     - name: "Disable Apache module {{ apache_phpfpm_mod }}"
-      apache2_module:
+      community.general.apache2_module:
         name: "{{ apache_phpfpm_mod }}"
         state: absent
       when:
@@ -21,27 +30,27 @@
         - ( apache_phpfpm_mod is defined ) and ( apache_phpfpm_mod in apache_modules_loaded )
 
     - name: Disable Apache module mpm_itk
-      apache2_module:
+      community.general.apache2_module:
         name: mpm_itk
         state: absent
       when: ( apache_mpm_loaded is defined ) and ( apache_mpm_loaded == "mpm_itk" )
 
     - name: Disable Apache module mpm_prefork
-      apache2_module:
+      community.general.apache2_module:
         name: mpm_prefork
         state: absent
         ignore_configcheck: true
       when: ( apache_mpm_loaded is defined ) and ( apache_mpm_loaded == "mpm_prefork" )
 
     - name: "Enable Apache mpm_event"
-      apache2_module:
+      community.general.apache2_module:
         name: mpm_event
         state: present
         ignore_configcheck: true
       register: apache_mpm_event_enabled
 
     - name: Restart Apache if the MPM has changed
-      service:
+      ansible.builtin.service:
         name: apache2
         state: restarted
       when: apache_mpm_event_enabled.changed
@@ -56,21 +65,21 @@
   block:
 
     - name: "Disable Apache module mpm_event"
-      apache2_module:
+      community.general.apache2_module:
         name: mpm_event
         state: absent
         ignore_configcheck: true
       when: ( apache_mpm_loaded is defined ) and  ( apache_mpm_loaded == "mpm_event" )
 
     - name: "Enable Apache mpm_prefork"
-      apache2_module:
+      community.general.apache2_module:
         name: mpm_prefork
         state: present
         ignore_configcheck: true
       register: apache_mpm_prefork_enabled
 
     - name: Restart Apache if the MPM has changed
-      service:
+      ansible.builtin.service:
         name: apache2
         state: restarted
       when: apache_mpm_prefork_enabled.changed
@@ -85,23 +94,23 @@
   block:
 
     - name: Check the enabled MPM
-      command: a2query -M
+      ansible.builtin.command: a2query -M
       check_mode: false
       changed_when: false
       register: apache_mpm_check
 
     - name: Debug the enabled MPM
-      debug:
+      ansible.builtin.debug:
         msg: "{{ apache_mpm_check.stdout }}"
         verbosity: 2
 
     - name: Set a fact for the enabled MPM
-      set_fact:
+      ansible.builtin.set_fact:
         apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
       when: apache_mpm_check.stdout != "invalid"
 
     - name: Fail if no Apache MPM loaded
-      fail:
+      ansible.builtin.fail:
         msg: "No Apache MPM loaded"
       when: apache_mpm_check.stdout == "invalid"
 
@@ -115,7 +124,7 @@
       block:
 
         - name: Register the loaded modules
-          command: a2query -m
+          ansible.builtin.command: a2query -m
           check_mode: false
           changed_when: false
           register: apache_modules_check
@@ -123,19 +132,19 @@
       rescue:
 
         - name: No mod enabled
-          set_fact:
+          ansible.builtin.set_fact:
             apache_modules_loaded: []
           when: '"No module matches" in apache_modules_check.stderr'
 
     - name: Debug the loaded modules
-      debug:
+      ansible.builtin.debug:
         var: apache_modules_check.stdout_lines
         verbosity: 2
       when: apache_modules_check.stdout is defined
 
     - name: Set an array of the loaded modules
-      set_fact:
-        apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [ line.split(' ')[0] ] }}"
+      ansible.builtin.set_fact:
+        apache_modules_loaded: "{{ apache_modules_loaded | default([]) + [line.split(' ')[0]] }}"
       when: apache_modules_check.stdout is defined
       loop: "{{ apache_modules_check.stdout_lines }}"
       loop_control:
@@ -143,7 +152,7 @@
         label: "{{ line }}"
 
     - name: Debug loaded modules
-      debug:
+      ansible.builtin.debug:
         var: apache_modules_loaded
         verbosity: 2
       when: apache_modules_loaded is defined

@@ -1,9 +1,18 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Check the status of a mod_md cert
   block:
 
     - name: "Query the status for {{ apache_mdomain }}"
-      uri:
+      ansible.builtin.uri:
         url: "http://localhost/md-status/{{ apache_mdomain }}"
         return_content: true
         status_code:
@@ -13,17 +22,17 @@
       register: apache_mdomain_status
 
     - name: "Debug the mdomain status for {{ apache_mdomain }}"
-      debug:
+      ansible.builtin.debug:
         var: apache_mdomain_status.json
         verbosity: 1
       when: apache_mdomain_status.json is defined
 
     - name: Set apache_md_certs_present to an empty array
-      set_fact:
+      ansible.builtin.set_fact:
         apache_md_certs_present: []
 
     - name: "Set a fact for the mdomain RSA status for {{ apache_mdomain_status }}"
-      set_fact:
+      ansible.builtin.set_fact:
         apache_md_certs_present: "{{ apache_md_certs_present }} + [ 'rsa3072' ]"
       when:
         - ( apache_md_private_keys is defined )
@@ -36,7 +45,7 @@
         - ( apache_mdomain_status.json.cert.rsa.ocsp.renewal.finished )
 
     - name: "Set a fact for the mdomain EC status for {{ apache_mdomain_status }}"
-      set_fact:
+      ansible.builtin.set_fact:
         apache_md_certs_present: "{{ apache_md_certs_present }} + [ 'secp384r1' ]"
       when:
         - ( apache_md_private_keys is defined )
@@ -49,27 +58,27 @@
         - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.finished )
 
     - name: Debug apache_md_private_keys array
-      debug:
+      ansible.builtin.debug:
         var: apache_md_private_keys
         verbosity: 1
 
     - name: Debug apache_md_certs_present array
-      debug:
+      ansible.builtin.debug:
         var: apache_md_certs_present
         verbosity: 1
 
     - name: Debug the difference between apache_md_private_keys and apache_md_certs_present
-      debug:
+      ansible.builtin.debug:
         msg:
-          - "{{ apache_md_private_keys | difference(apache_md_certs_present ) }}"
+          - "{{ apache_md_private_keys | difference(apache_md_certs_present) }}"
 
     - name: Set a fact to indicate the key and cert status is good
-      set_fact:
+      ansible.builtin.set_fact:
         apache_md_certs: true
       when: apache_md_private_keys | difference(apache_md_certs_present ) == []
 
     - name: Set a fact to indicate the key and cert status is bad
-      set_fact:
+      ansible.builtin.set_fact:
         apache_md_certs: false
       when: apache_md_private_keys | difference(apache_md_certs_present ) != []
 

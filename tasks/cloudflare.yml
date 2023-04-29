@@ -1,9 +1,18 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Generate Cloudflare config
   block:
 
     - name: Download Cloudflare IPv4 list
-      get_url:
+      ansible.builtin.get_url:
         url: "https://www.cloudflare.com/ips-v4"
         dest: "/root/cloudflare_ips_v4.txt"
         owner: root
@@ -12,21 +21,21 @@
         force: true
 
     - name: Slurp Cloudflare IPv4 list
-      slurp:
+      ansible.builtin.slurp:
         src: "/root/cloudflare_ips_v4.txt"
       register: "apache_cloudflare_ips_v4_b64encoded"
 
     - name: Create an array from the Cloudflare IP lists
-      set_fact:
+      ansible.builtin.set_fact:
         apache_cloudflare_ips: "{{ ( apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | trim ).split('\n') }}"
 
     - name: Debug Cloudflare IP array
-      debug:
+      ansible.builtin.debug:
         msg: "apache_cloudflare_ips: {{ apache_cloudflare_ips }}"
         verbosity: 2
 
     - name: Apache Cloudflare config generated
-      template:
+      ansible.builtin.template:
         src: cloudflare.conf.j2
         dest: /etc/apache2/conf-available/cloudflare.conf
         owner: root
