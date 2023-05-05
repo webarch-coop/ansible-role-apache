@@ -234,9 +234,10 @@
         - name: Debug PHP FPM module and conf names
           ansible.builtin.debug:
             msg:
+              - "apache_php_version: {{ apache_php_version }}"
               - "apache_phpfpm_mod: {{ apache_phpfpm_mod }}"
               - "apache_phpfpm_conf: {{ apache_phpfpm_conf }}"
-            verbosity: 2
+            verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
       when: ( apache_php is defined ) and ( apache_php )
 
