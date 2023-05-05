@@ -226,6 +226,12 @@
           ansible.builtin.set_fact:
             apache_php_version: "{{ apache_update_alternatives_query_php.stdout | string | community.general.jc('update_alt_q') | community.general.json_query('default') | regex_replace('^/usr/bin/php') }}"
 
+        - name: A default PHP version is required
+          ansible.builtin.assert:
+            that:
+              - apache_php_version is regex('^[5-9][.][0-9]')
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
         - name: Set facts for the PHP FPM module and conf names
           ansible.builtin.set_fact:
             apache_phpfpm_mod: "php{{ apache_php_version }}"
