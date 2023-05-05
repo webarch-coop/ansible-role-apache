@@ -225,7 +225,7 @@
         - name: Set a fact for the default version of PHP
           ansible.builtin.set_fact:
             apache_php_update_alt_q: "{{ apache_update_alternatives_query_php.stdout | string | community.general.jc('update_alt_q') }}"
-            apache_php_version: "{{ apache_update_alternatives_query_php.stdout | string | community.general.jc('update_alt_q') | community.general.json_query('default') | regex_replace('^/usr/bin/php') }}"
+            apache_php_version: "{{ apache_update_alternatives_query_php.stdout | string | community.general.jc('update_alt_q') | community.general.json_query('value') | regex_replace('^/usr/bin/php') }}"
 
         - name: Debug PHP update-alternatives --query php | jc -- update-alt-q
           ansible.builtin.debug:
