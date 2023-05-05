@@ -22,7 +22,7 @@
         path: /etc/ansible/facts.d
         recurse: true
         state: directory
-        mode: "0700"
+        mode: "0755"
         owner: root
         group: root
 
