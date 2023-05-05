@@ -225,12 +225,31 @@
         - name: Set a fact for the default version of PHP
           ansible.builtin.set_fact:
             apache_php_update_alt_q: "{{ apache_update_alternatives_query_php.stdout | string | community.general.jc('update_alt_q') }}"
-            apache_php_version: "{{ apache_update_alternatives_query_php.stdout | string | community.general.jc('update_alt_q') | community.general.json_query('value') | regex_replace('^/usr/bin/php') }}"
 
-        - name: Debug PHP update-alternatives --query php | jc -- update-alt-q
+        - name: Debug PHP update-alternatives --query php | jc --update-alt-q | jp value
           ansible.builtin.debug:
-            var: apache_php_update_alt_q
+            var: apache_php_update_alt_q.value
             verbosity: 3
+
+        - name: Check if the default version of PHP is a symlink
+          ansible.builtin.stat:
+            path: "{{ apache_php_update_alt_q.value }}"
+          register: apache_php_update_alt_q_value_path
+
+        - name: Debug PHP default version path
+          ansible.builtin.debug:
+            var: apache_php_update_alt_q_value_path.stat
+            verbosity: 3
+
+        - name: Set a fact for the default version of PHP when it is a symlink
+          ansible.builtin.set_fact:
+            apache_php_version: "{{ apache_php_update_alt_q_value_path.stat.lnk_target | regex_replace('^php') }}"
+          when: apache_php_update_alt_q_value_path.stat.islnk | bool
+
+        - name: Set a fact for the default version of PHP when it is a not symlink
+          ansible.builtin.set_fact:
+            apache_php_version: "{{ apache_php_update_alt_q.value | regex_replace('^/usr/bin/php') }}"
+          when: not apache_php_update_alt_q_value_path.stat.islnk | bool
 
         - name: A default PHP version is required
           ansible.builtin.assert:
