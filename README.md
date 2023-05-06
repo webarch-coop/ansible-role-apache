@@ -1,98 +1,25 @@
-# Ansible Apache Role
+# Webarchitects Apache Ansible Role
 
 [![pipeline status](https://git.coop/webarch/apache/badges/master/pipeline.svg)](https://git.coop/webarch/apache/-/commits/master)
 
-An Ansible role for installing and configuring Apache on Debian servers.
+This repo contains an Ansible role for installing and configuring Apache on Debian servers.
+
+If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/apache/-/releases).
+
+On Debian Buster [Apache](https://packages.debian.org/buster-backports/apache2) is installed from [backports](https://backports.debian.org/) as this allows for the use of TLSv1.3, support for [mod_md](https://httpd.apache.org/docs/trunk/mod/mod_md.html) on Buster still needs to be added see [this issue](https://git.coop/webarch/apache/issues/5).
+
+## Role variables
+
+See the [defaults/main.yml](defaults/main.yml) file for the default variables, the [vars/main.yml](vars/main.yml) file for the preset variables and the [meta/argument_specs.yml](meta/argument_specs.yml) file for the variable specification.
+
+## Repository
 
 The primary URL of this repo is [`https://git.coop/webarch/apache`](https://git.coop/webarch/apache) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-apache) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/apache).
 
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/apache/-/releases).
 
-On Buster [Apache](https://packages.debian.org/buster-backports/apache2) is installed from [backports](https://backports.debian.org/) as this allows for the use of TLSv1.3, support for [mod_md](https://httpd.apache.org/docs/trunk/mod/mod_md.html) on Buster still needs to be added see [this issue](https://git.coop/webarch/apache/issues/5).
+## Copyright
 
-See the [defaults/main.yml](defaults/main.yml) file for the default settings.
+Copyright 2018-2023 Chris Croome, &lt;[chris@webarchitects.co.uk](mailto:chris@webarchitects.co.uk)&gt;.
 
-To use this role you need to use Ansible Galaxy to install it into another repository by adding a `requirements.yml` file in that repo that contains:
-
-```yml
----
-- name: apache
-  # src: https://git.coop/webarch/apache.git
-  src: https://github.com/webarch-coop/ansible-role-apache.git
-  version: master
-  scm: git
-```
-
-To pull this repo in run:
-
-```bash
-ansible-galaxy install -r requirements.yml --force -p galaxy/roles 
-```
-
-The other repo should also contain a (for example) `apache.yml` file that contains something like this (for `mpm_event` / `php-fpm`):
-
-```yml
----
-- name: Install Apache
-  become: yes
-
-  hosts: apache_buster_servers
-
-  vars:
-    apache_mods_enabled:
-      - dir
-      - env
-      - headers
-      - http2
-      - include
-      - mime
-      - proxy
-      - proxy_fcgi
-      - rewrite
-      - ssl
-      - status
-      - mpm_event
-    apache_mods_disabled:
-      - suexec
-      - mpm_itk
-      - mpm_prefork
-      - php7.3
-    apache_conf_enabled:
-      - php7.3-fpm
-      - webarch
-    apache_conf_disabled:
-      - serve-cgi-bin
-      - phpmyadmin
-    apache_sites_enabled:
-      - localhost
-    apache_sites_disabled:
-      - 000-default
-    apache_user: www-data
-    apache_group: www-data
-    # The following vars are all optional
-    apache_ulimit: 65536
-    # These vars depend on the ratelimit conf
-    apache_apache_rate_limit: 64
-    apache_rate_initial_burst: 256
-
-  roles:
-    - apache
-```
-
-And a `hosts.yml` file that contains a `apache_servers` list as follows: 
-
-```yml
----
-all:
-  children:
-    apache_servers:
-      hosts:
-        host1.example.org:
-        host2.example.org:
-```
-
-Then it can be run as follows:
-
-```bash
-ansible-playbook apache.yml -i hosts.yml
-```
+This role is released under [the same terms as Ansible itself](https://github.com/ansible/ansible/blob/devel/COPYING), the [GNU GPLv3](LICENSE).
