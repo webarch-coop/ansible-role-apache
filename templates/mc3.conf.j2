@@ -92,9 +92,6 @@ ErrorDocument 403 /mc3/403.shtml
 <VirtualHost *:80>
   ServerName {{ inventory_hostname }} 
   ServerAlias www.{{ inventory_hostname }}
-  <IfModule mpm_itk_module>
-    AssignUserID www-data www-data 
-  </IfModule>
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data 
   </IfModule>
@@ -127,9 +124,6 @@ ErrorDocument 403 /mc3/403.shtml
 <VirtualHost *:443>
   ServerName {{ inventory_hostname }} 
   ServerAlias www.{{ inventory_hostname }}
-  <IfModule mpm_itk_module>
-    AssignUserID www-data www-data 
-  </IfModule>
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data 
   </IfModule>

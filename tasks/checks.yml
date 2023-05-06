@@ -16,6 +16,7 @@
         that:
           - ( apache_mods_enabled is defined ) and ( apache_mods_enabled[0] is defined )
           - ( "mpm_prefork" in apache_mods_enabled ) or ( "mpm_event" in apache_mods_enabled )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Checks when mpm_event enabled
       ansible.builtin.assert:
@@ -23,6 +24,7 @@
           - ( "mpm_prefork" not in apache_mods_enabled )
           - ( "mpm_event" not in apache_mods_disabled )
           - ( "mpm_itk" not in apache_mods_disabled )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: ( "mpm_event" in apache_mods_enabled )
 
     - name: Checks when mpm_prefork enabled
@@ -30,6 +32,7 @@
         that:
           - ( "mpm_event" not in apache_mods_enabled )
           - ( "mpm_prefork" not in apache_mods_disabled )
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: ( "mpm_prefork" in apache_mods_enabled )
 
     - name: Check that there are no duplicates in the mods arrays
@@ -37,140 +40,91 @@
         that:
           - apache_mods_enabled | unique | count == apache_mods_enabled | count
           - apache_mods_disabled | unique | count == apache_mods_disabled | count
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Check that there are no duplicates in the conf arrays
       ansible.builtin.assert:
         that:
           - apache_conf_enabled | unique | count == apache_conf_enabled | count
           - apache_conf_disabled | unique | count == apache_conf_disabled | count
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Check that there are no duplicates in the sites arrays
       ansible.builtin.assert:
         that:
           - apache_sites_enabled | unique | count == apache_sites_enabled | count
           - apache_sites_disabled | unique | count == apache_sites_disabled | count
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
-    - name: Check apache_mods_enabled and apache_mods_disabled arrays
-      block:
+    - name: Debug apache_mods_enabled array
+      ansible.builtin.debug:
+        var: apache_mods_enabled
+        verbosity: 2
+      when: apache_mods_enabled != []
 
-        - name: Debug apache_mods_enabled array
-          ansible.builtin.debug:
-            var: apache_mods_enabled
-            verbosity: 2
+    - name: Debug apache_mods_disabled array
+      ansible.builtin.debug:
+        var: apache_mods_disabled
+        verbosity: 2
+      when: apache_mods_disabled != []
 
-        - name: Debug apache_mods_disabled array
-          ansible.builtin.debug:
-            var: apache_mods_disabled
-            verbosity: 2
-
-        - name: Check that no mods are enabled and disabled
-          ansible.builtin.assert:
-            that: mod not in apache_mods_disabled
-          loop: "{{ apache_mods_enabled }}"
-          loop_control:
-            loop_var: mod
-            label: "{{ mod }}"
-
-        - name: Check that no mods are disabled and enabled
-          ansible.builtin.assert:
-            that: mod not in apache_mods_enabled
-          loop: "{{ apache_mods_disabled }}"
-          loop_control:
-            loop_var: mod
-            label: "{{ mod }}"
-
+    - name: Check that no mods are enabled and disabled
+      ansible.builtin.assert:
+        that:
+          - apache_mods_enabled | ansible.builtin.intersect(apache_mods_disabled) == []
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when:
-        - ( apache_mods_enabled is defined ) and ( apache_mods_enabled[0] is defined )
-        - ( apache_mods_disabled is defined ) and ( apache_mods_disabled[0] is defined )
+        - apache_mods_enabled != []
+        - apache_mods_disabled != []
 
-    - name: Check apache_conf_enabled and apache_conf_disabled arrays
-      block:
+    - name: Debug apache_conf_enabled arrays
+      ansible.builtin.debug:
+        var: apache_conf_enabled
+        verbosity: 2
+      when: apache_conf_enabled != []
 
-        - name: Debug apache_conf_enabled arrays
-          ansible.builtin.debug:
-            var: apache_conf_enabled
-            verbosity: 2
+    - name: Debug apache_conf_disabled arrays
+      ansible.builtin.debug:
+        var: apache_conf_disabled
+        verbosity: 2
+      when: apache_conf_disabled != []
 
-        - name: Debug apache_conf_disabled arrays
-          ansible.builtin.debug:
-            var:
-              - apache_conf_disabled
-            verbosity: 2
-
-        - name: Check that no conf are enabled and disabled
-          ansible.builtin.assert:
-            that: conf not in apache_conf_disabled
-          loop: "{{ apache_conf_enabled }}"
-          loop_control:
-            loop_var: conf
-            label: "{{ conf }}"
-
-        - name: Check that no conf are disabled and enabled
-          ansible.builtin.assert:
-            that: conf not in apache_conf_enabled
-          loop: "{{ apache_conf_disabled }}"
-          loop_control:
-            loop_var: conf
-            label: "{{ conf }}"
-
+    - name: Check that no conf are enabled and disabled
+      ansible.builtin.assert:
+        that:
+          - apache_conf_enabled | ansible.builtin.intersect(apache_conf_disabled) == []
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when:
-        - ( apache_conf_enabled is defined ) and ( apache_conf_enabled[0] is defined )
-        - ( apache_conf_disabled is defined ) and ( apache_conf_disabled[0] is defined )
+        - apache_conf_enabled != []
+        - apache_conf_disabled != []
 
-    - name: Check apache_sites_enabled and apache_sites_disabled arrays
-      block:
+    - name: Debug apache_sites_enabled arrays
+      ansible.builtin.debug:
+        var: apache_sites_enabled
+        verbosity: 2
+      when: apache_sites_enabled != []
 
-        - name: Debug apache_sites_enabled arrays
-          ansible.builtin.debug:
-            var: apache_sites_enabled
-            verbosity: 2
+    - name: Debug apache_sites_disabled arrays
+      ansible.builtin.debug:
+        var: apache_sites_disabled
+        verbosity: 2
+      when: apache_sites_disabled != []
 
-        - name: Debug apache_sites_disabled arrays
-          ansible.builtin.debug:
-            var: apache_sites_disabled
-            verbosity: 2
-
-        - name: Check that no sites are enabled and disabled
-          ansible.builtin.assert:
-            that: site not in apache_sites_disabled
-          loop: "{{ apache_sites_enabled }}"
-          loop_control:
-            loop_var: site
-            label: "{{ site }}"
-
-        - name: Check that no sites are disabled and enabled
-          ansible.builtin.assert:
-            that: site not in apache_sites_enabled
-          loop: "{{ apache_sites_disabled }}"
-          loop_control:
-            loop_var: site
-            label: "{{ site }}"
-
+    - name: Check that no sites are enabled and disabled
+      ansible.builtin.assert:
+        that:
+          - apache_sites_enabled | ansible.builtin.intersect(apache_sites_disabled) == []
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when:
-        - ( apache_sites_enabled is defined ) and ( apache_sites_enabled[0] is defined )
-        - ( apache_sites_disabled is defined ) and (  apache_sites_disabled[0] is defined )
+        - apache_sites_enabled != []
+        - apache_sites_disabled != []
 
 - name: Check the Apache version, modules and conf, loaded and enabled
   block:
 
-    - name: Check the Apache version
-      ansible.builtin.command: apache2ctl -v
-      check_mode: false
-      changed_when: false
-      register: apache_version_check
-
-    - name: Debug Apache version check
-      ansible.builtin.debug:
-        msg: "{{ apache_version_check.stdout_lines[0] }}"
-        verbosity: 2
-
-    - name: Set a fact for the Apache version
-      ansible.builtin.set_fact:
-        apache_version: "{{ apache_version_check.stdout_lines[0].split(' ')[2] | regex_replace('^Apache[/]') }}"
-
     - name: Debug Apache version
       ansible.builtin.debug:
-        var: apache_version
+        var: ansible_local.a2query.version
         verbosity: 1
 
     - name: TLS versions
@@ -179,14 +133,14 @@
         - name: Set facts for TLS versions
           ansible.builtin.set_fact:
             apache_tls1_3: true
-          when: apache_version is version('2.4.41', '>=')
+          when: ansible_local.a2query.version is version('2.4.41', '>=')
 
         - name: Debug TLS 1.3 variable
           ansible.builtin.debug:
             var: apache_tls1_3
             verbosity: 1
 
-      when: apache_version is version('2.4.41', '>=')
+      when: ansible_local.a2query.version is ansible.builtin.version('2.4.41', 'ge')
 
     - name: Check if phpquery is installed
       ansible.builtin.command: which phpquery
@@ -272,32 +226,10 @@
 
       when: ( apache_php is defined ) and ( apache_php )
 
-    - name: Check the enabled MPM
-      ansible.builtin.command: a2query -M
-      check_mode: false
-      changed_when: false
-      register: apache_mpm_check
-
     - name: Debug the enabled MPM
       ansible.builtin.debug:
-        msg: "{{ apache_mpm_check.stdout }}"
+        var: ansible_local.a2query.mpm
         verbosity: 2
-
-    - name: Set a fact for the enabled MPM
-      ansible.builtin.set_fact:
-        apache_mpm_loaded: "mpm_{{ apache_mpm_check.stdout | trim }}"
-      when: apache_mpm_check.stdout != "invalid"
-
-    - name: Set a fact for the enabled MPM
-      ansible.builtin.set_fact:
-        apache_mpm_loaded: ""
-      when: apache_mpm_check.stdout == "invalid"
-
-    - name: Debug the enabled MPM
-      ansible.builtin.debug:
-        var: apache_mpm_loaded
-        verbosity: 2
-      when: apache_mpm_loaded is defined
 
     - name: "Check if a Let's Encrypt HTTPS cert is present for {{ inventory_hostname }}"
       ansible.builtin.stat:
@@ -305,15 +237,6 @@
       check_mode: false
       register: apache_cert
       when: ( "md" not in apache_mods_enabled )
-
-    - name: Include mod checks
-      ansible.builtin.include_tasks: a2mod_checks.yml
-
-    - name: Include conf checks
-      ansible.builtin.include_tasks: a2conf_checks.yml
-
-    - name: Include site checks
-      ansible.builtin.include_tasks: a2site_checks.yml
 
   tags:
     - apache

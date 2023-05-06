@@ -8,21 +8,8 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check loaded modules
-  ansible.builtin.include_tasks: a2mod_checks.yml
-  tags:
-    - apache
-
 - name: Apache modules disabled
   block:
-
-    - name: Apache ITK MPM package absent
-      ansible.builtin.apt:
-        pkg:
-          - libapache2-mpm-itk
-        state: absent
-        update_cache: false
-      when: '"mpm_itk" in apache_mods_disabled'
 
     - name: Apache FastCGI absent
       ansible.builtin.apt:
@@ -30,7 +17,9 @@
           - libapache2-mod-fcgid
         state: absent
         update_cache: false
-      when: '"fcgid" in apache_mods_disabled'
+      when:
+        - ( "fcgid" in apache_mods_disabled )
+        - ( "libapache2-mod-fcgid" in ansible_local.dpkg.installed )
 
     - name: Apache suEXEC package absent
       ansible.builtin.apt:
@@ -38,42 +27,46 @@
           - apache2-suexec-pristine
         state: absent
         update_cache: false
-      when: '"suexec" in apache_mods_disabled'
+      when:
+        - ( "suexec" in apache_mods_disabled )
+        - ( "apache2-suexec-pristine" in ansible_local.dpkg.installed )
 
     - name: "Apache package absent {{ apache_phpfpm_mod }}"
       ansible.builtin.apt:
         pkg:
-          - "libapache2-mod-php{{ apache_php_version }}"
+          - "{{ apache_mod_php_pkg }}"
         state: absent
         update_cache: false
-      when: ( apache_php ) and ( "apache_phpfpm_mod" in apache_mods_disabled )
+      vars:
+        apache_mod_php_pkg: "libapache2-mod-php{{ apache_php_version }}"
+      when:
+        - apache_php | bool
+        - ( "apache_phpfpm_mod" in apache_mods_disabled )
+        - ( apache_mod_php_pkg in ansible_local.dpkg.installed )
 
     - name: Disable modules
       community.general.apache2_module:
-        name: "{{ mod }}"
+        name: "{{ apache_mod }}"
         state: absent
-      when: mod in apache_modules_loaded
+      when: apache_mod in ansible_local.a2query.modules_enabled
       loop: "{{ apache_mods_disabled }}"
       loop_control:
-        loop_var: mod
-        label: "{{ mod }}"
+        loop_var: apache_mod
+        label: "{{ apache_mod }}"
+
+    - name: Re-read Ansible local facts
+      ansible.builtin.setup:
+        filter: ansible_local
 
   when:
     - apache_mods_disabled is defined
     - apache_mods_disabled != []
+    - apache_mods_disabled | ansible.builtin.intersect(ansible_local.a2query.modules_enabled) != []
   tags:
     - apache
 
 - name: Apache modules enabled
   block:
-
-    - name: Apache ITK MPM package present
-      ansible.builtin.apt:
-        pkg:
-          - libapache2-mpm-itk
-        state: present
-        update_cache: false
-      when: '"mpm_itk" in apache_mods_enabled'
 
     - name: Apache Suexec package present
       ansible.builtin.apt:
@@ -81,7 +74,9 @@
           - apache2-suexec-pristine
         state: present
         update_cache: false
-      when: '"suexec" in apache_mods_enabled'
+      when:
+        - ( "suexec" in apache_mods_enabled )
+        - ( "apache2-suexec-pristine" not in ansible_local.dpkg.installed )
 
     - name: Apache FastCGI package present
       ansible.builtin.apt:
@@ -89,29 +84,56 @@
           - libapache2-mod-fcgid
         state: present
         update_cache: false
-      when: '"fcgid" in apache_mods_enabled'
+      when:
+       - ( "fcgid" in apache_mods_enabled )
+       - ( "libapache2-mod-fcgid" not in ansible_local.dpkg.installed )
 
     - name: Apache mod_php package present
       ansible.builtin.apt:
         pkg:
-          - "libapache2-mod-php{{ apache_php_version }}"
+          - "{{ apache_mod_php_pkg }}"
         state: present
         update_cache: false
-      when: ( apache_php ) and ( "apache_phpfpm_mod" in apache_mods_enabled )
+      vars:
+        apache_mod_php_pkg: "libapache2-mod-php{{ apache_php_version }}"
+      when:
+        - apache_php | bool
+        - ( "apache_phpfpm_mod" in apache_mods_enabled )
+        - ( apache_mod_php_pkg not in ansible_local.dpkg.installed )
+
+    - name: Check that all the modules to be enabled exist
+      ansible.builtin.stat:
+        path: "/etc/apache2/mods-available{{ apache_mod }}"
+      register: apache_mod_path
+      loop: "{{ apache_mods_enabled }}"
+      loop_control:
+        loop_var: apache_mod
+        label: "{{ apache_mod }}"
+
+    - name: Debug apache_mod_path
+      debug:
+        var: apache_mod_path
+
+    - fail:
 
     - name: Apache modules enabled
       community.general.apache2_module:
-        name: "{{ mod }}"
+        name: "{{ apache_mod }}"
         state: present
-      when: mod not in apache_modules_loaded
+      when: apache_mod not in apache_modules_loaded
       loop: "{{ apache_mods_enabled }}"
       loop_control:
-        loop_var: mod
-        label: "{{ mod }}"
+        loop_var: apache_mod
+        label: "{{ apache_mod }}"
+
+    - name: Re-read Ansible local facts
+      ansible.builtin.setup:
+        filter: ansible_local
 
   when:
     - apache_mods_enabled is defined
     - apache_mods_enabled != []
+    - apache_mods_enabled | ansible.builtin.difference(ansible_local.a2query.modules_enabled) != []
   tags:
     - apache
 ...

@@ -11,34 +11,31 @@
 - name: Disable and enable Apache conf
   block:
 
-    - name: Check loaded conf
-      ansible.builtin.include_tasks: a2conf_checks.yml
-
     - name: Apache conf disabled
-      ansible.builtin.command: "a2disconf {{ conf }}"
+      ansible.builtin.command: "a2disconf {{ apache_conf }}"
       args:
-        removes: "/etc/apache2/conf-enabled/{{ conf }}.conf"
+        removes: "/etc/apache2/conf-enabled/{{ apache_conf }}.conf"
       when:
         - apache_conf_disabled is defined
         - apache_conf_disabled != []
-        - conf in apache_conf_loaded
+        - conf in ansible_local.a2query.conf_enabled
       loop: "{{ apache_conf_disabled }}"
       loop_control:
-        loop_var: conf
-        label: "{{ conf }}"
+        loop_var: apache_conf
+        label: "{{ apache_conf }}"
 
     - name: Apache conf enabled
-      ansible.builtin.command: "a2enconf {{ conf }}"
+      ansible.builtin.command: "a2enconf {{ apache_conf }}"
       args:
-        creates: "/etc/apache2/conf-enabled/{{ conf }}.conf"
+        creates: "/etc/apache2/conf-enabled/{{ apache_conf }}.conf"
       when:
         - apache_conf_enabled is defined
         - apache_conf_enabled != []
-        - conf not in apache_conf_loaded
+        - conf not in ansible_local.a2query.conf_enabled
       loop: "{{ apache_conf_enabled }}"
       loop_control:
-        loop_var: conf
-        label: "{{ conf }}"
+        loop_var: apache_conf
+        label: "{{ apache_conf }}"
 
   tags:
     - apache

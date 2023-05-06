@@ -149,7 +149,7 @@
         owner: root
         group: root
         mode: "0644"
-      when: ( "mpm_itk" in apache_mods_enabled ) or ( "mpm_prefork" in apache_mods_enabled )
+      when: ( "mpm_prefork" in apache_mods_enabled )
 
     - name: Apache ratelimit conf present
       ansible.builtin.template:

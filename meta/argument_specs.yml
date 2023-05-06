@@ -98,11 +98,16 @@ argument_specs:
         type: int
         required: false
         description: Apache MPM MaxRequestWorkers.
-      apache_packages_present:
+      apache_pkgs_absent:
         type: list
         elements: str
         required: false
-        description: A list of Apache packages that should be present.
+        description: A list of Apache packages that should be removed if present.
+      apache_pkgs_present:
+        type: list
+        elements: str
+        required: false
+        description: A list of Apache packages that should be installed if abesnt.
       apache_server_admin:
         type: str
         required: true

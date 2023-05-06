@@ -17,34 +17,52 @@
         - apache_verify is defined
         - apache_verify | bool
 
-    - name: Apache present from buster-backports
-      ansible.builtin.apt:
-        pkg:
-          - apache2
-        state: latest
-        install_recommends: true
-        default_release: buster-backports
-        update_cache: true
-      when: ansible_distribution_release == "buster"
+    - name: Include apt role local fact tasks
+      ansible.builtin.include_role:
+        name: apt
+        tasks_from: local_facts.yml
+      when: >-
+        ( ansible_local.dpkg.arch is not defined ) or
+        ( ansible_local.gpg.version is not defined ) or
+        ( ansible_local.bash.path is not defined )
 
-    - name: Apache present
-      ansible.builtin.apt:
-        pkg:
-          - apache2
-        state: present
-        install_recommends: true
-        update_cache: false
-      when: ansible_distribution_release != "buster"
+    - name: Packages present and absent
+      block:
 
-    - name: Additional packages present
-      ansible.builtin.apt:
-        pkg: "{{ apache_packages_present }}"
-        state: present
-        update_cache: false
-      when: ( apache_packages_present is defined ) and ( apache_packages_present != [] )
+        - name: Apache packages absent
+          ansible.builtin.apt:
+            pkg: "{{ apache_packages_absent }}"
+            state: absent
+            update_cache: false
+
+        - name: Apache present from buster-backports
+          ansible.builtin.apt:
+            pkg:
+              - apache2
+            state: latest
+            install_recommends: true
+            default_release: buster-backports
+            update_cache: true
+          when:
+            - ( "apache2" in apache_pkgs_present )
+            - ansible_distribution_release == "buster"
+
+        - name: Apache packages present
+          ansible.builtin.apt:
+            pkg: "{{ apache_packages_present }}"
+            state: present
+            install_recommends: true
+            update_cache: false
+
+      when: >-
+        ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) and
+        ( apache_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != [] ) ) or
+        ( ( apache_pkgs_present is defined ) and ( apache_pkgs_present != [] ) and
+        ( apache_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != [] ) )
 
     - name: Include local facts tasks
       ansible.builtin.include_tasks: local_facts.yml
+      when: ansible_local.a2query is not defined
 
     - name: Include Apache checks
       ansible.builtin.include_tasks: checks.yml
@@ -57,6 +75,10 @@
         owner: root
         group: root
 
+    - name: Include MPM switching tasks
+      ansible.builtin.include_tasks: mpm.yml
+      when: ansible_local.a2query.mpm not in apache_mods_enabled
+
     - name: Apache DH parameters file present
       community.crypto.openssl_dhparam:
         path: "{{ apache_dhparam_path }}"
@@ -64,15 +86,16 @@
 
     - name: Include suEXEC tasks
       ansible.builtin.include_tasks: suexec.yml
-      when: ( apache_suexec is defined ) and ( apache_suexec )
+      when:
+        - apache_suexec is defined
+        - apache_suexec | bool
 
     - name: Install specific version of mod_md
       ansible.builtin.include_tasks: md.yml
-      when: ( "md" in apache_mods_enabled ) and ( apache_md_version is defined ) and ( apache_md_version != "default" )
-
-    - name: Include MPM switching tasks
-      ansible.builtin.include_tasks: mpm.yml
-      when: ( apache_mpm_loaded not in apache_mods_enabled ) or ( apache_mpm_loaded | length == 0 )
+      when:
+        - ( "md" in apache_mods_enabled )
+        - apache_md_version is defined
+        - apache_md_version != "default"
 
     - name: Apache config available
       ansible.builtin.include_tasks: config.yml

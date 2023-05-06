@@ -8,46 +8,34 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Apache sites checked, disabled and enabled
+- name: Apache sites disabled and enabled
   block:
 
-    - name: Check loaded sites
-      ansible.builtin.include_tasks: a2site_checks.yml
-
     - name: Apache sites disabled
-      ansible.builtin.command: "a2dissite {{ site }}"
+      ansible.builtin.command: "a2dissite {{ apache_site }}"
       args:
-        removes: "/etc/apache2/sites-enabled/{{ site }}.conf"
+        removes: "/etc/apache2/sites-enabled/{{ apache_site }}.conf"
       when:
         - apache_sites_disabled is defined
         - apache_sites_disabled != []
-        - site in apache_sites_loaded
+        - apache_site in ansible_local.a2query.sites_enabled
       loop: "{{ apache_sites_disabled }}"
       loop_control:
-        loop_var: site
-        label: "{{ site }}"
+        loop_var: apache_site
+        label: "{{ apache_site }}"
 
-    - name: Apache site enabled
-      block:
-
-        - name: Apache sites enabled
-          ansible.builtin.command: "a2ensite {{ site }}"
-          args:
-            creates: "/etc/apache2/sites-enabled/{{ site }}.conf"
-          when:
-            - apache_sites_enabled is defined
-            - apache_sites_enabled != []
-            - site not in apache_sites_loaded
-          loop: "{{ apache_sites_enabled }}"
-          loop_control:
-            loop_var: site
-            label: "{{ site }}"
-
-      rescue:
-
-        - name: Site enable failed
-          ansible.builtin.debug:
-            msg: Enabing an Apache site failed, check that the files exists in /etc/apache2/sites-available
+    - name: Apache sites enabled
+      ansible.builtin.command: "a2ensite {{ apache_site }}"
+      args:
+        creates: "/etc/apache2/sites-enabled/{{ apache_site }}.conf"
+      when:
+        - apache_sites_enabled is defined
+        - apache_sites_enabled != []
+        - apache_site not in ansible_local.a2query.sites_enabled
+      loop: "{{ apache_sites_enabled }}"
+      loop_control:
+        loop_var: apache_site
+        label: "{{ apache_site }}"
 
   tags:
     - apache
