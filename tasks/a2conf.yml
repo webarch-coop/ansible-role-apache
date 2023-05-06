@@ -18,8 +18,21 @@
       when:
         - apache_conf_disabled is defined
         - apache_conf_disabled != []
-        - conf in ansible_local.a2query.conf_enabled
+        - apache_conf in ansible_local.a2query.conf_enabled
       loop: "{{ apache_conf_disabled }}"
+      loop_control:
+        loop_var: apache_conf
+        label: "{{ apache_conf }}"
+
+    - name: Check that all the conf to be enabled exist
+      ansible.builtin.stat:
+        path: "/etc/apache2/conf-available/{{ apache_conf }}.conf"
+      when: apache_conf not in ansible_local.a2query.conf_enabled
+      register: apache_conf_path
+      failed_when:
+        - not ansible_check_mode | bool
+        - not apache_conf_path.stat.exists | bool
+      loop: "{{ apache_conf_enabled }}"
       loop_control:
         loop_var: apache_conf
         label: "{{ apache_conf }}"
@@ -31,7 +44,7 @@
       when:
         - apache_conf_enabled is defined
         - apache_conf_enabled != []
-        - conf not in ansible_local.a2query.conf_enabled
+        - apache_conf not in ansible_local.a2query.conf_enabled
       loop: "{{ apache_conf_enabled }}"
       loop_control:
         loop_var: apache_conf

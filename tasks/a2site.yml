@@ -24,6 +24,19 @@
         loop_var: apache_site
         label: "{{ apache_site }}"
 
+    - name: Check that all the sites to be enabled exist
+      ansible.builtin.stat:
+        path: "/etc/apache2/sites-available/{{ apache_site }}.conf"
+      when: apache_site not in ansible_local.a2query.sites_enabled
+      register: apache_site_path
+      failed_when:
+        - not ansible_check_mode | bool
+        - not apache_site_path.stat.exists | bool
+      loop: "{{ apache_sites_enabled }}"
+      loop_control:
+        loop_var: apache_site
+        label: "{{ apache_site }}"
+
     - name: Apache sites enabled
       ansible.builtin.command: "a2ensite {{ apache_site }}"
       args:

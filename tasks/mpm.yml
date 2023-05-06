@@ -16,10 +16,19 @@
         var: ansible_local.a2query.modules_enabled
         verbosity: 1
 
+    # The Ansible module does not to work here so use command
+    # - name: "Disable Apache module {{ apache_phpfpm_mod }}"
+    #   community.general.apache2_module:
+    #     name: "{{ apache_phpfpm_mod }}"
+    #     state: absent
+    #   when:
+    #     - apache_phpfpm_mod is defined
+    #     - apache_phpfpm_mod in ansible_local.a2query.modules_enabled
+
     - name: "Disable Apache module {{ apache_phpfpm_mod }}"
-      community.general.apache2_module:
-        name: "{{ apache_phpfpm_mod }}"
-        state: absent
+      ansible.builtin.command: "a2dismod {{ apache_phpfpm_mod }}"
+      args:
+        removes: "/etc/apache2/mods-enabled/{{ apache_phpfpm_mod }}.load"
       when:
         - apache_phpfpm_mod is defined
         - apache_phpfpm_mod in ansible_local.a2query.modules_enabled

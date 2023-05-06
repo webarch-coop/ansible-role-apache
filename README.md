@@ -2,7 +2,7 @@
 
 [![pipeline status](https://git.coop/webarch/apache/badges/master/pipeline.svg)](https://git.coop/webarch/apache/-/commits/master)
 
-This repository contains an Ansible role for installing Apache on Debian Stretch, Buster and Bullseye (Ubuntu support should be added at some point). 
+An Ansible role for installing and configuring Apache on Debian servers.
 
 The primary URL of this repo is [`https://git.coop/webarch/apache`](https://git.coop/webarch/apache) however it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-apache) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/apache).
 

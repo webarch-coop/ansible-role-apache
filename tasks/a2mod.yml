@@ -85,8 +85,8 @@
         state: present
         update_cache: false
       when:
-       - ( "fcgid" in apache_mods_enabled )
-       - ( "libapache2-mod-fcgid" not in ansible_local.dpkg.installed )
+        - ( "fcgid" in apache_mods_enabled )
+        - ( "libapache2-mod-fcgid" not in ansible_local.dpkg.installed )
 
     - name: Apache mod_php package present
       ansible.builtin.apt:
@@ -103,24 +103,22 @@
 
     - name: Check that all the modules to be enabled exist
       ansible.builtin.stat:
-        path: "/etc/apache2/mods-available{{ apache_mod }}"
+        path: "/etc/apache2/mods-available/{{ apache_mod }}.load"
+      when: apache_mod not in ansible_local.a2query.modules_enabled
       register: apache_mod_path
+      failed_when:
+        - not ansible_check_mode | bool
+        - not apache_mod_path.stat.exists | bool
       loop: "{{ apache_mods_enabled }}"
       loop_control:
         loop_var: apache_mod
         label: "{{ apache_mod }}"
 
-    - name: Debug apache_mod_path
-      debug:
-        var: apache_mod_path
-
-    - fail:
-
     - name: Apache modules enabled
       community.general.apache2_module:
         name: "{{ apache_mod }}"
         state: present
-      when: apache_mod not in apache_modules_loaded
+      when: apache_mod not in ansible_local.a2query.modules_enabled
       loop: "{{ apache_mods_enabled }}"
       loop_control:
         loop_var: apache_mod
