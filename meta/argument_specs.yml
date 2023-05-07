@@ -103,9 +103,9 @@ argument_specs:
         required: true
         description: Apache mods that should be enabled.
       apache_mod_path:
-        type: 
+        type: dict
         required: false
-        description: Internal 
+        description: Internal result from stating mods-available .load file.
       apache_mpm_event_enabled:
         type: dict
         required: false
