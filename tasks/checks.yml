@@ -224,7 +224,7 @@
               - "apache_phpfpm_conf: {{ apache_phpfpm_conf }}"
             verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
-      when: ( apache_php is defined ) and ( apache_php )
+      when: ( apache_php is defined ) and ( apache_php | bool )
 
     - name: Debug the enabled MPM
       ansible.builtin.debug:
