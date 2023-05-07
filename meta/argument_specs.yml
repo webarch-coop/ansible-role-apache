@@ -18,6 +18,10 @@ argument_specs:
         type: str
         required: true
         description: The path for /usr/sbin/a2query.
+      apache_cert:
+        type: dict
+        required: false
+        description: Internal result of stating certificate path.
       apache_chroot_dir:
         type: str
         required: false
@@ -36,6 +40,14 @@ argument_specs:
         elements: str
         required: true
         description: A list of Apache conf that should be enabled.
+      apache_conf_path:
+        type: dict
+        required: false
+        description: Internal result of stating a conf available path.
+      apache_configtest:
+        type: dict
+        required: false
+        description: Internal result from running apache2ctl configtest.
       apache_dhparam_path:
         type: str
         required: true
@@ -90,6 +102,14 @@ argument_specs:
         elements: str
         required: true
         description: Apache mods that should be enabled.
+      apache_mod_path:
+        type: 
+        required: false
+        description: Internal 
+      apache_mpm_event_enabled:
+        type: dict
+        required: false
+        description: Internal result from enabling the mpm_event module.
       apache_mpm_max_connections_per_child:
         type: int
         required: false
@@ -98,6 +118,43 @@ argument_specs:
         type: int
         required: false
         description: Apache MPM MaxRequestWorkers.
+      apache_mpm_prefork_enabled:
+        type: dict
+        required: false
+        description: Internal result from enabling the mpm_prefork module.
+      apache_php:
+        type: bool
+        required: false
+        description: Internal boolean to indicate if PHP is installed or not.
+      apache_php_update_alt_q:
+        type: dict
+        required: false
+        description: Internal JSON version of the result of running update-alternatives --query php.
+      apache_php_update_alt_q_value_path:
+        type: dict
+        required: false
+        description: Internal result from stating the PHP alternatives value path.
+      apache_php_version:
+        type: str
+        required: false
+        description: Internal variable for the PHP default version.
+      apache_php_versions:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of PHP versions installed.
+      apache_phpfpm_conf:
+        type: str
+        required: false
+        description: Internal variable for the PHP-FPM module name.
+      apache_phpfpm_mod:
+        type: str
+        required: false
+        description: Internal variable for the mod-php module name.
+      apache_phpquery_versions:
+        type: str
+        required: false
+        description: Internal variable for the PHP version.
       apache_pkgs_absent:
         type: list
         elements: str
@@ -133,6 +190,10 @@ argument_specs:
         elements: str
         required: true
         description: A list of Apache sites that should be enabled.
+      apache_site_path:
+        type: dict
+        required: false
+        description: Internal restlt from stating a sites-available conf file.
       apache_suexec:
         type: bool
         required: false
@@ -145,6 +206,10 @@ argument_specs:
         type: str
         required: true
         description: A list of colon seperate TLSv1.2 ciphers for SSLCipherSuite.
+      apache_tls1_3:
+        type: bool
+        required: false
+        description: Internal boolean to indicate that Apache is a version greater than or equal to version 2.4.41.
       apache_tls1_3_cipher_suites:
         type: str
         required: true
@@ -153,6 +218,10 @@ argument_specs:
         type: int
         required: true
         description: The maximun number of files Apache can open, used for the APACHE_ULIMIT_MAX_FILES env var.
+      apache_update_alternatives_query_php:
+        type: dict
+        required: false
+        description: Internal restlt from running update-alternatives --query php.
       apache_user:
         type: str
         required: true
@@ -161,4 +230,8 @@ argument_specs:
         type: bool
         required: false
         description: Verify all variables that start with apache_.
+      apache_which_phpquery:
+        type: dict
+        required: false
+        description: Internal result from running which phpquery.
 ...
