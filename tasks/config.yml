@@ -167,10 +167,15 @@
     - name: Conditionally provision a Let's Encrypt cert using acmesh role
       block:
 
+        - name: Ensure that the acme.sh has been installed
+          ansible.builtin.include_role:
+            name: acmesh
+            tasks_from: acmesh.yml
+
         - name: "Provision a Let's Encrypt cert for {{ inventory_hostname }}"
           ansible.builtin.include_role:
             name: acmesh
-            tasks_from: letsencrypt
+            tasks_from: letsencrypt.yml
           vars:
             common_name: "{{ inventory_hostname }}"
 
