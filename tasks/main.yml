@@ -34,6 +34,11 @@
             pkg: "{{ apache_packages_absent }}"
             state: absent
             update_cache: false
+          when:
+            - apache_packages_absent is defined
+            - apache_packages_absent != []
+            - ansible_local.dpkg.installed is defined
+            - apache_packages_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
 
         - name: Apache present from buster-backports
           ansible.builtin.apt:
@@ -44,6 +49,7 @@
             default_release: buster-backports
             update_cache: true
           when:
+            - apache_packages_present is defined
             - ( "apache2" in apache_pkgs_present )
             - ansible_distribution_release == "buster"
 
@@ -53,12 +59,15 @@
             state: present
             install_recommends: true
             update_cache: false
+          when:
+            - apache_packages_present is defined
+            - apache_packages_present != []
+            - ansible_local.dpkg.installed is defined
+            - apache_packages_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
 
       when: >-
-        ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) and
-        ( apache_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != [] ) ) or
-        ( ( apache_pkgs_present is defined ) and ( apache_pkgs_present != [] ) and
-        ( apache_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != [] ) )
+        ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) or
+        ( ( apache_pkgs_present is defined ) and ( apache_pkgs_present != [] )
 
     - name: Include local facts tasks
       ansible.builtin.include_tasks: local_facts.yml
