@@ -66,8 +66,8 @@
             - apache_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
 
       when: >-
-        ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) or
-        ( ( apache_pkgs_present is defined ) and ( apache_pkgs_present != [] )
+        ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) ) or
+        ( ( apache_pkgs_present is defined ) and ( apache_pkgs_present != [] ) )
 
     - name: Include local facts tasks
       ansible.builtin.include_tasks: local_facts.yml
