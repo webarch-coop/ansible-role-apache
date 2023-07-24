@@ -172,7 +172,7 @@
             name: acmesh
             tasks_from: acmesh.yml
 
-        - name: "Provision a Let's Encrypt cert for {{ inventory_hostname }}"
+        - name: "Provision a Let's Encrypt cert for {{ inventory_hostname }}"  # noqa: var-naming[no-role-prefix]
           ansible.builtin.include_role:
             name: acmesh
             tasks_from: letsencrypt.yml
