@@ -11,6 +11,22 @@
 - name: Check that mistakes haven't been made in the variables and arrays
   block:
 
+    - name: Find the mods available
+      ansible.builtin.find:
+        paths: /etc/apache2/mods-available
+        file_type: file
+        use_regex: true
+        patterns: '^.*[.]load$'
+        recurse: false
+      register: apache_mods_available_load
+
+    - name: Debug the mods available
+      ansible.builtin.debug:
+        var: apache_mods_available_load
+
+    - name: Debug fail
+      ansible.builtin.fail:
+
     - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
       ansible.builtin.assert:
         that:
