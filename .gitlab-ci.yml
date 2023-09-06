@@ -29,7 +29,6 @@ stages:
   - trixie
   - bookworm
   # - bullseye
-  - jammy
 trixie:
   image: registry.git.coop/webarch/containers/images/trixie:20230822
   stage: trixie
@@ -47,9 +46,4 @@ bookworm:
 #   stage: bullseye
 #   script:
 #     - molecule test --all
-jammy:
-  image: registry.git.coop/webarch/containers/images/jammy:20230822
-  stage: jammy
-  script:
-    - molecule test --all
 ...
