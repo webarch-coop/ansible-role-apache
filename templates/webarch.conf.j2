@@ -89,6 +89,11 @@ SetEnv PAGE_DESC  ""
   </IfModule>
   RedirectMatch 404 /\\.(svn|git|hg|bzr|cvs)(/|$)
 </Directory>
+<Directory "/var/www/html/.git">
+  Options None
+  AllowOverride None
+  Require all denied
+</Directory>
 <Directory "/var/www/html/.well-known">
   Options None
   AllowOverride None

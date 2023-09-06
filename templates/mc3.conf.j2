@@ -23,14 +23,14 @@ Alias /mc3.shtml /var/www/mc3/mc3.shtml
 Alias /icons /usr/share/apache2/icons
 # env vars for the default index page, mc3.shtml
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
-SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}" 
+SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}"
 {% endif %}
 SetEnv HOME_DOMAIN "mc3.coop"
 SetEnv SITE_TITLE "MC3 Co-operative Hosting"
 SetEnv STATIC_DIR "/mc3/"
 SetEnv STATIC_TOP "top.shtml"
 SetEnv STATIC_BOT "bot.shtml"
-# default page title 
+# default page title
 SetEnv PAGE_TITLE "Directory Listing"
 SetEnv PAGE_DESC  ""
 <Directory "/">
@@ -39,14 +39,14 @@ SetEnv PAGE_DESC  ""
   Require all denied
 </Directory>
 <Directory "/var/www/mc3">
-  Options IncludesNoExec 
+  Options IncludesNoExec
   DirectoryIndex mc3.shtml
   AddOutputFilter Includes shtml
-  SSILegacyExprParser on 
-  SSILastModified on 
+  SSILegacyExprParser on
+  SSILastModified on
   HeaderName /mc3/top.shtml
   ReadmeName /mc3/bot.shtml
-  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
+  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=*
   IndexOptions Charset=UTF-8 SuppressHTMLPreamble XHTML TrackModified IconsAreLinks
   IndexOptions SuppressDescription
   AllowOverride None
@@ -70,16 +70,21 @@ SetEnv PAGE_DESC  ""
 </Directory>
 <Directory "/var/www/html/.well-known">
   Options None
-  AllowOverride None 
+  AllowOverride None
   ForceType text/plain
+</Directory>
+<Directory "/var/www/html/.git">
+  Options None
+  AllowOverride None
+  Require all denied
 </Directory>
 <Directory "/home/*/sites/*">
   DirectoryIndex mc3.shtml
   AddOutputFilter Includes shtml
-  SSILegacyExprParser on 
+  SSILegacyExprParser on
   HeaderName /mc3/top.shtml
   ReadmeName /mc3/bot.shtml
-  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=* 
+  IndexOptions FancyIndexing VersionSort HTMLTable NameWidth=* DescriptionWidth=*
   IndexOptions Charset=UTF-8 SuppressHTMLPreamble XHTML TrackModified IconsAreLinks
   IndexOptions SuppressDescription
 </Directory>
@@ -90,10 +95,10 @@ ErrorDocument 403 /mc3/403.shtml
 
 # The default virtual host for port 80
 <VirtualHost *:80>
-  ServerName {{ inventory_hostname }} 
+  ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
   <IfModule suexec_module>
-    SuexecUserGroup www-data www-data 
+    SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin graham@mc3.coop
   #SetEnv PIWIK_SITE_ID "1"
@@ -122,10 +127,10 @@ ErrorDocument 403 /mc3/403.shtml
 # The default virtual host for port 443
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
-  ServerName {{ inventory_hostname }} 
+  ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
   <IfModule suexec_module>
-    SuexecUserGroup www-data www-data 
+    SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin graham@mc3.coop
   #SetEnv PIWIK_SITE_ID "1"
