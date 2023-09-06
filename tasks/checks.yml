@@ -27,8 +27,8 @@
 
     - name: Set a fact for the mods available
       ansible.builtin.set_fact:
-        # apache_mods_available: "{{ apache_mods_available_load | community.general.json_query('files[].paths') | map('basename') | map('regex_replace', '[.]load$') | sort }}"
-        apache_mods_available: "{{ apache_mods_available_load | community.general.json_query('files[].paths') }}"
+        # apache_mods_available: "{{ apache_mods_available_load | community.general.json_query('files[].path') | map('basename') | map('regex_replace', '[.]load$') | sort }}"
+        apache_mods_available: "{{ apache_mods_available_load | community.general.json_query('files[].path') }}"
 
     - name: Debug the mods available
       ansible.builtin.debug:
