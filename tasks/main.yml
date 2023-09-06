@@ -10,7 +10,7 @@
 ---
 - name: Apache role skipped
   ansible.builtin.debug:
-    msg: "The tasks in the Apache role are not being run since the apache variables is not true."
+    msg: "The tasks in the Apache role are not being run since the apache variable is not true."
   when: not apache | bool
   tags:
     - apache

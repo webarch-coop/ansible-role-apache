@@ -14,6 +14,10 @@ argument_specs:
     description: An Ansible role for installing and configurinag the Apache HTTP server.
     short_description: The main entry point for the Apache role.
     options:
+      apache:
+        type: bool
+        required: true
+        description: Run the tasks in this role.
       apache_a2query:
         type: str
         required: true
