@@ -46,6 +46,7 @@
             - apache_pkgs_absent != []
             - ansible_local.dpkg.installed is defined
             - apache_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
+          notify: Restart Apache
 
         - name: Apache present from buster-backports
           ansible.builtin.apt:
@@ -59,6 +60,7 @@
             - apache_pkgs_present is defined
             - ( "apache2" in apache_pkgs_present )
             - ansible_distribution_release == "buster"
+          notify: Restart Apache
 
         - name: Apache packages present
           ansible.builtin.apt:
@@ -71,6 +73,7 @@
             - apache_pkgs_present != []
             - ansible_local.dpkg.installed is defined
             - apache_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
+          notify: Restart Apache
 
       when: >-
         ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) ) or
@@ -99,6 +102,7 @@
       community.crypto.openssl_dhparam:
         path: "{{ apache_dhparam_path }}"
         size: "{{ apache_dhparam_size }}"
+      notify: Restart Apache
 
     - name: Include suEXEC tasks
       ansible.builtin.include_tasks: suexec.yml
@@ -123,6 +127,7 @@
         mode: "0755"
         owner: root
         group: root
+      notify: Restart Apache
 
     - name: Include Apache check config tasks
       ansible.builtin.include_tasks: check_config.yml
@@ -144,6 +149,7 @@
         name: apache2
         enabled: true
       when: ansible_distribution_release != "stretch"
+      notify: Restart Apache
 
     - name: Apache configtest
       ansible.builtin.command: apache2ctl configtest
@@ -161,14 +167,6 @@
       ansible.builtin.fail:
         msg: "{{ apache_configtest.stdout_lines }}"
       when: ( "Syntax OK" not in apache_configtest.stderr ) or ( apache_configtest.rc == 1 )
-
-    - name: Apache restarted
-      ansible.builtin.service:
-        name: apache2
-        state: restarted
-      when: ( "Syntax OK" in apache_configtest.stderr ) or ( apache_configtest.rc == 0 )
-      tags:
-        - molecule-idempotence-notest
 
   when: apache | bool
   tags:

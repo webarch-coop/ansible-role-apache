@@ -23,6 +23,7 @@
       loop_control:
         loop_var: apache_conf
         label: "{{ apache_conf }}"
+      notify: Restart Apache
 
     - name: Check that all the conf to be enabled exist
       ansible.builtin.stat:
@@ -49,6 +50,7 @@
       loop_control:
         loop_var: apache_conf
         label: "{{ apache_conf }}"
+      notify: Restart Apache
 
   tags:
     - apache

@@ -16,6 +16,7 @@
         pkg:
           - apache2-suexec-custom
         state: present
+      notify: Restart Apache
 
     - name: Apache suEXEC config directory only readable by root
       ansible.builtin.file:

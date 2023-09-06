@@ -38,6 +38,7 @@
       loop_control:
         loop_var: file
         label: "{{ file }}"
+      notify: Restart Apache
 
     - name: Custom Apache mods available in place
       ansible.builtin.template:
@@ -77,6 +78,7 @@
         group: root
         mode: "0644"
       when: ( apache_sites_enabled is defined ) and ( "000-default" in apache_sites_enabled )
+      notify: Restart Apache
 
     - name: Conditional update default-ssl.conf
       ansible.builtin.template:
@@ -86,6 +88,7 @@
         group: root
         mode: "0644"
       when: ( apache_sites_enabled is defined ) and ( "default-ssl" in apache_sites_enabled )
+      notify: Restart Apache
 
     - name: Apache localhost site available
       ansible.builtin.template:
@@ -94,6 +97,7 @@
         owner: root
         group: root
         mode: "0644"
+      notify: Restart Apache
 
     - name: Conditionally include Webarchitects config
       ansible.builtin.include_tasks: webarch.yml
@@ -124,6 +128,7 @@
         owner: root
         group: root
         mode: "0644"
+      notify: Restart Apache
 
     - name: Expires and robots conf available
       ansible.builtin.template:
@@ -141,6 +146,7 @@
       loop_control:
         loop_var: file
         label: "{{ file }}"
+      notify: Restart Apache
 
     - name: Apache mpm_prefork.conf in place
       ansible.builtin.template:
@@ -150,6 +156,7 @@
         group: root
         mode: "0644"
       when: ( "mpm_prefork" in apache_mods_enabled )
+      notify: Restart Apache
 
     - name: Apache ratelimit conf present
       ansible.builtin.template:
@@ -159,10 +166,12 @@
         group: root
         mode: "0644"
       when: '"ratelimit" in apache_mods_enabled'
+      notify: Restart Apache
 
     - name: Cloudflare config available
       ansible.builtin.include_tasks: cloudflare.yml
       when: ( "remoteip" in apache_mods_enabled )
+      notify: Restart Apache
 
     - name: Conditionally provision a Let's Encrypt cert using acmesh role
       block:

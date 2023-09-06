@@ -19,6 +19,7 @@
           - libcurl4-openssl-dev
           - libjansson-dev
         state: present
+      notify: Restart Apache
 
     - name: Find the latest version of mod_md
       block:
@@ -66,6 +67,7 @@
           community.general.make:
             chdir: /usr/local/src/mod_md
             target: install
+          notify: Restart Apache
 
       when: apache_md_repo.changed
 
