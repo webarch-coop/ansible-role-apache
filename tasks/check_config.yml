@@ -33,7 +33,7 @@
       ansible.builtin.assert:
         that:
           - apache_mods_enabled | difference(apache_mods_available) | length == 0
-        fail_msg: "The follwing mode that are set to be enabled are not available:{% for apache_mod in apache_mods_enabled | difference(apache_mods_available) %} {{ apache_mod }}{% endfor %}"
+        fail_msg: "The following mods that are set to be enabled are not available:{% for apache_mod in apache_mods_enabled | difference(apache_mods_available) %} {{ apache_mod }}{% endfor %}"
 
     - name: Find the conf available
       ansible.builtin.find:
@@ -53,6 +53,12 @@
         var: apache_conf_available
         verbosity: 2
 
+    - name: Check that all conf to be enabled is available
+      ansible.builtin.assert:
+        that:
+          - apache_conf_enabled | difference(apache_conf_available) | length == 0
+        fail_msg: "The following conf that is set to be enabled is not available:{% for apache_conf in apache_conf_enabled | difference(apache_conf_available) %} {{ apache_conf }}{% endfor %}"
+
     - name: Find the sites available
       ansible.builtin.find:
         paths: /etc/apache2/sites-available
@@ -70,6 +76,12 @@
       ansible.builtin.debug:
         var: apache_sites_available
         verbosity: 2
+
+    - name: Check that all sites to be enabled are available
+      ansible.builtin.assert:
+        that:
+          - apache_sites_enabled | difference(apache_sites_available) | length == 0
+        fail_msg: "The following sites that are set to be enabled are not available:{% for apache_sites in apache_sites_enabled | difference(apache_sites_available) %} {{ apache_stes }}{% endfor %}"
 
   tags:
     - apache
