@@ -1,0 +1,76 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Check that config to be enabled exists
+  block:
+
+    - name: Find the mods available
+      ansible.builtin.find:
+        paths: /etc/apache2/mods-available
+        file_type: file
+        use_regex: true
+        patterns: '^.*[.]load$'
+        recurse: false
+      register: apache_mods_available_paths
+
+    - name: Set a fact for the mods available
+      ansible.builtin.set_fact:
+        apache_mods_available: "{{ apache_mods_available_paths | community.general.json_query('files[].path') | map('basename') | map('regex_replace', '[.]load$') | sort }}"
+
+    - name: Debug the mods available
+      ansible.builtin.debug:
+        var: apache_mods_available
+        verbosity: 2
+
+    - name: Check that all mods to be enabled are available
+      ansible.builtin.assert:
+        that:
+          - apache_mods_enabled | difference(apache_mods_available) | length == 0
+        fail_msg: "The follwing mode that are set to be enabled are not available:{% for apache_mod in apache_mods_enabled | difference(apache_mods_available) %} {{ apache_mod }}{% endfor %}"
+
+    - name: Find the conf available
+      ansible.builtin.find:
+        paths: /etc/apache2/conf-available
+        file_type: file
+        use_regex: true
+        patterns: '^.*[.]conf$'
+        recurse: false
+      register: apache_conf_available_paths
+
+    - name: Set a fact for the conf available
+      ansible.builtin.set_fact:
+        apache_conf_available: "{{ apache_conf_available_paths | community.general.json_query('files[].path') | map('basename') | map('regex_replace', '[.]conf$') | sort }}"
+
+    - name: Debug the conf available
+      ansible.builtin.debug:
+        var: apache_conf_available
+        verbosity: 2
+
+    - name: Find the sites available
+      ansible.builtin.find:
+        paths: /etc/apache2/sites-available
+        file_type: file
+        use_regex: true
+        patterns: '^.*[.]conf$'
+        recurse: false
+      register: apache_sites_available_paths
+
+    - name: Set a fact for the sites available
+      ansible.builtin.set_fact:
+        apache_sites_available: "{{ apache_sites_available_paths | community.general.json_query('files[].path') | map('basename') | map('regex_replace', '[.]conf$') | sort }}"
+
+    - name: Debug the sites available
+      ansible.builtin.debug:
+        var: apache_sites_available
+        verbosity: 2
+
+  tags:
+    - apache
+...

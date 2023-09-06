@@ -124,6 +124,9 @@
         owner: root
         group: root
 
+    - name: Include Apache check config tasks
+      ansible.builtin.include_tasks: check_config.yml
+
     - name: Apache modules disabled and enabled
       ansible.builtin.include_tasks: a2mod.yml
       when: ( apache_mods_disabled is defined ) or ( apache_mods_enabled is defined )
