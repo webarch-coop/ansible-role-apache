@@ -20,9 +20,14 @@
         recurse: false
       register: apache_mods_available_load
 
+    - name: Set a fact for the mods available
+      ansible.builtin.set_fact:
+        apache_mods_available: "{{ apache_mods_available_load | community.general.json_query('find[].paths') | map('basename') | map('regex_replace', '[.]load$') | sort }}"
+
     - name: Debug the mods available
       ansible.builtin.debug:
-        var: apache_mods_available_load
+        var: apache_mods_available
+        verbosity: 2
 
     - name: Debug fail
       ansible.builtin.fail:
