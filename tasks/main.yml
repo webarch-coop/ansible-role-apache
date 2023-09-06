@@ -147,9 +147,10 @@
 
     - name: Apache configtest
       ansible.builtin.command: apache2ctl configtest
+      check_mode: false
+      changed_when: false
       register: apache_configtest
       failed_when: apache_configtest.rc is not regex('^0|1$')
-      check_mode: false
 
     - name: Print the apache2ctl configtest standard error
       ansible.builtin.debug:
@@ -166,6 +167,8 @@
         name: apache2
         state: restarted
       when: ( "Syntax OK" in apache_configtest.stderr ) or ( apache_configtest.rc == 0 )
+      tags:
+        - molecule-idempotence-notest
 
   when: apache | bool
   tags:
