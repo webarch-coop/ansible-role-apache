@@ -8,6 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
+apache: false
 apache_user: www-data
 apache_group: www-data
 apache_document_root: /var/www/html
