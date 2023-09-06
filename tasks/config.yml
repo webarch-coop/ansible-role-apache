@@ -171,7 +171,6 @@
     - name: Cloudflare config available
       ansible.builtin.include_tasks: cloudflare.yml
       when: ( "remoteip" in apache_mods_enabled )
-      notify: Restart Apache
 
     - name: Conditionally provision a Let's Encrypt cert using acmesh role
       block:
