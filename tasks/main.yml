@@ -40,7 +40,7 @@
           ansible.builtin.apt:
             pkg: "{{ apache_pkgs_absent }}"
             state: absent
-            update_cache: false
+            update_cache: true
           when:
             - apache_pkgs_absent is defined
             - apache_pkgs_absent != []
