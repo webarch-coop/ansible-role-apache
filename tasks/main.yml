@@ -41,6 +41,7 @@
             pkg: "{{ apache_pkgs_absent }}"
             state: absent
             update_cache: true
+            cache_valid_time: 60
           when:
             - apache_pkgs_absent is defined
             - apache_pkgs_absent != []
@@ -56,6 +57,7 @@
             install_recommends: true
             default_release: buster-backports
             update_cache: true
+            cache_valid_time: 60
           when:
             - apache_pkgs_present is defined
             - ( "apache2" in apache_pkgs_present )
@@ -67,7 +69,8 @@
             pkg: "{{ apache_pkgs_present }}"
             state: present
             install_recommends: true
-            update_cache: false
+            update_cache: true
+            cache_valid_time: 60
           when:
             - apache_pkgs_present is defined
             - apache_pkgs_present != []
