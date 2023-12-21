@@ -25,16 +25,16 @@ Alias /icons /usr/share/apache2/icons
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
 SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}"
 SetEnv PHPMYADMIN_PATH "/phpmyadmin/"
-{% elif phpmyadmin_domain is defined %}
-SetEnv PHPMYADMIN_DOMAIN "{{ phpmyadmin_domain }}"
-{% if phpmyadmin_path is defined %}
-SetEnv PHPMYADMIN_PATH "{{ phpmyadmin_path }}"
+{% elif apache_phpmyadmin_domain is defined %}
+SetEnv PHPMYADMIN_DOMAIN "{{ apache_phpmyadmin_domain }}"
+{% if apache_phpmyadmin_path is defined %}
+SetEnv PHPMYADMIN_PATH "{{ apache_phpmyadmin_path }}"
 {% else %}
 SetEnv PHPMYADMIN_PATH "/"
 {% endif %}
 {% endif %}
-{% if matomo_domain is defined %}
-SetEnv PIWIK_DOMAIN "{{ matomo_domain }}"
+{% if apache_matomo_domain is defined %}
+SetEnv PIWIK_DOMAIN "{{ apache_matomo_domain }}"
 {% endif %}
 SetEnv HOME_DOMAIN "webarch.net"
 SetEnv SITE_TITLE "Webarchitects Shared Hosting"
@@ -135,9 +135,9 @@ ErrorDocument 506 /wsh/506.shtml
     SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin support@webarch.net
-  {%- if matomo_domain is defined %}
+  {%- if apache_matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
-  SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
+  SetEnv PIWIK_SITE_DOMAIN "{{ apache_matomo_domain }}"
   {%- elif matomo_user is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
@@ -145,11 +145,11 @@ ErrorDocument 506 /wsh/506.shtml
   DocumentRoot "/var/www/wsh"
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
-{% elif phpmyadmin_domain is defined %}
-{% if phpmyadmin_path is defined %}
-  RedirectPermanent /phpmyadmin https://{{ phpmyadmin_domain }}{{ phpmyadmin_path }}
+{% elif apache_phpmyadmin_domain is defined %}
+{% if apache_phpmyadmin_path is defined %}
+  RedirectPermanent /phpmyadmin https://{{ apache_phpmyadmin_domain }}{{ apache_phpmyadmin_path }}
 {% else %}
-  RedirectPermanent /phpmyadmin https://{{ phpmyadmin_domain }}
+  RedirectPermanent /phpmyadmin https://{{ apache_phpmyadmin_domain }}
 {% endif %}
 {% endif %}
   <IfModule ssl_module>
@@ -186,9 +186,9 @@ ErrorDocument 506 /wsh/506.shtml
     SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin "{{ apache_server_admin }}"
-  {%- if matomo_domain is defined %}
+  {%- if apache_matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
-  SetEnv PIWIK_SITE_DOMAIN "{{ matomo_domain }}"
+  SetEnv PIWIK_SITE_DOMAIN "{{ apache_matomo_domain }}"
   {%- elif matomo_user is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"

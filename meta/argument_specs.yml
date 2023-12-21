@@ -80,6 +80,10 @@ argument_specs:
         type: int
         required: true
         description: The port that Apache should listen on the localhost.
+      apache_matomo_domain:
+        type: str
+        required: false
+        description: An optional Matomo domain name for the webarch.conf template.
       apache_md_private_keys:
         type: list
         elements: str
@@ -159,6 +163,14 @@ argument_specs:
         type: str
         required: false
         description: Internal variable for the PHP version.
+      apache_phpmyadmin_domain:
+        type: str
+        required: false
+        description: Optional phpMyAdmin domain name for the webarch.conf template.
+      apache_phpmyadmin_path:
+        type: str
+        required: false
+        description: Optional phpMyAdmin path for the webarch.conf template.
       apache_pkgs_absent:
         type: list
         elements: str

@@ -14,11 +14,14 @@ variables:
   ANSIBLE_FORCE_COLOR: "1"
   ANSIBLE_REMOTE_TMP: "/tmp"
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
+  DEBIAN_FRONTEND: noninteractive
+  DEFAULT_MANAGED_STR: "Ansible managed"
   MOLECULE_VERBOSITY: "0"
   PY_COLORS: "1"
 before_script:
   - whoami
   - pwd
+  - chmod 700 $(pwd)
   - which ansible
   - ansible --version
   - which yamllint
