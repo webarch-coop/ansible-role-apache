@@ -16,16 +16,16 @@
 # It is split into several files forming the configuration hierarchy outlined
 # below, all located in the /etc/apache2/ directory:
 #
-#	/etc/apache2/
-#	|-- apache2.conf
-#	|	`--  ports.conf
-#	|-- mods-enabled
-#	|	|-- *.load
-#	|	`-- *.conf
-#	|-- conf-enabled
-#	|	`-- *.conf
-# 	`-- sites-enabled
-#	 	`-- *.conf
+#    /etc/apache2/
+#    |-- apache2.conf
+#    |    `--  ports.conf
+#    |-- mods-enabled
+#    |    |-- *.load
+#    |    `-- *.conf
+#    |-- conf-enabled
+#    |    `-- *.conf
+#     `-- sites-enabled
+#         `-- *.conf
 #
 #
 # * apache2.conf is the main configuration file (this file). It puts the pieces
@@ -166,26 +166,26 @@ Include ports.conf
 # your system is serving content from a sub-directory in /srv you must allow
 # access here, or in any related virtual host.
 <Directory "/">
-	Options FollowSymLinks
-	AllowOverride None
-	Require all denied
+    Options FollowSymLinks
+    AllowOverride None
+    Require all denied
 </Directory>
 
 <Directory "/usr/share">
-	AllowOverride None
-	Require all granted
+    AllowOverride None
+    Require all granted
 </Directory>
 
 <Directory "/var/www/">
-	Options FollowSymLinks
-	AllowOverride None
-	Require all granted
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
 </Directory>
 
 #<Directory /srv/>
-#	Options Indexes FollowSymLinks
-#	AllowOverride None
-#	Require all granted
+#    Options Indexes FollowSymLinks
+#    AllowOverride None
+#    Require all granted
 #</Directory>
 
 # AccessFileName: The name of the file to look for in each directory
@@ -199,7 +199,7 @@ AccessFileName .htaccess
 # viewed by Web clients.
 #
 <FilesMatch "^\.ht">
-	Require all denied
+    Require all denied
 </FilesMatch>
 
 
@@ -230,4 +230,4 @@ IncludeOptional conf-enabled/*.conf
 # Include the virtual host configurations:
 IncludeOptional sites-enabled/*.conf
 
-# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+# vim: syntax=apache:

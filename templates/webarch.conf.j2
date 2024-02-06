@@ -1,4 +1,4 @@
-# {{ ansible_managed }}
+# {# j2lint: disable=jinja-statements-no-tabs #}{# j2lint: disable=single-statement-per-line #}{# j2lint: disable=jinja-statements-indentation #}{# j2lint: disable=jinja-statements-delimiter #}{{ ansible_managed }}
 # WSH Settings for all sites
 
 # Log formats
@@ -27,11 +27,11 @@ SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}"
 SetEnv PHPMYADMIN_PATH "/phpmyadmin/"
 {% elif apache_phpmyadmin_domain is defined %}
 SetEnv PHPMYADMIN_DOMAIN "{{ apache_phpmyadmin_domain }}"
-{% if apache_phpmyadmin_path is defined %}
+{%     if apache_phpmyadmin_path is defined %}
 SetEnv PHPMYADMIN_PATH "{{ apache_phpmyadmin_path }}"
-{% else %}
+{%     else %}
 SetEnv PHPMYADMIN_PATH "/"
-{% endif %}
+{%     endif %}
 {% endif %}
 {% if apache_matomo_domain is defined %}
 SetEnv PIWIK_DOMAIN "{{ apache_matomo_domain }}"
@@ -62,7 +62,7 @@ SetEnv PAGE_DESC  ""
   IndexOptions SuppressDescription
   AllowOverride None
   Require all granted
-  {%- if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
+{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
   <Files wsh.shtml>
     Header add Link "</wsh/webarch.css>;rel=preload;nopush"
     Header add Link "</wsh/lib/pure/0.6.0/pure-min.css>;rel=preload;nopush"
@@ -70,7 +70,7 @@ SetEnv PAGE_DESC  ""
     Header add Link "</wsh/webarch-print.css>;rel=preload;nopush"
     Header add Link "</wsh/favicon.ico>;rel=preload;nopush"
   </Files>
-  {%- endif %}
+{% endif %}
   <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault A1209600
@@ -135,22 +135,22 @@ ErrorDocument 506 /wsh/506.shtml
     SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin support@webarch.net
-  {%- if apache_matomo_domain is defined %}
+{% if apache_matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ apache_matomo_domain }}"
-  {%- elif matomo_user is defined %}
+{% elif matomo_user is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
-  {%- endif %}
+{% endif %}
   DocumentRoot "/var/www/wsh"
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
 {% elif apache_phpmyadmin_domain is defined %}
-{% if apache_phpmyadmin_path is defined %}
+{%     if apache_phpmyadmin_path is defined %}
   RedirectPermanent /phpmyadmin https://{{ apache_phpmyadmin_domain }}{{ apache_phpmyadmin_path }}
-{% else %}
+{%     else %}
   RedirectPermanent /phpmyadmin https://{{ apache_phpmyadmin_domain }}
-{% endif %}
+{%     endif %}
 {% endif %}
   <IfModule ssl_module>
     RedirectMatch 301 ^(?!/\.well-known/acme-challenge/).* https://{{ inventory_hostname }}$0
@@ -161,21 +161,22 @@ ErrorDocument 506 /wsh/506.shtml
 </VirtualHost>
 
 {% if "md" in apache_mods_enabled or apache_cert.stat.exists %}
-  {%- if "md" in apache_mods_enabled %}
+{%     if "md" in apache_mods_enabled %}
 <IfModule md_module>
   <MDomain {{ inventory_hostname }}>
     MDStapling on
     MDRequireHttps permanent
-    MDPrivateKeys {% for key in apache_md_private_keys %} {{key }}{% endfor %}
-    {%- if apache_md_certs is not defined or not apache_md_certs %}
+    MDPrivateKeys {% for key in apache_md_private_keys %} {{ key }}{% endfor %}
+{%-         if apache_md_certs is not defined or not apache_md_certs %}
     MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
     MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
-    {%- endif %}
+{%         endif %}
     MDContactEmail "{{ apache_server_admin }}"
     MDCertificateAgreement accepted
   </MDomain>
 </IfModule>
-  {%- endif %}
+{%     endif %}
+{% endif %}
 
 # The default virtual host for port 443
 <IfModule ssl_module>
@@ -186,23 +187,22 @@ ErrorDocument 506 /wsh/506.shtml
     SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin "{{ apache_server_admin }}"
-  {%- if apache_matomo_domain is defined %}
+{% if apache_matomo_domain is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "{{ apache_matomo_domain }}"
-  {%- elif matomo_user is defined %}
+{% elif matomo_user is defined %}
   SetEnv PIWIK_SITE_ID "1"
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
-  {%- endif %}
+{% endif %}
   SSLEngine on
-  {%- if apache_md_certs is not defined or not apache_md_certs %}
+{% if apache_md_certs is not defined or not apache_md_certs %}
   SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
   SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
   SSLCertificateChainFile   /etc/ssl/le/{{ inventory_hostname }}.ca.pem
-  {%- endif %}
+{% endif %}
   <IfModule headers_module>
     Header set Strict-Transport-Security "max-age=63072000" env=HTTPS
   </IfModule>
-  {# endif #}
   DocumentRoot "/var/www/wsh"
   <FilesMatch "\.shtml$">
     SSLOptions +StdEnvVars
@@ -210,12 +210,11 @@ ErrorDocument 506 /wsh/506.shtml
   ErrorLog ${APACHE_LOG_DIR}/wsh-error.log
   LogLevel warn
   CustomLog ${APACHE_LOG_DIR}/wsh-ssl_access.log combined
-  {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+{% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   # phpmyadmin log for fail2ban, see https://www.phryneas.de/fail2ban-phpmyadmin/
   LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %{userID}n %{userStatus}n" pma_combined
   CustomLog ${APACHE_LOG_DIR}/phpmyadmin_access.log pma_combined
-  {% endif %}
+{% endif %}
 </VirtualHost>
 </IfModule>
-{% endif %}
 # vim: syntax=apache ts=4 sw=4 sts=4 sr noet

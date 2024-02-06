@@ -1,8 +1,8 @@
 # {{ ansible_managed }}
 <IfModule mod_ssl.c>
         <VirtualHost _default_:443>
-				ServerAdmin {{ apache_server_admin | default('webmaster@localhost') }}
-				DocumentRoot {{ apache_document_root | default('/var/www/html') }}
+                ServerAdmin {{ apache_server_admin | default('webmaster@localhost') }}
+                DocumentRoot {{ apache_document_root | default('/var/www/html') }}
 
                 # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
                 # error, crit, alert, emerg.
@@ -35,7 +35,7 @@
 {% else %}
                 SSLCertificateFile      /etc/ssl/certs/ssl-cert-snakeoil.pem
                 SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
-{% endif %}            
+{% endif %}
 
                 #   Server Certificate Chain:
                 #   Point SSLCertificateChainFile at a file containing the
@@ -136,4 +136,4 @@
         </VirtualHost>
 </IfModule>
 
-# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+# vim: syntax=apache:

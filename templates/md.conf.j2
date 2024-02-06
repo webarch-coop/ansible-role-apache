@@ -1,8 +1,8 @@
-# {{ ansible_managed }}
+# {# j2lint: disable=single-statement-per-line #}{# j2lint: disable=jinja-statements-no-tabs #}{{ ansible_managed }}
 <IfModule md_module>
 	MDContactEmail "{{ apache_server_admin }}"
 	MDCertificateAgreement accepted
-    MDPrivateKeys{% for key in apache_md_private_keys %} {{key }}{% endfor %}
+    MDPrivateKeys{% for key in apache_md_private_keys %} {{ key }}{% endfor %}
 	MDRenewMode always
     MDRenewWindow {{ apache_md_renew_window | default('33%') }}
 	MDRequireHttps permanent

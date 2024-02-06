@@ -1,3 +1,4 @@
+# {# j2lint: disable=jinja-statements-no-tabs #}{# j2lint: disable=single-statement-per-line #}{# j2lint: disable=operator-enclosed-by-spaces #}{{ ansible_managed }}
 <IfModule mod_ssl.c>
 
     # {{ ansible_managed }}
@@ -38,7 +39,7 @@
 	SSLPassPhraseDialog  exec:/usr/share/apache2/ask-for-passphrase
 
 	#   Inter-Process Session Cache:
-	#   Configure the SSL Session Cache: First the mechanism 
+	#   Configure the SSL Session Cache: First the mechanism
 	#   to use and second the expiring timeout (in seconds).
 	#   (The mechanism dbm has known memory leaks and should not be used).
 	#SSLSessionCache		 dbm:${APACHE_RUN_DIR}/ssl_scache
@@ -47,7 +48,7 @@
 
 	#   Semaphore:
 	#   Configure the path to the mutual exclusion semaphore the
-	#   SSL engine uses internally for inter-process synchronization. 
+	#   SSL engine uses internally for inter-process synchronization.
 	#   (Disabled by default, the global Mutex directive consolidates by default
 	#   this)
 	#Mutex file:${APACHE_LOCK_DIR}/ssl_mutex ssl-cache
@@ -93,7 +94,7 @@
 	SSLStaplingReturnResponderErrors off
 	SSLStaplingCache        shmcb:/var/run/ocsp(128000)
 
-	# https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslopensslconfcmd 
+	# https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslopensslconfcmd
 	SSLOpenSSLConfCmd DHParameters {{ apache_dhparam_path }}
 
 </IfModule>

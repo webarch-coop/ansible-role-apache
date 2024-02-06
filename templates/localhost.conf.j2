@@ -3,33 +3,33 @@
 <VirtualHost 127.0.0.1:{{ apache_localhost_port | default('80') }}>
   ServerName localhost
 {% if apache_mods_enabled is defined %}
-{% if "suexec" in apache_mods_enabled %}
+{%     if "suexec" in apache_mods_enabled %}
   <IfModule suexec_module>
-    SuexecUserGroup www-data www-data 
+    SuexecUserGroup www-data www-data
   </IfModule>
-{% endif %}
-{% if "status" in apache_mods_enabled %}
+{%     endif %}
+{%     if "status" in apache_mods_enabled %}
   <IfModule status_module>
     <Location /server-status>
       SetHandler server-status
       Require local
     </Location>
-{% if "md" in apache_mods_enabled %}
+{%         if "md" in apache_mods_enabled %}
     <IfModule md_module>
       <Location "/md-status">
         SetHandler md-status
         Require local
       </Location>
     </IfModule>
-{% endif %}
+{%         endif %}
   </IfModule>
-{% endif %}
-{% if apache_php and "proxy_fcgi" in apache_mods_enabled %}
-  <Location /status>                                                       
+{%     endif %}
+{%     if apache_php and "proxy_fcgi" in apache_mods_enabled %}
+  <Location /status>
     SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
     Require local
-  </Location> 
-{% endif %}
+  </Location>
+{%     endif %}
 {% endif %}
   IncludeOptional /etc/apache2/localhost.d/*.conf
   DocumentRoot "/var/www/localhost"
@@ -38,7 +38,7 @@
     AllowOverride AuthConfig Indexes FileInfo Limit
     Require local
 {% if apache_mods_enabled is defined %}
-{% if apache_php and apache_phpfpm_mod is defined and apache_phpfpm_mod in apache_mods_enabled %}
+{%     if apache_php and apache_phpfpm_mod is defined and apache_phpfpm_mod in apache_mods_enabled %}
     <IfModule php7_module>
       php_admin_value doc_root /var/www/localhost
       php_admin_value open_basedir /var/www/localhost/:/tmp/:/usr/share/php/
@@ -46,8 +46,8 @@
         SetHandler application/x-httpd-php
       </FilesMatch>
     </IfModule>
-{% endif %}
-{% if apache_php and "proxy_fcgi" in apache_mods_enabled %}
+{%     endif %}
+{%     if apache_php and "proxy_fcgi" in apache_mods_enabled %}
     # https://wiki.apache.org/httpd/PHP-FPM#Proxy_via_handler
     <IfModule proxy_fcgi_module>
       <IfModule setenvif_module>
@@ -59,8 +59,9 @@
         </If>
       </FilesMatch>
     </IfModule>
-{% endif %}
+{%     endif %}
 {% endif %}
   </Directory>
 </VirtualHost>
-# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+
+# vim: syntax=apache

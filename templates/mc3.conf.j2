@@ -113,7 +113,7 @@ ErrorDocument 403 /mc3/403.shtml
 </VirtualHost>
 
 {% if "md" in apache_mods_enabled or apache_cert.stat.exists %}
-  {% if "md" in apache_mods_enabled %}
+{%     if "md" in apache_mods_enabled %}
 <IfModule md_module>
   <MDomain {{ inventory_hostname }}>
     MDStapling on
@@ -123,7 +123,7 @@ ErrorDocument 403 /mc3/403.shtml
     MDContactEmail graham@mc3.coop
   </MDomain>
 </IfModule>
-  {% endif %}
+{%     endif %}
 # The default virtual host for port 443
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
@@ -136,16 +136,16 @@ ErrorDocument 403 /mc3/403.shtml
   #SetEnv PIWIK_SITE_ID "1"
   #SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   SSLEngine on
-  {# if "md" not in apache_mods_enabled #}
+{#     if "md" not in apache_mods_enabled #}
   # <IfModule !md_module>
-    SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
-    SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
-    SSLCertificateChainFile       /etc/ssl/le/{{ inventory_hostname }}.ca.pem
+    SSLCertificateFile       /etc/ssl/le/{{ inventory_hostname }}.cert.pem
+    SSLCertificateKeyFile    /etc/ssl/le/{{ inventory_hostname }}.key.pem
+    SSLCertificateChainFile  /etc/ssl/le/{{ inventory_hostname }}.ca.pem
   # </IfModule>
   <IfModule headers_module>
     Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
   </IfModule>
-  {# endif #}
+{#     endif #}
   DocumentRoot "/var/www/mc3"
   <FilesMatch "\.(cgi|shtml|phtml|php)$">
     SSLOptions +StdEnvVars
@@ -153,12 +153,13 @@ ErrorDocument 403 /mc3/403.shtml
   ErrorLog ${APACHE_LOG_DIR}/mc3-error.log
   LogLevel warn
   CustomLog ${APACHE_LOG_DIR}/mc3-ssl_access.log combined
-  {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+{%     if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   # phpmyadmin log for fail2ban, see https://www.phryneas.de/fail2ban-phpmyadmin/
   LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %{userID}n %{userStatus}n" pma_combined
   CustomLog ${APACHE_LOG_DIR}/phpmyadmin_access.log pma_combined
-  {% endif %}
+{%     endif %}
 </VirtualHost>
 </IfModule>
 {% endif %}
-# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+
+# vim: syntax=apache:

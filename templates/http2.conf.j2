@@ -2,29 +2,29 @@
 # mod_http2 doesn't work with mpm_prefork
 <IfModule !mpm_prefork>
 {% if apache_mods_enabled is defined and "md" in apache_mods_enabled %}
-	Protocols h2 h2c http/1.1 acme-tls/1
+    Protocols h2 h2c http/1.1 acme-tls/1
 {% else %}
     Protocols h2 h2c http/1.1
 {% endif %}
 
     # # HTTP/2 push configuration
-    # 
+    #
     # H2Push          on
-    # 
+    #
     # # Default Priority Rule
-    # 
+    #
     # H2PushPriority * After 16
-    # 
+    #
     # # More complex ruleset:
-    # 
+    #
     # H2PushPriority  *                       after
     # H2PushPriority  text/css                before
     # H2PushPriority  image/jpeg              after   32
     # H2PushPriority  image/png               after   32
     # H2PushPriority  application/javascript  interleaved
-    # 
+    #
     # # Configure some stylesheet and script to be pushed by the webserver
-    # 
+    #
     # <FilesMatch "\.html$">
     #     Header add Link "</style.css>; rel=preload; as=style"
     #     Header add Link "</script.js>; rel=preload; as=script"
@@ -37,4 +37,4 @@
     # LogFormat "%h %l %u %t \"%r\" %>s %B" common
 </IfModule>
 
-# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+# vim: syntax=apache:
