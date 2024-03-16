@@ -34,6 +34,15 @@ argument_specs:
         type: bool
         required: false
         description: Chroot Apache.
+      apache_conf_available_paths:
+        type: dict
+        required: false
+        description: Internal variable for the results of finding .conf files in /etc/apache2/conf-available.
+      apache_conf_available:
+        type: list
+        elements: str
+        required: false
+        description: Internal variable for the Apache conf available.
       apache_conf_disabled:
         type: list
         elements: str
@@ -100,6 +109,15 @@ argument_specs:
         type: str
         required: false
         description: The version of mod_md to install.
+      apache_mods_available_paths:
+        type: dict
+        required: false
+        description: Internal variable for the results of finding .conf files in /etc/apache2/mods-available.
+      apache_mods_available:
+        type: list
+        elements: str
+        required: false
+        description: Internal variable for the Apache mods available.
       apache_mods_disabled:
         type: list
         elements: str
@@ -196,6 +214,15 @@ argument_specs:
           - Minor
           - OS
           - Prod
+      apache_sites_available_paths:
+        type: dict
+        required: false
+        description: Internal variable for the results of finding .conf files in /etc/apache2/sites-available.
+      apache_sites_available:
+        type: list
+        elements: str
+        required: false
+        description: Internal variable for the Apache sites available.
       apache_sites_disabled:
         type: list
         elements: str
@@ -233,7 +260,7 @@ argument_specs:
       apache_ulimit:
         type: int
         required: true
-        description: The maximun number of files Apache can open, used for the APACHE_ULIMIT_MAX_FILES env var.
+        description: The maximum number of files Apache can open, used for the APACHE_ULIMIT_MAX_FILES env var.
       apache_update_alternatives_query_php:
         type: dict
         required: false
