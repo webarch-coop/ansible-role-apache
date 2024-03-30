@@ -13,4 +13,7 @@
     name: apache2
     state: restarted
   listen: Restart Apache
+  when:
+    - apache_init is defined
+    - apache_init == "systemd"
 ...

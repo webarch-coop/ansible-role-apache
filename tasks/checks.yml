@@ -11,6 +11,29 @@
 - name: Check that mistakes haven't been made in the variables and arrays
   block:
 
+    # When in a docker container apache_init.stdout is usually sh or bash
+    - name: Check if system has been booted with systemd as init system
+      ansible.builtin.command: "ps -p 1 -o comm="
+      changed_when: false
+      check_mode: false
+      register: apache_ps
+      failed_when: apache_ps.rc is not regex('^0|47$')
+
+    - name: Set a fact for the init system
+      ansible.builtin.set_fact:
+        apache_init: "{{ apache_ps.stdout }}"
+      when: apache_ps.rc == 0
+
+    - name: When the exit code is 47 assume is is because this is a chroot
+      ansible.builtin.set_fact:
+        apache_init: chroot
+      when: apache_ps.rc == 47
+
+    - name: Debug the ini system when it is not systemd
+      ansible.builtin.debug:
+        var: apache_init
+      when: apache_init != "systemd"
+
     - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
       ansible.builtin.assert:
         that:
