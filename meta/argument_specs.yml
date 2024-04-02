@@ -85,6 +85,10 @@ argument_specs:
         type: str
         required: true
         description: The group that the Apache process should run as.
+      apache_init:
+        type: str
+        required: false
+        description: Internal variable for the init system.
       apache_localhost_port:
         type: int
         required: true
@@ -199,6 +203,10 @@ argument_specs:
         elements: str
         required: false
         description: A list of Apache packages that should be installed if abesnt.
+      apache_ps:
+        type: dict
+        required: false
+        description: Internal dictionary for the result from running ps to check init system.
       apache_server_admin:
         type: str
         required: true
