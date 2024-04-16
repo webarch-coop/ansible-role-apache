@@ -52,7 +52,7 @@
         name: apache2
         state: restarted
       when:
-        - apache_mpm_event_enabled.changed
+        - apache_mpm_event_enabled.changed | bool
         - apache_init is defined
         - apache_init == "systemd"
 
@@ -84,7 +84,7 @@
         name: apache2
         state: restarted
       when:
-        - apache_mpm_prefork_enabled.changed
+        - apache_mpm_prefork_enabled.changed | bool
         - apache_init is defined
         - apache_init == "systemd"
 
