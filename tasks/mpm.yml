@@ -51,7 +51,10 @@
       ansible.builtin.service:
         name: apache2
         state: restarted
-      when: apache_mpm_event_enabled.changed
+      when:
+        - apache_mpm_event_enabled.changed
+        - apache_init is defined
+        - apache_init == "systemd"
 
   when:
     - ansible_local.a2query.mpm == "prefork"
@@ -80,7 +83,10 @@
       ansible.builtin.service:
         name: apache2
         state: restarted
-      when: apache_mpm_prefork_enabled.changed
+      when:
+        - apache_mpm_prefork_enabled.changed
+        - apache_init is defined
+        - apache_init == "systemd"
 
   when:
     - ansible_local.a2query.mpm == "event"
