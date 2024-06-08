@@ -261,6 +261,23 @@
       register: apache_cert
       when: ( "md" not in apache_mods_enabled )
 
+    - name: Chroot checks
+      block:
+
+        - name: Check the chroot directory
+          ansible.builtin.stat:
+            path: "{{ apache_chroot_dir }}"
+          register: apache_chroot_dir_path
+
+        - name: The chroot directory needs to exists for Apache to be chrooted into it
+          ansible.builtin.assert:
+            that:
+              - apache_chroot_dir_path.stat.isdir is defined
+              - apache_chroot_dir_path.stat.isdir | bool
+            quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+
+      when: apache_chroot | bool
+
   tags:
     - apache
 ...

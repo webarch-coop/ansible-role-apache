@@ -33,14 +33,14 @@ stages:
   - trixie
   - bookworm
 trixie:
-  image: registry.git.coop/webarch/containers/images/trixie:20240426
+  image: registry.git.coop/webarch/containers/images/trixie:20240605
   stage: trixie
   script:
     - pre-commit install
     - pre-commit run --all-files
     - molecule test --all
 bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20240426
+  image: registry.git.coop/webarch/containers/images/bookworm:20240605
   stage: bookworm
   script:
     - pre-commit install
