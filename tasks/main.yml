@@ -49,20 +49,21 @@
             - apache_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
           notify: Restart Apache
 
-        - name: Apache present from buster-backports
-          ansible.builtin.apt:
-            pkg:
-              - apache2
-            state: latest
-            install_recommends: true
-            default_release: buster-backports
-            update_cache: true
-            cache_valid_time: 60
-          when:
-            - apache_pkgs_present is defined
-            - ( "apache2" in apache_pkgs_present )
-            - ansible_distribution_release == "buster"
-          notify: Restart Apache
+        # Buster backports no longer exists
+        # - name: Apache present from buster-backports  # noqa: package-latest
+        #   ansible.builtin.apt:
+        #     pkg:
+        #       - apache2
+        #     state: latest
+        #     install_recommends: true
+        #     default_release: buster-backports
+        #     update_cache: true
+        #     cache_valid_time: 60
+        #   when:
+        #     - apache_pkgs_present is defined
+        #     - ( "apache2" in apache_pkgs_present )
+        #     - ansible_distribution_release == "buster"
+        #   notify: Restart Apache
 
         - name: Apache packages present
           ansible.builtin.apt:

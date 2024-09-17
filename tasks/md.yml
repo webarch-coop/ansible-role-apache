@@ -50,18 +50,20 @@
         update: true
       register: apache_md_repo
 
-    - name: Build and install mod_md
+    - name: Build and install mod_md  # noqa: no-handler
       block:
 
         - name: Buildconf mod_md
           ansible.builtin.command: ./buildconf
           args:
             chdir: /usr/local/src/mod_md
+          changed_when: true
 
         - name: Configure mod_md
           ansible.builtin.command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
           args:
             chdir: /usr/local/src/mod_md
+          changed_when: true
 
         - name: Make install mod_md
           community.general.make:
@@ -69,7 +71,7 @@
             target: install
           notify: Restart Apache
 
-      when: apache_md_repo.changed
+      when: apache_md_repo.changed | bool
 
   when: apache_md_version != "default"
   tags:

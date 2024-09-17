@@ -29,9 +29,10 @@
         group: root
       register: apache_a2query_facts
 
-    - name: Re-read Ansible local facts
+    - name: Re-read Ansible local facts  # noqa: no-handler
       ansible.builtin.setup:
         filter: ansible_local
+      changed_when: false
       when: apache_a2query_facts.changed
 
   tags:

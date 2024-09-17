@@ -11,8 +11,6 @@
 # https://ansible-lint.readthedocs.io/rules/
 skip_list:
   - key-order[task]
-  - no-changed-when
-  - no-handler
-  - package-latest
+var_naming_pattern: "^[apache|molecule]_?[a-z0-9_]*$"
 # vim: syntax=yaml
 ...

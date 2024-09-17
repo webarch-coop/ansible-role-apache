@@ -23,6 +23,8 @@
         path: /etc/apache2/suexec
         state: directory
         mode: "0700"
+        owner: root
+        group: root
 
   tags:
     - apache

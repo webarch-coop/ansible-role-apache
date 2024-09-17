@@ -52,6 +52,10 @@
         label: "{{ apache_site }}"
       notify: Restart Apache
 
+    - name: Re-read Ansible local facts
+      ansible.builtin.setup:
+        filter: ansible_local
+
   tags:
     - apache
 ...
