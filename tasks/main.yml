@@ -29,9 +29,9 @@
         name: apt
         tasks_from: local_facts.yml
       when: >-
-        ( ansible_local.dpkg.arch is not defined ) or
-        ( ansible_local.gpg.version is not defined ) or
-        ( ansible_local.bash.path is not defined )
+        ( ansible_facts.ansible_local.dpkg.arch is not defined ) or
+        ( ansible_facts.ansible_local.gpg.version is not defined ) or
+        ( ansible_facts.ansible_local.bash.path is not defined )
 
     - name: Packages present and absent
       block:
@@ -45,7 +45,7 @@
           when:
             - apache_pkgs_absent is defined
             - apache_pkgs_absent != []
-            - ansible_local.dpkg.installed is defined
+            - ansible_facts.ansible_local.dpkg.installed is defined
             - apache_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
           notify: Restart Apache
 
@@ -62,7 +62,7 @@
         #   when:
         #     - apache_pkgs_present is defined
         #     - ( "apache2" in apache_pkgs_present )
-        #     - ansible_distribution_release == "buster"
+        #     - ansible_facts.distribution_release == "buster"
         #   notify: Restart Apache
 
         - name: Apache packages present
@@ -75,7 +75,7 @@
           when:
             - apache_pkgs_present is defined
             - apache_pkgs_present != []
-            - ansible_local.dpkg.installed is defined
+            - ansible_facts.ansible_local.dpkg.installed is defined
             - apache_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
           notify: Restart Apache
 
@@ -85,7 +85,7 @@
 
     - name: Include local facts tasks
       ansible.builtin.include_tasks: local_facts.yml
-      when: ansible_local.a2query is not defined
+      when: ansible_facts.ansible_local.a2query is not defined
 
     - name: Include Apache checks
       ansible.builtin.include_tasks: checks.yml
@@ -100,7 +100,7 @@
 
     - name: Include MPM switching tasks
       ansible.builtin.include_tasks: mpm.yml
-      when: ansible_local.a2query.mpm not in apache_mods_enabled
+      when: ansible_facts.ansible_local.a2query.mpm not in apache_mods_enabled
 
     - name: Apache DH parameters file present
       community.crypto.openssl_dhparam:
@@ -152,7 +152,7 @@
       ansible.builtin.systemd:
         name: apache2
         enabled: true
-      when: ansible_distribution_release != "stretch"
+      when: ansible_facts.distribution_release != "stretch"
       notify: Restart Apache
 
     - name: Apache configtest

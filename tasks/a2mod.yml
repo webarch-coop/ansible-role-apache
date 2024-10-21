@@ -19,7 +19,7 @@
         update_cache: false
       when:
         - ( "fcgid" in apache_mods_disabled )
-        - ( "libapache2-mod-fcgid" in ansible_local.dpkg.installed )
+        - ( "libapache2-mod-fcgid" in ansible_facts.ansible_local.dpkg.installed )
       notify: Restart Apache
 
     - name: Apache suEXEC package absent
@@ -30,7 +30,7 @@
         update_cache: false
       when:
         - ( "suexec" in apache_mods_disabled )
-        - ( "apache2-suexec-pristine" in ansible_local.dpkg.installed )
+        - ( "apache2-suexec-pristine" in ansible_facts.ansible_local.dpkg.installed )
       notify: Restart Apache
 
     - name: "Apache package absent {{ apache_phpfpm_mod }}"
@@ -44,14 +44,14 @@
       when:
         - apache_php | bool
         - ( "apache_phpfpm_mod" in apache_mods_disabled )
-        - ( apache_mod_php_pkg in ansible_local.dpkg.installed )
+        - ( apache_mod_php_pkg in ansible_facts.ansible_local.dpkg.installed )
       notify: Restart Apache
 
     - name: Disable modules
       community.general.apache2_module:
         name: "{{ apache_mod }}"
         state: absent
-      when: apache_mod in ansible_local.a2query.modules_enabled
+      when: apache_mod in ansible_facts.ansible_local.a2query.modules_enabled
       loop: "{{ apache_mods_disabled }}"
       loop_control:
         loop_var: apache_mod
@@ -80,7 +80,7 @@
         update_cache: false
       when:
         - ( "suexec" in apache_mods_enabled )
-        - ( "apache2-suexec-pristine" not in ansible_local.dpkg.installed )
+        - ( "apache2-suexec-pristine" not in ansible_facts.ansible_local.dpkg.installed )
       notify: Restart Apache
 
     - name: Apache FastCGI package present
@@ -91,7 +91,7 @@
         update_cache: false
       when:
         - ( "fcgid" in apache_mods_enabled )
-        - ( "libapache2-mod-fcgid" not in ansible_local.dpkg.installed )
+        - ( "libapache2-mod-fcgid" not in ansible_facts.ansible_local.dpkg.installed )
       notify: Restart Apache
 
     - name: Apache mod_php package present
@@ -105,13 +105,13 @@
       when:
         - apache_php | bool
         - ( "apache_phpfpm_mod" in apache_mods_enabled )
-        - ( apache_mod_php_pkg not in ansible_local.dpkg.installed )
+        - ( apache_mod_php_pkg not in ansible_facts.ansible_local.dpkg.installed )
       notify: Restart Apache
 
     # - name: Check that all the modules to be enabled exist
     #   ansible.builtin.stat:
     #     path: "/etc/apache2/mods-available/{{ apache_mod }}.load"
-    #   when: apache_mod not in ansible_local.a2query.modules_enabled
+    #   when: apache_mod not in ansible_facts.ansible_local.a2query.modules_enabled
     #   register: apache_mod_path
     #   failed_when:
     #     - not ansible_check_mode | bool
@@ -125,7 +125,7 @@
       community.general.apache2_module:
         name: "{{ apache_mod }}"
         state: present
-      when: apache_mod not in ansible_local.a2query.modules_enabled
+      when: apache_mod not in ansible_facts.ansible_local.a2query.modules_enabled
       loop: "{{ apache_mods_enabled }}"
       loop_control:
         loop_var: apache_mod

@@ -18,7 +18,7 @@
       when:
         - apache_sites_disabled is defined
         - apache_sites_disabled != []
-        - apache_site in ansible_local.a2query.sites_enabled
+        - apache_site in ansible_facts.ansible_local.a2query.sites_enabled
       loop: "{{ apache_sites_disabled }}"
       loop_control:
         loop_var: apache_site
@@ -28,7 +28,7 @@
     # - name: Check that all the sites to be enabled exist
     #   ansible.builtin.stat:
     #     path: "/etc/apache2/sites-available/{{ apache_site }}.conf"
-    #   when: apache_site not in ansible_local.a2query.sites_enabled
+    #   when: apache_site not in ansible_facts.ansible_local.a2query.sites_enabled
     #   register: apache_site_path
     #   failed_when:
     #     - not ansible_check_mode | bool
@@ -45,7 +45,7 @@
       when:
         - apache_sites_enabled is defined
         - apache_sites_enabled != []
-        - apache_site not in ansible_local.a2query.sites_enabled
+        - apache_site not in ansible_facts.ansible_local.a2query.sites_enabled
       loop: "{{ apache_sites_enabled }}"
       loop_control:
         loop_var: apache_site

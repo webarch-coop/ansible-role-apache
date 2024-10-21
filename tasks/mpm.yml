@@ -13,7 +13,7 @@
 
     - name: Debug Apache modules enabled
       ansible.builtin.debug:
-        var: ansible_local.a2query.modules_enabled
+        var: ansible_facts.ansible_local.a2query.modules_enabled
         verbosity: 1
 
     # The Ansible module does not to work here so use command
@@ -23,7 +23,7 @@
     #     state: absent
     #   when:
     #     - apache_phpfpm_mod is defined
-    #     - apache_phpfpm_mod in ansible_local.a2query.modules_enabled
+    #     - apache_phpfpm_mod in ansible_facts.ansible_local.a2query.modules_enabled
 
     - name: "Disable Apache module {{ apache_phpfpm_mod }}"
       ansible.builtin.command: "a2dismod {{ apache_phpfpm_mod }}"
@@ -31,14 +31,14 @@
         removes: "/etc/apache2/mods-enabled/{{ apache_phpfpm_mod }}.load"
       when:
         - apache_phpfpm_mod is defined
-        - apache_phpfpm_mod in ansible_local.a2query.modules_enabled
+        - apache_phpfpm_mod in ansible_facts.ansible_local.a2query.modules_enabled
 
     - name: Disable Apache module mpm_prefork
       community.general.apache2_module:
         name: mpm_prefork
         state: absent
         ignore_configcheck: true
-      when: ansible_local.a2query.mpm == "prefork"
+      when: ansible_facts.ansible_local.a2query.mpm == "prefork"
 
     - name: Enable Apache mpm_event
       community.general.apache2_module:
@@ -57,7 +57,7 @@
         - apache_init == "systemd"
 
   when:
-    - ansible_local.a2query.mpm == "prefork"
+    - ansible_facts.ansible_local.a2query.mpm == "prefork"
     - ( "mpm_event" in apache_mods_enabled )
   tags:
     - apache
@@ -70,7 +70,7 @@
         name: mpm_event
         state: absent
         ignore_configcheck: true
-      when: ansible_local.a2query.mpm == "event"
+      when: ansible_facts.ansible_local.a2query.mpm == "event"
 
     - name: Enable Apache mpm_prefork
       community.general.apache2_module:
@@ -89,7 +89,7 @@
         - apache_init == "systemd"
 
   when:
-    - ansible_local.a2query.mpm == "event"
+    - ansible_facts.ansible_local.a2query.mpm == "event"
     - ( "mpm_prefork" in apache_mods_enabled )
   tags:
     - apache
