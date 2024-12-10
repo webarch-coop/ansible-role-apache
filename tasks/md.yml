@@ -36,9 +36,34 @@
 
         - name: Set a fact for the latest version of Apache mod_md
           ansible.builtin.set_fact:
-            apache_md_version: "{{ apache_md_latest_headers.location | urlsplit('path') | basename }}"
+            apache_md_version: >-
+              {{- apache_md_latest_headers.location |
+              ansible.builtin.urlsplit('path') |
+              ansible.builtin.basename -}}
+
+        - name: Debug apache_md_version
+          ansible.builtin.debug:
+            var: apache_md_version
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
       when: apache_md_version == "latest"
+
+    - name: GitHub GPG key present
+      ansible.builtin.get_url:
+        url: "{{ apache_github_gpg_url }}"
+        checksum: "{{ apache_github_gpg_checksum }}"
+        dest: /root/github.asc
+        mode: "0640"
+        owner: root
+        group: root
+      check_mode: false
+      changed_when: false
+
+    - name: GitHub GPG public key imported
+      ansible.builtin.command: gpg --import /root/github.asc
+      register: apache_gpg_import
+      check_mode: false
+      changed_when: ( "not changed" not in apache_gpg_import.stderr )
 
     - name: Source code present
       ansible.builtin.git:
@@ -48,16 +73,19 @@
         depth: 1
         force: true
         update: true
+        verify_commit: true
       register: apache_md_repo
 
+    # https://github.com/icing/mod_md?tab=readme-ov-file#installation
     - name: Build and install mod_md  # noqa: no-handler
       block:
 
-        - name: Buildconf mod_md
-          ansible.builtin.command: ./buildconf
-          args:
-            chdir: /usr/local/src/mod_md
-          changed_when: true
+        # This no longer appears to be needed
+        # - name: Buildconf mod_md
+        #   ansible.builtin.command: ./buildconf
+        #   args:
+        #     chdir: /usr/local/src/mod_md
+        #   changed_when: true
 
         - name: Configure mod_md
           ansible.builtin.command: ./configure --with-apxs=/usr/bin/apxs --enable-werror

@@ -11,4 +11,7 @@
 # https://docs.ansible.com/ansible/latest/playbook_guide/complex_data_manipulation.html
 apachevarnames: "{{ q('varnames', '^apache_') | sort }}"
 apachehostvars: "{{ dict(apachevarnames | list | zip(q('vars', *apachevarnames))) }}"
+
+apache_github_gpg_url: https://github.com/web-flow.gpg
+apache_github_gpg_checksum: sha256:6e8af687f60cf3f403151c8fb1b26e95e6f9e424ca60cc8f3787bd4466a3ef84
 ...

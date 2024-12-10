@@ -81,6 +81,14 @@ argument_specs:
         type: str
         required: true
         description: The default DocumentRoot.
+      apache_github_gpg_url:
+        type: str
+        required: true
+        description: GitHub GPG key URL.
+      apache_github_gpg_checksum:
+        type: str
+        required: true
+        description: GitHub GPG key SHA256 checksum.
       apache_group:
         type: str
         required: true

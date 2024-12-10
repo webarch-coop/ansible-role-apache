@@ -34,6 +34,57 @@
         var: apache_init
       when: apache_init != "systemd"
 
+    - name: Read package facts when not defined
+      ansible.builtin.package_facts:
+        manager: apt
+      when: ansible_facts.packages is not defined
+
+    - name: Set a fact for the Apache apt package version
+      ansible.builtin.set_fact:
+        apache_version: >-
+          {{- ansible_facts.packages['apache2'] |
+          community.general.json_query('[0].version') |
+          ansible.builtin.regex_replace('-.*$') -}}
+
+    - name: Debug apache_version
+      ansible.builtin.debug:
+        var: apache_version
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    # https://packages.ubuntu.com/focal-updates/apache2
+    - name: The Apache version string should be a semvar and the minium version should be the Ubuntu Focal version
+      ansible.builtin.assert:
+        that:
+          - apache_version is ansible.builtin.version('2.4.41', '>=', version_type='semver')
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+        fail_msg: "The apache_version variable should be a semvar >= 2.4.41 however it is set to {{ apache_version }}"
+
+    # https://github.com/icing/mod_md?tab=readme-ov-file#versions-and-releases
+    - name: When mod_md is enabled the Apache version required is >= 2.4.48
+      ansible.builtin.assert:
+        that:
+          - apache_version is ansible.builtin.version('2.4.48', '>=', version_type='semver')
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+        fail_msg: "The apache_version variable should be a semvar >= 2.4.48 when mod_md is enabled but it is {{ apache_version }}"
+      when:
+        - ( "md" in apache_mods_enabled )
+        - apache_md_version is defined
+        - apache_md_version != "default"
+
+    # https://github.com/icing/mod_md?tab=readme-ov-file#prerequisites
+    - name: When mod_md is enabled mod_ssl is required
+      ansible.builtin.assert:
+        that:
+          - ( "ssl" in apache_mods_enabled )
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+        fail_msg: >-
+          Apache module ssl is required when md is enabled, apache_mods_enabled is a list containing
+          {{ apache_mods_enabled | join(', ') }}
+      when:
+        - ( "md" in apache_mods_enabled )
+        - apache_md_version is defined
+        - apache_md_version != "default"
+
     - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
       ansible.builtin.assert:
         that:
