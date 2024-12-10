@@ -48,22 +48,23 @@
 
       when: apache_md_version == "latest"
 
-    - name: GitHub GPG key present
-      ansible.builtin.get_url:
-        url: "{{ apache_github_gpg_url }}"
-        checksum: "{{ apache_github_gpg_checksum }}"
-        dest: /root/github.asc
-        mode: "0640"
-        owner: root
-        group: root
-      check_mode: false
-      changed_when: false
-
-    - name: GitHub GPG public key imported
-      ansible.builtin.command: gpg --import /root/github.asc
-      register: apache_gpg_import
-      check_mode: false
-      changed_when: ( "not changed" not in apache_gpg_import.stderr )
+    # Enable verify_commit and uncomment the following when this repo has verified release tags
+    # - name: GitHub GPG key present
+    #   ansible.builtin.get_url:
+    #     url: "{{ apache_github_gpg_url }}"
+    #     checksum: "{{ apache_github_gpg_checksum }}"
+    #     dest: /root/github.asc
+    #     mode: "0640"
+    #     owner: root
+    #     group: root
+    #   check_mode: false
+    #   changed_when: false
+    #
+    # - name: GitHub GPG public key imported
+    #   ansible.builtin.command: gpg --import /root/github.asc
+    #   register: apache_gpg_import
+    #   check_mode: false
+    #   changed_when: ( "not changed" not in apache_gpg_import.stderr )
 
     - name: Source code present
       ansible.builtin.git:
@@ -73,7 +74,7 @@
         depth: 1
         force: true
         update: true
-        verify_commit: true
+        # verify_commit: true
       register: apache_md_repo
 
     # https://github.com/icing/mod_md?tab=readme-ov-file#installation

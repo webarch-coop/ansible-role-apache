@@ -160,14 +160,14 @@ ErrorDocument 506 /wsh/506.shtml
   CustomLog ${APACHE_LOG_DIR}/wsh-access.log combined
 </VirtualHost>
 
-{% if "md" in apache_mods_enabled or apache_cert.stat.exists %}
+{% if "md" in apache_mods_enabled or apache_cert.stat.exists | bool %}
 {%     if "md" in apache_mods_enabled %}
 <IfModule md_module>
   <MDomain {{ inventory_hostname }}>
     MDStapling on
     MDRequireHttps permanent
     MDPrivateKeys {% for key in apache_md_private_keys %} {{ key }}{% endfor %}
-{%-         if apache_md_certs is not defined or not apache_md_certs %}
+{%-         if apache_md_certs is not defined or not apache_md_certs | bool %}
     MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
     MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
 {%         endif %}

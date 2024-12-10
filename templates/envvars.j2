@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 # envvars - default environment variables for apache2ctl
-  
+
 # this won't be correct after changing uid
 unset HOME
 
@@ -14,8 +14,16 @@ fi
 # Since there is no sane way to get the parsed apache2 config in scripts, some
 # settings are defined via environment variables and then used in apache2ctl,
 # /etc/init.d/apache2, /etc/logrotate.d/apache2, etc.
-export APACHE_RUN_USER={{ apache_user | default('www-data') }}
-export APACHE_RUN_GROUP={{ apache_group | default('www-data') }}
+{% if apache_user != "www-data" %}
+export APACHE_RUN_USER={{ apache_user }}
+{% else %}
+export APACHE_RUN_USER=www-data
+{% endif %}
+{% if apache_group != "www-data" %}
+export APACHE_RUN_GROUP={{ apache_group }}
+{% else %}
+export APACHE_RUN_GROUP=www-data
+{% endif %}
 # temporary state file location. This might be changed to /run in Wheezy+1
 export APACHE_PID_FILE=/var/run/apache2$SUFFIX/apache2.pid
 export APACHE_RUN_DIR=/var/run/apache2$SUFFIX
@@ -32,12 +40,17 @@ export LANG
 
 ## The command to get the status for 'apache2ctl status'.
 ## Some packages providing 'www-browser' need '--dump' instead of '-dump'.
-export APACHE_LYNX='www-browser -dump'
-export APACHE_STATUSURL='http://localhost:{{ apache_localhost_port | default('80') }}/server-status'
+#export APACHE_LYNX='www-browser -dump'
+{% if apache_localhost_port != "80" %}
+export APACHE_STATUSURL='http://localhost:{{ apache_localhost_port }}/server-status'
+{% endif %}
 
 ## If you need a higher file descriptor limit, uncomment and adjust the
 ## following line (default is 8192):
-APACHE_ULIMIT_MAX_FILES='ulimit -n {{ apache_ulimit | default('8192') }}'
+#APACHE_ULIMIT_MAX_FILES='ulimit -n 65536'
+{% if apache_ulimit != "8192" %}
+APACHE_ULIMIT_MAX_FILES='ulimit -n {{ apache_ulimit }}'
+{% endif %}
 
 ## If you would like to pass arguments to the web server, add them below
 ## to the APACHE_ARGUMENTS environment.
@@ -48,4 +61,4 @@ APACHE_ULIMIT_MAX_FILES='ulimit -n {{ apache_ulimit | default('8192') }}'
 ## installations which interact with Apache
 #export APACHE2_MAINTSCRIPT_DEBUG=1
 
-# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
+# vim: syntax=bash{# vim: syntax: jinja2 #}
