@@ -1,4 +1,4 @@
-# {# j2lint: disable=jinja-statements-no-tabs #}{# j2lint: disable=single-statement-per-line #}{# j2lint: disable=jinja-statements-indentation #}{# j2lint: disable=jinja-statements-delimiter #}{{ ansible_managed }}
+# {{ ansible_managed }}
 # WSH Settings for all sites
 
 # Log formats
@@ -162,17 +162,22 @@ ErrorDocument 506 /wsh/506.shtml
 
 {% if "md" in apache_mods_enabled or apache_cert.stat.exists | bool %}
 {%     if "md" in apache_mods_enabled %}
+# https://github.com/icing/mod_md
 <IfModule md_module>
   <MDomain {{ inventory_hostname }}>
-    MDStapling on
-    MDRequireHttps permanent
-    MDPrivateKeys {% for key in apache_md_private_keys %} {{ key }}{% endfor %}
-{%-         if apache_md_certs is not defined or not apache_md_certs | bool %}
-    MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
-    MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
-{%         endif %}
-    MDContactEmail "{{ apache_server_admin }}"
     MDCertificateAgreement accepted
+    MDContactEmail "{{ apache_server_admin }}"
+    MDPrivateKeys {{ apache_md_private_keys | join(' ') }}
+    MDRequireHttps permanent
+    MDRenewMode always
+    MDStapling on
+    # Fall back to non mod_md cert if the mod_md cert does not exist
+    <IfFile ! /etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem>
+      <IfFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
+        MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
+        MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
+      </IfFile>
+    </IfFile>
   </MDomain>
 </IfModule>
 {%     endif %}
@@ -195,9 +200,9 @@ ErrorDocument 506 /wsh/506.shtml
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
 {% endif %}
   SSLEngine on
-{% if apache_md_certs is not defined or not apache_md_certs %}
-  SSLCertificateFile    	/etc/ssl/le/{{ inventory_hostname }}.cert.pem
-  SSLCertificateKeyFile 	/etc/ssl/le/{{ inventory_hostname }}.key.pem
+{% if "md" not in apache_mods_enabled %}
+  SSLCertificateFile        /etc/ssl/le/{{ inventory_hostname }}.cert.pem
+  SSLCertificateKeyFile     /etc/ssl/le/{{ inventory_hostname }}.key.pem
   SSLCertificateChainFile   /etc/ssl/le/{{ inventory_hostname }}.ca.pem
 {% endif %}
   <IfModule headers_module>

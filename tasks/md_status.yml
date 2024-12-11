@@ -33,7 +33,7 @@
 
     - name: "Set a fact for the mdomain RSA status for {{ apache_mdomain_status }}"
       ansible.builtin.set_fact:
-        apache_md_certs_present: "{{ apache_md_certs_present + [ 'rsa3072' ] }}"
+        apache_md_certs_present: "{{ apache_md_certs_present + ['rsa3072'] }}"
       when:
         - ( apache_md_private_keys is defined )
         - ( "rsa3072" in apache_md_private_keys )
@@ -46,7 +46,7 @@
 
     - name: "Set a fact for the mdomain EC status for {{ apache_mdomain_status }}"
       ansible.builtin.set_fact:
-        apache_md_certs_present: "{{ apache_md_certs_present + [ 'secp384r1' ] }}"
+        apache_md_certs_present: "{{ apache_md_certs_present + ['secp384r1'] }}"
       when:
         - ( apache_md_private_keys is defined )
         - ( "secp384r1" in apache_md_private_keys )
