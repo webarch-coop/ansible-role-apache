@@ -1,14 +1,16 @@
-# {# j2lint: disable=single-statement-per-line #}{# j2lint: disable=jinja-statements-no-tabs #}{{ ansible_managed }}
+# {{ ansible_managed }}
+
 <IfModule md_module>
-	MDContactEmail "{{ apache_server_admin }}"
-	MDCertificateAgreement accepted
-    MDPrivateKeys{% for key in apache_md_private_keys %} {{ key }}{% endfor %}
-	MDRenewMode always
-    MDRenewWindow {{ apache_md_renew_window | default('33%') }}
-	MDRequireHttps permanent
-	MDStapleOthers on
-	Protocols h2 h2c http/1.1 acme-tls/1
-	ProtocolsHonorOrder On
+  MDCertificateAgreement accepted
+  MDContactEmail "{{ apache_server_admin }}"
+  MDRenewMode always
+  MDRequireHttps permanent
+  MDStapleOthers on
+  Protocols h2 h2c http/1.1 acme-tls/1
+  ProtocolsHonorOrder On
+  MDCheckInterval 1h
+  MDPrivateKeys {{ apache_md_private_keys | join(' ') }}
+  MDRenewWindow {{ apache_md_renew_window }}
 </IfModule>
 
-# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+# vim: syntax=apache{# vim: syntax=jinja2 #}

@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+
 # localhost virtual host for server-status and other things for munin stats
 <VirtualHost 127.0.0.1:{{ apache_localhost_port | default('80') }}>
   ServerName localhost
@@ -64,4 +65,4 @@
   </Directory>
 </VirtualHost>
 
-# vim: syntax=apache
+# vim: syntax=apache{# vim: syntax=jinja2 #}

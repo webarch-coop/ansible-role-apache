@@ -1,4 +1,5 @@
 # {{ ansible_managed }} 
+
 Alias "/.well-known/acme-challenge" "{{ apache_document_root }}/.well-known/acme-challenge"
 <Directory "{{ apache_document_root }}/.well-known/acme-challenge">
   Options None
@@ -9,4 +10,5 @@ Alias "/.well-known/acme-challenge" "{{ apache_document_root }}/.well-known/acme
     H2Upgrade off
   </IfModule>
 </Directory>
-# vi:syntax=apache
+
+# vim: syntax=apache

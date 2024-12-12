@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+
 # mod_http2 doesn't work with mpm_prefork
 <IfModule !mpm_prefork>
 {% if apache_mods_enabled is defined and "md" in apache_mods_enabled %}

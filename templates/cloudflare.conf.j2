@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+
 # Cloudflare
 # https://support.cloudflare.com/hc/en-us/articles/360029696071
 <IfModule remoteip_module>
@@ -7,4 +8,5 @@
   RemoteIPTrustedProxy {{ ip }}
 {% endfor %}
 </IfModule>
-# vim: set ft=apache:
+
+# vim: syntax=apache{# vim: syntax=jinja2 #}

@@ -165,7 +165,9 @@ ErrorDocument 506 /wsh/506.shtml
 # https://github.com/icing/mod_md
 <IfModule md_module>
   <MDomain {{ inventory_hostname }}>
+    MDCAChallenges tls-alpn-01
     MDCertificateAgreement accepted
+    MDCertificateAuthority https://acme-v02.api.letsencrypt.org/directory
     MDContactEmail "{{ apache_server_admin }}"
     MDPrivateKeys {{ apache_md_private_keys | join(' ') }}
     MDRequireHttps permanent
