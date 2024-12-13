@@ -202,11 +202,11 @@ ErrorDocument 506 /wsh/506.shtml
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
 {% endif %}
   SSLEngine on
-{% if "md" not in apache_mods_enabled %}
-  SSLCertificateFile        /etc/ssl/le/{{ inventory_hostname }}.cert.pem
-  SSLCertificateKeyFile     /etc/ssl/le/{{ inventory_hostname }}.key.pem
-  SSLCertificateChainFile   /etc/ssl/le/{{ inventory_hostname }}.ca.pem
-{% endif %}
+  <IfModule ! md_module>
+    SSLCertificateFile        /etc/ssl/le/{{ inventory_hostname }}.cert.pem
+    SSLCertificateKeyFile     /etc/ssl/le/{{ inventory_hostname }}.key.pem
+    SSLCertificateChainFile   /etc/ssl/le/{{ inventory_hostname }}.ca.pem
+  </IfModule>
   <IfModule headers_module>
     Header set Strict-Transport-Security "max-age=63072000" env=HTTPS
   </IfModule>
