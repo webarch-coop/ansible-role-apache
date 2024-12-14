@@ -37,19 +37,19 @@ else
     fi
   else
     echo "There was an error parsing jc -v"
+    echo "${jc_version_check}"
     exit 1
   fi
 fi
-
 
 # Check that the server is using UTC
 localtime=$(readlink -f /etc/localtime)
 tz=$(basename "${localtime}")
 if [[ "${tz}" != "UTC" && "${tz}" != "UCT" ]]; then
   echo "The clock needs to be set to UTC"
+  echo "${tz}"
   exit 1
 fi
-
 
 if ! command -v jp &> /dev/null
 then
@@ -101,43 +101,68 @@ else
   fi
 fi
 
-# Get the date the cert was created in UNIX time
-created=$(jc -q -m --x509-cert < "${pubcert_src}" | jq -r . | jp -c -u '[].tbs_certificate.validity.not_before | [0]')
-# Check that the cert created date is a positive number
-if [[ "${created}" == +([0-9]) ]]; then
-  # Get the service started date
-  started=$(systemctl show "${service}" | jc -q -m --ini | jq -r . | jp -c -u ActiveEnterTimestamp | jc -q -m --date | jq -r . | jp -c -u epoch)
-  # Check that the service started date is a positive number
-  if [[ "${started}" == +([0-9]) ]]; then
-    # Check if the created date is more recent than the started date
-    if (( created > started )); then
-      # Check that the script is being run by root
-      if [[ "$(id -u)" == "0" ]] ; then
-        # Copy the pubcert_src
-        echo "cp --remove-destination -a ${pubcert_src} ${pubcert_dest}"
-        cp --remove-destination -a "${pubcert_src}" "${pubcert_dest}"
-        # Chown the pubcert_src
-        chown ${pubcert_owner}:${pubcert_group} "${pubcert_dest}"
-        # Chmod the pubcert_src
-        chmod ${pubcert_mode} "${pubcert_dest}"
-        # Copy the privkey_src
-        cp --remove-destination -a "${privkey_src}" "${privkey_dest}"
-        # Chown the privkey_src
-        chown ${privkey_owner}:${privkey_group} "${privcert_dest}"
-        # Chmod the privkey_src
-        chmod ${privkey_mode} "${privkey_dest}"
-        # Restart the service
-        service "${service}" restart && echo "${service} restarted for new cert"
-      else
-        echo "Service ${service} would have been restarted if ${0} was run as root or via sudo"
-      fi
+# Check that the cert dest directory exists
+pubcert_dest_dir=$(dirname "${pubcert_dest}")
+if [[ ! -d "${pubcert_dest_dir}" ]]; then
+  echo "The cert dest directory doesn't exist"
+  echo "${pubcert_dest_dir}"
+  exit 1
+fi
+
+# Check that the private key dest directory exists
+privkey_dest_dir=$(dirname "${privkey_dest}")
+if [[ ! -d "${pubcert_dest_dir}" ]]; then
+  echo "The private key dest directory doesn't exist"
+  echo "${privkey_dest_dir}"
+  exit 1
+fi
+
+# Get the date the src cert was created in UNIX time
+src_created=$(jc -q -m --x509-cert < "${pubcert_src}" | jq -r . | jp -c -u '[].tbs_certificate.validity.not_before | [0]')
+# Get the date the dest cert was created in UNIX time
+dest_created=$(jc -q -m --x509-cert < "${pubcert_dest}" | jq -r . | jp -c -u '[].tbs_certificate.validity.not_before | [0]')
+# Check that the src cert created date is a positive number
+if [[ "${src_created}" == +([0-9]) ]]; then
+  if [[ "${dest_created}" == +([0-9]) ]]; then
+    # Check if the dest cert created date is older that the src cert created date
+    if (( src_created > dest_created )); then
+      # Copy the pubcert_src to the pubcert_dest
+      echo "cp --remove-destination -a ${pubcert_src} ${pubcert_dest}"
+      cp --remove-destination -a "${pubcert_src}" "${pubcert_dest}"
+      # Chown the pubcert_dest
+      chown ${pubcert_owner}:${pubcert_group} "${pubcert_dest}"
+      # Chmod the pubcert_dest
+      chmod ${pubcert_mode} "${pubcert_dest}"
+      # Copy the privkey_src to the privkey_dest
+      cp --remove-destination -a "${privkey_src}" "${privkey_dest}"
+      # Chown the privkey_dest
+      chown ${privkey_owner}:${privkey_group} "${privcert_dest}"
+      # Chmod the privkey_dest
+      chmod ${privkey_mode} "${privkey_dest}"
     fi
   else
-    echo "Error getting the service started date"
+    echo "Error the dest cert created date should be a positive number"
+    echo "${dest_created}"
     exit 1
   fi
 else
-  echo "Error getting the certificate created date"
+  echo "Error the src cert created date should be a positive number"
+  echo "${src_created}"
+  exit 1
+fi
+
+# Get the service started date
+started=$(systemctl show "${service}" | jc -q -m --ini | jq -r . | jp -c -u ActiveEnterTimestamp | jc -q -m --date | jq -r . | jp -c -u epoch)
+# Check that the service started date is a positive number
+if [[ "${started}" == +([0-9]) ]]; then
+  # Check if the created date is more recent than the started date
+  if (( src_created > started )); then
+      # Restart the service
+      service "${service}" restart && echo "${service} restarted for new cert"
+  fi
+else
+  echo "Error getting the service started date"
+  echo "${started}"
   exit 1
 fi
 

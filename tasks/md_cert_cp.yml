@@ -67,11 +67,13 @@
 
     - name: "Run the Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
       ansible.builtin.command: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+      vars:
+        apache_md_cert_cp_script_run_changed: "{{ apache_md_cert_cp.name }} restarted for new cert"
       when:
         - apache_md_cert_cp_privkey_src.stat.exists | bool
         - apache_md_cert_cp_pubcert_src.stat.exists | bool
       register: apache_md_cert_cp_script_run
-      changed_when: apache_md_cert_cp_script_run.stdout == "{{ apache_md_cert_cp.name }} restarted for new cert"
+      changed_when: apache_md_cert_cp_script_run.stdout == apache_md_cert_cp_script_run_changed
 
     - name: "Crontab for Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
       ansible.builtin.cron:
