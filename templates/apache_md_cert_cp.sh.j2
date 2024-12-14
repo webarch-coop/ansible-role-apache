@@ -61,6 +61,7 @@ if [[ "${tz}" != "UTC" && "${tz}" != "UCT" ]]; then
   exit 1
 fi
 
+# Check that jp is available
 if ! command -v jp &> /dev/null
 then
   echo "jp could not be found"
