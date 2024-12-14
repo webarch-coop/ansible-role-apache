@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# Copyright 2018-2024 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+
 set -eE
 
 jc_min_version="1.22.0"
@@ -123,11 +133,11 @@ src_created=$(jc -q -m --x509-cert < "${pubcert_src}" | jq -r . | jp -c -u '[].t
 dest_created=$(jc -q -m --x509-cert < "${pubcert_dest}" | jq -r . | jp -c -u '[].tbs_certificate.validity.not_before | [0]')
 # Check that the src cert created date is a positive number
 if [[ "${src_created}" == +([0-9]) ]]; then
+  # Check that the dest cert created date is a positive number
   if [[ "${dest_created}" == +([0-9]) ]]; then
     # Check if the dest cert created date is older that the src cert created date
     if (( src_created > dest_created )); then
       # Copy the pubcert_src to the pubcert_dest
-      echo "cp --remove-destination -a ${pubcert_src} ${pubcert_dest}"
       cp --remove-destination -a "${pubcert_src}" "${pubcert_dest}"
       # Chown the pubcert_dest
       chown ${pubcert_owner}:${pubcert_group} "${pubcert_dest}"
