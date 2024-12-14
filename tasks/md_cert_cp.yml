@@ -1,0 +1,65 @@
+# Copyright 2018-2024 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Apache mod_md cert script and crontab
+  block:
+
+    - name: "Copy the Apache mod_md private key for {{ apache_md_cert_cp.name }}"
+      ansible.builtin.copy:
+        src: "{{ apache_md_cert_cp.privkey.src }}"
+        dest: "{{ apache_md_cert_cp.privkey.dest }}"
+        remote_src: true
+        owner: "{{ apache_md_cert_cp.privkey.owner }}"
+        group: "{{ apache_md_cert_cp.privkey.group }}"
+        mode: "{{ apache_md_cert_cp.privkey.mode }}"
+      register: apache_md_cert_cp_privkey
+
+    - name: "Copy the Apache mod_md cert for {{ apache_md_cert_cp.name }}"
+      ansible.builtin.copy:
+        src: "{{ apache_md_cert_cp.pubcert.src }}"
+        dest: "{{ apache_md_cert_cp.pubcert.dest }}"
+        remote_src: true
+        owner: "{{ apache_md_cert_cp.pubcert.owner }}"
+        group: "{{ apache_md_cert_cp.pubcert.group }}"
+        mode: "{{ apache_md_cert_cp.pubcert.mode }}"
+      register: apache_md_cert_cp_pubcert
+
+    - name: "Private key and / or certificate changed so restarted service {{ apache_md_cert_cp.name }}"  # noqa: no-handler
+      ansible.builtin.service:
+        name: "{{ apache_md_cert_cp.name }}"
+        state: restarted
+
+    - name: "Template Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+      ansible.builtin.template:
+        src: apache_md_cert_cp.sh.j2
+        dest: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: "Stat the Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+      ansible.builtin.stat:
+        path: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+      register: apache_md_cert_cp_script
+
+    - name: "Run the Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+      ansible.builtin.command: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+      register: apache_md_cert_cp_script_run
+      changed_when: apache_md_cert_cp_script_run.stdout == "{{ apache_md_cert_cp.name }} restarted for new cert"
+
+    - name: "Crontab for Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+      ansible.builtin.cron:
+        name: "Apache mod_md cert copy and service restart {{ apache_md_cert_cp.name }}"
+        special_time: "{{ apache_md_cert_cp.special_time }}"
+        job: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+
+  tags:
+    - apache
+...

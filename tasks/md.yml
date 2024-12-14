@@ -77,16 +77,21 @@
         # verify_commit: true
       register: apache_md_repo
 
+    - name: Stat /usr/local/src/mod_md
+      ansible.builtin.stat:
+        path: /usr/local/src/mod_md
+      register: apache_md_repo_path
+
     # https://github.com/icing/mod_md?tab=readme-ov-file#installation
     - name: Build and install mod_md  # noqa: no-handler
       block:
 
-        # This no longer appears to be needed
-        # - name: Buildconf mod_md
-        #   ansible.builtin.command: ./buildconf
-        #   args:
-        #     chdir: /usr/local/src/mod_md
-        #   changed_when: true
+        # https://github.com/icing/mod_md/issues/260#issuecomment-921067038
+        - name: Buildconf mod_md
+          ansible.builtin.command: ./buildconf
+          args:
+            chdir: /usr/local/src/mod_md
+          changed_when: true
 
         - name: Configure mod_md
           ansible.builtin.command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
@@ -100,7 +105,19 @@
             target: install
           notify: Restart Apache
 
-      when: apache_md_repo.changed | bool
+      when:
+        - apache_md_repo_path.stat.exists | bool
+        - apache_md_repo.changed | bool
+
+    - name: Include Apache mod_md cert copy tasks
+      ansible.builtin.include_tasks: md_cert_cp.yml
+      loop: "{{ apache_md_cert_copy }}"
+      loop_control:
+        loop_var: apache_md_cert_cp
+        label: "{{ apache_md_cert_cp.name }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
 
   when: apache_md_version != "default"
   tags:

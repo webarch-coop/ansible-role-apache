@@ -105,6 +105,78 @@ argument_specs:
         type: str
         required: false
         description: An optional Matomo domain name for the webarch.conf template.
+      apache_md_cert_copy:
+        type: list
+        elements: dict
+        required: false
+        description: A list of other services that mod_md key pairs should be copied for.
+        options:
+          name:
+            type: str
+            required: true
+            description: The name of the service that the key is being copied for and which will be restarted.
+          privkey:
+            type: dict
+            required: true
+            description: Dictionary of values for the private key.
+            options:
+              dest:
+                type: str
+                required: true
+                description: The destination path that the private key should be copied to.
+              group:
+                type: str
+                required: true
+                description: The group for the private key.
+              mode:
+                type: str
+                required: true
+                description: The mode for the private key.
+              owner:
+                type: str
+                required: true
+                description: The private key owner.
+              src:
+                type: str
+                required: true
+                description: The source path that the private key should be copied from.
+          pubcert:
+            type: dict
+            required: true
+            description: Dictionary of values for the public key.
+            options:
+              dest:
+                type: str
+                required: true
+                description: The destination path that the public key should be copied to.
+              group:
+                type: str
+                required: true
+                description: The group for the public key.
+              mode:
+                type: str
+                required: true
+                description: The mode for the public key.
+              owner:
+                type: str
+                required: true
+                description: The public key owner.
+              src:
+                type: str
+                required: true
+                description: The source path that the public key should be copied from.
+          special_time:
+            type: str
+            required: true
+            description: The special_time for ansible.builtin.cron to run the apache_md_cert_copy script at.
+            choices:
+              - annually
+              - daily
+              - hourly
+              - monthly
+              - reboot
+              - weekly
+              - yearly
       apache_md_private_keys:
         type: list
         elements: str
