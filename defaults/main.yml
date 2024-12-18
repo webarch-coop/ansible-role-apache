@@ -52,15 +52,21 @@ apache_sites_enabled:
 apache_sites_disabled: []
 apache_conf_enabled:
   - charset
-  - le
   - localized-error-pages
   - other-vhosts-access-log
   - security
   - version-control
-apache_conf_disabled: []
-  # - mc3
-  # - serve-cgi-bin
-  # - webarch
+apache_conf_disabled:
+  - le
+  - mc3
+  - php7.4-fpm
+  - php8.0-fpm
+  - php8.1-fpm
+  - php8.2-fpm
+  - php8.3-fpm
+  - php8.4-fpm
+  - serve-cgi-bin
+  - webarch
 apache_mods_enabled:
   - access_compat
   - alias
@@ -79,6 +85,7 @@ apache_mods_enabled:
   - headers
   - http2
   - include
+  - md
   - mime
   - mpm_event
   - negotiation
