@@ -2,11 +2,12 @@
 
 # mod_http2 doesn't work with mpm_prefork
 <IfModule !mpm_prefork>
-{% if apache_mods_enabled is defined and "md" in apache_mods_enabled %}
-    Protocols h2 h2c http/1.1 acme-tls/1
-{% else %}
-    Protocols h2 h2c http/1.1
-{% endif %}
+    <IfModule md_module>
+        Protocols h2 h2c http/1.1 acme-tls/1
+    </IfModule>
+    <IfModule !md_module>
+        Protocols h2 h2c http/1.1
+    </IfModule>
 
     # # HTTP/2 push configuration
     #

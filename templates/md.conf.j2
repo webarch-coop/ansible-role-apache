@@ -6,7 +6,13 @@
   MDRenewMode always
   MDRequireHttps permanent
   MDStapleOthers on
-  Protocols h2 h2c http/1.1 acme-tls/1
+  # mod_http2 doesn't work with mpm_prefork
+  <IfModule !mpm_prefork>
+    Protocols h2 h2c http/1.1 acme-tls/1
+  </IfModule>
+  <IfModule mpm_prefork>
+    Protocols http/1.1 acme-tls/1
+  </IfModule>
   ProtocolsHonorOrder On
   MDCheckInterval 1h
   MDPrivateKeys {{ apache_md_private_keys | join(' ') }}
