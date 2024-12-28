@@ -47,7 +47,7 @@
       when: apache_md_cert_cp_pubcert_src.stat.exists | bool
       register: apache_md_cert_cp_pubcert
 
-    - name: "Private key and / or certificate changed so restarted service {{ apache_md_cert_cp.name }}"  # noqa: no-handler
+    - name: "Private key and / or certificate changed so restart service {{ apache_md_cert_cp.name }}"  # noqa: no-handler
       ansible.builtin.service:
         name: "{{ apache_md_cert_cp.name }}"
         state: restarted
