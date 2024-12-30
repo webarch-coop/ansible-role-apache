@@ -1,0 +1,115 @@
+# Copyright 2018-2024 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Install mod_md from https://github.com/icing/mod_md
+  block:
+
+    - name: Requirements present
+      ansible.builtin.apt:
+        pkg:
+          - apache2-dev
+          - apache2-ssl-dev
+          - libcurl4-openssl-dev
+          - libjansson-dev
+        state: present
+      notify: Restart Apache
+
+    - name: Find the latest version of mod_md
+      block:
+
+        - name: Use a HEAD request to get the latest redirect URL
+          ansible.builtin.uri:
+            url: https://github.com/icing/mod_md/releases/latest
+            method: HEAD
+            status_code: 302
+            follow_redirects: none
+          check_mode: false
+          changed_when: false
+          register: apache_md_latest_headers
+
+        - name: Set a fact for the latest version of Apache mod_md
+          ansible.builtin.set_fact:
+            apache_md_version: >-
+              {{- apache_md_latest_headers.location |
+              ansible.builtin.urlsplit('path') |
+              ansible.builtin.basename -}}
+
+        - name: Debug apache_md_version
+          ansible.builtin.debug:
+            var: apache_md_version
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+      when: apache_md_version == "latest"
+
+    # Enable verify_commit and uncomment the following when this repo has verified release tags
+    # - name: GitHub GPG key present
+    #   ansible.builtin.get_url:
+    #     url: "{{ apache_github_gpg_url }}"
+    #     checksum: "{{ apache_github_gpg_checksum }}"
+    #     dest: /root/github.asc
+    #     mode: "0640"
+    #     owner: root
+    #     group: root
+    #   check_mode: false
+    #   changed_when: false
+    #
+    # - name: GitHub GPG public key imported
+    #   ansible.builtin.command: gpg --import /root/github.asc
+    #   register: apache_gpg_import
+    #   check_mode: false
+    #   changed_when: ( "not changed" not in apache_gpg_import.stderr )
+
+    - name: Source code present
+      ansible.builtin.git:
+        repo: https://github.com/icing/mod_md.git
+        dest: /usr/local/src/mod_md
+        version: "{{ apache_md_version }}"
+        depth: 1
+        force: true
+        update: true
+        # verify_commit: true
+      register: apache_md_repo
+
+    - name: Stat /usr/local/src/mod_md
+      ansible.builtin.stat:
+        path: /usr/local/src/mod_md
+      register: apache_md_repo_path
+
+    # https://github.com/icing/mod_md?tab=readme-ov-file#installation
+    - name: Build and install mod_md  # noqa: no-handler
+      block:
+
+        # https://github.com/icing/mod_md/issues/260#issuecomment-921067038
+        - name: Buildconf mod_md
+          ansible.builtin.command: ./buildconf
+          args:
+            chdir: /usr/local/src/mod_md
+          changed_when: true
+
+        - name: Configure mod_md
+          ansible.builtin.command: ./configure --with-apxs=/usr/bin/apxs --enable-werror
+          args:
+            chdir: /usr/local/src/mod_md
+          changed_when: true
+
+        - name: Make install mod_md
+          community.general.make:
+            chdir: /usr/local/src/mod_md
+            target: install
+          notify: Restart Apache
+
+      when:
+        - apache_md_repo_path.stat.exists | bool
+        - apache_md_repo.changed | bool
+
+  when: apache_md_version != "default"
+  tags:
+    - apache
+...

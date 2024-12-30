@@ -13,7 +13,7 @@
 
     - name: "Query the status for {{ apache_mdomain }}"
       ansible.builtin.uri:
-        url: "http://localhost:{{ apache_localhost_port }}/md-status/{{ apache_mdomain }}"
+        url: "https://{{ apache_mdomain }}/.httpd/certificate-status"
         return_content: true
         status_code:
           - 200
@@ -26,60 +26,6 @@
         var: apache_mdomain_status.json
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_mdomain_status.json is defined
-
-    - name: Set apache_md_certs_present to an empty array
-      ansible.builtin.set_fact:
-        apache_md_certs_present: []
-
-    - name: "Set a fact for the mdomain RSA status for {{ apache_mdomain_status }}"
-      ansible.builtin.set_fact:
-        apache_md_certs_present: "{{ apache_md_certs_present + ['rsa3072'] }}"
-      when:
-        - ( apache_md_private_keys is defined )
-        - ( "rsa3072" in apache_md_private_keys )
-        - ( apache_mdomain_status.status != 404 )
-        - ( apache_mdomain_status.json.name is defined )
-        - ( apache_mdomain_status.json.name | ansible.builtin.regex_replace('^"') | ansible.builtin.regex_replace('"$') ) == apache_mdomain
-        - ( apache_mdomain_status.json.cert is defined )
-        - ( apache_mdomain_status.json.cert.rsa.ocsp.renewal.finished is defined )
-        - ( apache_mdomain_status.json.cert.rsa.ocsp.renewal.finished )
-
-    - name: "Set a fact for the mdomain EC status for {{ apache_mdomain_status }}"
-      ansible.builtin.set_fact:
-        apache_md_certs_present: "{{ apache_md_certs_present + ['secp384r1'] }}"
-      when:
-        - ( apache_md_private_keys is defined )
-        - ( "secp384r1" in apache_md_private_keys )
-        - ( apache_mdomain_status.status != 404 )
-        - ( apache_mdomain_status.json.name is defined )
-        - ( apache_mdomain_status.json.name | ansible.builtin.regex_replace('^"') | ansible.builtin.regex_replace('"$') ) == apache_mdomain
-        - ( apache_mdomain_status.json.cert is defined )
-        - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.finished is defined )
-        - ( apache_mdomain_status.json.cert.secp384r1.ocsp.renewal.finished )
-
-    - name: Debug apache_md_private_keys array
-      ansible.builtin.debug:
-        var: apache_md_private_keys
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-
-    - name: Debug apache_md_certs_present array
-      ansible.builtin.debug:
-        var: apache_md_certs_present
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
-
-    - name: Debug the difference between apache_md_private_keys and apache_md_certs_present
-      ansible.builtin.debug:
-        msg: "{{ apache_md_private_keys | difference(apache_md_certs_present) }}"
-
-    - name: Set a fact to indicate the key and cert status is good
-      ansible.builtin.set_fact:
-        apache_md_certs: true
-      when: apache_md_private_keys | difference(apache_md_certs_present ) == []
-
-    - name: Set a fact to indicate the key and cert status is bad
-      ansible.builtin.set_fact:
-        apache_md_certs: false
-      when: apache_md_private_keys | difference(apache_md_certs_present ) != []
 
   tags:
     - apache

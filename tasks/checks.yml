@@ -133,13 +133,13 @@
     - name: Debug apache_mods_enabled array
       ansible.builtin.debug:
         var: apache_mods_enabled
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_mods_enabled != []
 
     - name: Debug apache_mods_disabled array
       ansible.builtin.debug:
         var: apache_mods_disabled
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_mods_disabled != []
 
     - name: Check that no mods are enabled and disabled
@@ -154,13 +154,13 @@
     - name: Debug apache_conf_enabled arrays
       ansible.builtin.debug:
         var: apache_conf_enabled
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_conf_enabled != []
 
     - name: Debug apache_conf_disabled arrays
       ansible.builtin.debug:
         var: apache_conf_disabled
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_conf_disabled != []
 
     - name: Check that no conf are enabled and disabled
@@ -175,13 +175,13 @@
     - name: Debug apache_sites_enabled arrays
       ansible.builtin.debug:
         var: apache_sites_enabled
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_sites_enabled != []
 
     - name: Debug apache_sites_disabled arrays
       ansible.builtin.debug:
         var: apache_sites_disabled
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_sites_disabled != []
 
     - name: Check that no sites are enabled and disabled
@@ -303,7 +303,7 @@
     - name: Debug the enabled MPM
       ansible.builtin.debug:
         var: ansible_facts.ansible_local.a2query.mpm
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     - name: "Check if a Let's Encrypt HTTPS cert is present for {{ inventory_hostname }}"
       ansible.builtin.stat:

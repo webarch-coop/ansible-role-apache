@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+# {{ ansible_managed }}
+
+# Copyright 2018-2024 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+
+set -eE
+
+apache_reload_required=0
+
+# This script needs to be run as root
+if [[ "$(id -u)" != "0" ]] ; then
+  echo "The ${0} script can only be run by root"
+  exit 1
+fi
+
+# Check that jp is available
+if ! command -v jp &> /dev/null
+then
+  echo "jp could not be found"
+  exit 1
+fi
+
+# Check that wget is available
+if ! command -v wget &> /dev/null
+then
+  echo "wget could not be found"
+  exit 1
+fi
+
+# Set an array for the Apache VirtualHost ServerName's
+declare -a namevhosts
+readarray -t namevhosts < <(apachectl -S | grep -e '^         port 443 namevhost ' | awk '{ print $4 }')
+
+# Get the certificate-status renewal for each VirtualHost
+for namevhost in "${namevhosts[@]}"
+do
+  # Check if a renewal dictionary exists
+  namevhost_cert_renewal=$(wget -q https://${namevhost}/.httpd/certificate-status -O - | jp renewal)
+  if [[ "${namevhost_cert_renewal}" != "null" ]]
+  then
+    # Check if the renewal has finished
+    namevhost_cert_renewal_finished=$(echo "${namevhost_cert_renewal}" | jp finished)
+    if [[ "${namevhost_cert_renewal_finished}" == "true" ]]
+    then
+      echo "Apache reload required for ${namevhost}"
+      apache_reload_required=1
+    fi
+  fi
+done
+
+# Reload Apache when required
+if [[ "${apache_reload_required}" == "1" ]]
+then
+  echo "Reloading Apache for new certificates"
+  service apache2 reload
+  exit 0
+fi
+
+# vim: syntax=bash{# vim: syntax=jinja2 #}

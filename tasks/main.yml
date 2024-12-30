@@ -98,12 +98,9 @@
         - apache_suexec is defined
         - apache_suexec | bool
 
-    - name: Install specific version of mod_md
+    - name: Include mod_md tasks
       ansible.builtin.include_tasks: md.yml
-      when:
-        - ( "md" in apache_mods_enabled )
-        - apache_md_version is defined
-        - apache_md_version != "default"
+      when: ( "md" in apache_mods_enabled )
 
     - name: Apache config available
       ansible.builtin.include_tasks: config.yml

@@ -170,12 +170,12 @@ ErrorDocument 506 /wsh/506.shtml
       <MDomain {{ inventory_hostname }}>
         MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
         MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
-      </IfFile>
+      </MDomain>
     </IfFile>
     <IfFile !/etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
       MDomain {{ inventory_hostname }}
     </IfFile>
-  </MDomain>
+  </IfFile>
 </IfModule>
 
 # The default virtual host for port 443
