@@ -6,7 +6,7 @@ This repo contains an Ansible role for installing and configuring Apache on Debi
 
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/apache/-/releases).
 
-On Debian Buster [Apache](https://packages.debian.org/buster-backports/apache2) is installed from [backports](https://backports.debian.org/) as this allows for the use of TLSv1.3, support for [mod_md](https://httpd.apache.org/docs/trunk/mod/mod_md.html) on Buster still needs to be added see [this issue](https://git.coop/webarch/apache/issues/5).
+By default this role uses [mod_md](https://github.com/icing/mod_md/) for HTTPS certifiates, in addition the cert and key matching the `inventory_hostname` can be copied for use by other applications, such as Exim, using the `apache_md_cert_copy` list of dictionaries.
 
 ## Role variables
 

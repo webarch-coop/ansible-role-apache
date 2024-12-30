@@ -5,7 +5,6 @@
   MDContactEmail "{{ apache_server_admin }}"
   MDRenewMode always
   MDRequireHttps permanent
-  MDStapleOthers on
   # mod_http2 doesn't work with mpm_prefork
   <IfModule !mpm_prefork>
     Protocols h2 h2c http/1.1 acme-tls/1
@@ -14,7 +13,10 @@
     Protocols http/1.1 acme-tls/1
   </IfModule>
   ProtocolsHonorOrder On
+  MDStapling on
+  MDStapleOthers on
   MDCheckInterval 1h
+  MDStaplingRenewWindow 6h
   MDPrivateKeys {{ apache_md_private_keys | join(' ') }}
   MDRenewWindow {{ apache_md_renew_window }}
 </IfModule>

@@ -160,30 +160,23 @@ ErrorDocument 506 /wsh/506.shtml
   CustomLog ${APACHE_LOG_DIR}/wsh-access.log combined
 </VirtualHost>
 
-{% if "md" in apache_mods_enabled or apache_cert.stat.exists | bool %}
-{%     if "md" in apache_mods_enabled %}
 # https://github.com/icing/mod_md
 <IfModule md_module>
-  <MDomain {{ inventory_hostname }}>
-    MDCAChallenges tls-alpn-01
-    MDCertificateAgreement accepted
-    MDCertificateAuthority https://acme-v02.api.letsencrypt.org/directory
-    MDContactEmail "{{ apache_server_admin }}"
-    MDPrivateKeys {{ apache_md_private_keys | join(' ') }}
-    MDRequireHttps permanent
-    MDRenewMode always
-    MDStapling on
-    # Fall back to non mod_md cert if the mod_md cert does not exist
-    <IfFile ! /etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem>
-      <IfFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
+  <IfFile /etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem>
+    MDomain {{ inventory_hostname }}
+  </IfFile>
+  <IfFile !/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem>
+    <IfFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
+      <MDomain {{ inventory_hostname }}>
         MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
         MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
       </IfFile>
     </IfFile>
+    <IfFile !/etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
+      MDomain {{ inventory_hostname }}
+    </IfFile>
   </MDomain>
 </IfModule>
-{%     endif %}
-{% endif %}
 
 # The default virtual host for port 443
 <IfModule ssl_module>
@@ -202,10 +195,16 @@ ErrorDocument 506 /wsh/506.shtml
   SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
 {% endif %}
   SSLEngine on
-  <IfModule ! md_module>
-    SSLCertificateFile        /etc/ssl/le/{{ inventory_hostname }}.cert.pem
-    SSLCertificateKeyFile     /etc/ssl/le/{{ inventory_hostname }}.key.pem
-    SSLCertificateChainFile   /etc/ssl/le/{{ inventory_hostname }}.ca.pem
+  <IfModule !md_module>
+    <IfFile /etc/ssl/le/{{ inventory_hostname }}.cert.pem>
+      SSLCertificateFile /etc/ssl/le/{{ inventory_hostname }}.cert.pem
+    </IfFile>
+    <IfFile /etc/ssl/le/{{ inventory_hostname }}.key.pem>
+      SSLCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
+    </IfFile>
+    <IfFile /etc/ssl/le/{{ inventory_hostname }}.ca.pem>
+      SSLCertificateChainFile /etc/ssl/le/{{ inventory_hostname }}.ca.pem
+    </IfFile>
   </IfModule>
   <IfModule headers_module>
     Header set Strict-Transport-Security "max-age=63072000" env=HTTPS
