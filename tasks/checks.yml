@@ -85,6 +85,52 @@
         - apache_md_version is defined
         - apache_md_version != "default"
 
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Debug the services
+      ansible.builtin.debug:
+        var: ansible_facts.services.keys()
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Debug the services that certs are to be copied for
+      ansible.builtin.debug:
+        var: apache_md_cert_copy_service.name
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      loop: "{{ apache_md_cert_copy }}"
+      loop_control:
+        loop_var: apache_md_cert_copy_service
+        label: "{{ apache_md_cert_copy_service.name }}"
+      when: apache_md_cert_copy != []
+
+    - name: Debug the JMESPath query for services that certs are to be copied for
+      ansible.builtin.debug:
+        var: apache_md_cert_copy_service_jpq
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      vars:
+        apache_md_cert_copy_service_jpq: '["{{ apache_md_cert_copy_service.name }}.service"]|[0]'
+      loop: "{{ apache_md_cert_copy }}"
+      loop_control:
+        loop_var: apache_md_cert_copy_service
+        label: "{{ apache_md_cert_copy_service.name }}"
+      when: apache_md_cert_copy != []
+
+    - name: Check that the services that certs are to be copied for are running
+      ansible.builtin.assert:
+        that:
+          - apache_md_cert_copy_service_name in ansible_facts.services.keys()
+          - (ansible_facts.services | community.general.json_query(apache_md_cert_copy_service_jpq)).state == "running"
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: "The {{ apache_md_cert_copy_service_name }} service need to be running if certs are to be copied for it."
+      vars:
+        apache_md_cert_copy_service_name: "{{ apache_md_cert_copy_service.name }}.service"
+        apache_md_cert_copy_service_jpq: '["{{ apache_md_cert_copy_service.name }}.service"]|[0]'
+      loop: "{{ apache_md_cert_copy }}"
+      loop_control:
+        loop_var: apache_md_cert_copy_service
+        label: "{{ apache_md_cert_copy_service.name }}"
+      when: apache_md_cert_copy != []
+
     - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
       ansible.builtin.assert:
         that:

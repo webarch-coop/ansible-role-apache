@@ -184,23 +184,22 @@ apache_mods_disabled: []
   # - usertrack
   # - vhost_alias
   # - xml2enc
-apache_md_cert_copy: []
-# Following is an example for copying the mod_md key pair for Exim4
-# apache_md_cert_copy:
-#   - name: exim4
-#     privkey:
-#       src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.pem"
-#       dest: /etc/exim4/exim.key
-#       owner: Debian-exim
-#       group: ssl-cert
-#       mode: "0640"
-#     pubcert:
-#       src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem"
-#       dest: /etc/exim4/exim.crt
-#       owner: Debian-exim
-#       group: ssl-cert
-#       mode: "0640"
-#     special_time: daily
+apache_md_cert_copy:
+  # Copy the mod_md key pair for Exim4
+  - name: exim4
+    privkey:
+      src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.pem"
+      dest: /etc/exim4/exim.key
+      owner: Debian-exim
+      group: ssl-cert
+      mode: "0640"
+    pubcert:
+      src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem"
+      dest: /etc/exim4/exim.crt
+      owner: Debian-exim
+      group: ssl-cert
+      mode: "0640"
+    special_time: daily
 # See this issue https://github.com/icing/mod_md/issues/260
 apache_md_private_keys:
   - rsa3072

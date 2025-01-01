@@ -1,4 +1,4 @@
-# Webarchitects Apache Ansible Role
+# Webarchitect Apache Ansible Role
 
 [![pipeline status](https://git.coop/webarch/apache/badges/master/pipeline.svg)](https://git.coop/webarch/apache/-/commits/master)
 
@@ -6,7 +6,7 @@ This repo contains an Ansible role for installing and configuring Apache on Debi
 
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/apache/-/releases).
 
-By default this role uses [mod_md](https://github.com/icing/mod_md/) for HTTPS certifiates, in addition the cert and key matching the `inventory_hostname` can be copied for use by other applications, such as Exim, using the `apache_md_cert_copy` list of dictionaries.
+By default this role uses [mod_md](https://github.com/icing/mod_md/) for HTTPS certifiates, in addition the cert and key matching the `inventory_hostname` are be copied for use by other applications, specifically Exim, see the `apache_md_cert_copy` list of dictionaries.
 
 ## Role variables
 
