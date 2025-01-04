@@ -38,7 +38,7 @@ fi
 
 # Set an array for the Apache VirtualHost ServerName's
 declare -a namevhosts
-readarray -t namevhosts < <(apachectl -S | grep -e '^         port 443 namevhost ' | awk '{ print $4 }')
+readarray -t namevhosts < <(apachectl -S | grep -e '^         port 443 namevhost ' | awk '{ print $4 }' | sort)
 
 # Get the certificate-status renewal for each VirtualHost
 for namevhost in "${namevhosts[@]}"
