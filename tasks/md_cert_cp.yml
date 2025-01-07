@@ -16,70 +16,83 @@
         path: "{{ apache_md_cert_cp.privkey.src }}"
       register: apache_md_cert_cp_privkey_src
 
-    - name: "Copy the Apache mod_md private key for {{ apache_md_cert_cp.name }}"
-      ansible.builtin.copy:
-        src: "{{ apache_md_cert_cp.privkey.src }}"
-        dest: "{{ apache_md_cert_cp.privkey.dest }}"
-        remote_src: true
-        force: true
-        owner: "{{ apache_md_cert_cp.privkey.owner }}"
-        group: "{{ apache_md_cert_cp.privkey.group }}"
-        mode: "{{ apache_md_cert_cp.privkey.mode }}"
-        validate: openssl ec -noout -text -in %s
-      when: apache_md_cert_cp_privkey_src.stat.exists | bool
-      register: apache_md_cert_cp_privkey
-
     - name: "Stat the Apache mod_md cert for {{ apache_md_cert_cp.name }}"
       ansible.builtin.stat:
         path: "{{ apache_md_cert_cp.pubcert.src }}"
       register: apache_md_cert_cp_pubcert_src
 
-    - name: "Copy the Apache mod_md cert for {{ apache_md_cert_cp.name }}"
-      ansible.builtin.copy:
-        src: "{{ apache_md_cert_cp.pubcert.src }}"
-        dest: "{{ apache_md_cert_cp.pubcert.dest }}"
-        remote_src: true
-        force: true
-        owner: "{{ apache_md_cert_cp.pubcert.owner }}"
-        group: "{{ apache_md_cert_cp.pubcert.group }}"
-        mode: "{{ apache_md_cert_cp.pubcert.mode }}"
-        validate: openssl x509 -noout -text -in %s
-      when: apache_md_cert_cp_pubcert_src.stat.exists | bool
-      register: apache_md_cert_cp_pubcert
+    - name: Copy the private key and certificate when they exist
+      block:
 
-    - name: "Private key and / or certificate changed so restart service {{ apache_md_cert_cp.name }}"  # noqa: no-handler
-      ansible.builtin.service:
-        name: "{{ apache_md_cert_cp.name }}"
-        state: restarted
+        - name: "Copy the Apache mod_md private key for {{ apache_md_cert_cp.name }}"
+          ansible.builtin.copy:
+            src: "{{ apache_md_cert_cp.privkey.src }}"
+            dest: "{{ apache_md_cert_cp.privkey.dest }}"
+            remote_src: true
+            force: true
+            owner: "{{ apache_md_cert_cp.privkey.owner }}"
+            group: "{{ apache_md_cert_cp.privkey.group }}"
+            mode: "{{ apache_md_cert_cp.privkey.mode }}"
+            validate: openssl ec -noout -text -in %s
+          register: apache_md_cert_cp_privkey
 
-    - name: "Template Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
-      ansible.builtin.template:
-        src: apache_md_cert_cp.sh.j2
-        dest: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
-        owner: root
-        group: root
-        mode: "0750"
+        - name: "Copy the Apache mod_md cert for {{ apache_md_cert_cp.name }}"
+          ansible.builtin.copy:
+            src: "{{ apache_md_cert_cp.pubcert.src }}"
+            dest: "{{ apache_md_cert_cp.pubcert.dest }}"
+            remote_src: true
+            force: true
+            owner: "{{ apache_md_cert_cp.pubcert.owner }}"
+            group: "{{ apache_md_cert_cp.pubcert.group }}"
+            mode: "{{ apache_md_cert_cp.pubcert.mode }}"
+            validate: openssl x509 -noout -text -in %s
+          register: apache_md_cert_cp_pubcert
 
-    - name: "Stat the Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
-      ansible.builtin.stat:
-        path: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
-      register: apache_md_cert_cp_script
+        - name: "Private key and / or certificate changed so restart service {{ apache_md_cert_cp.name }}"  # noqa: no-handler
+          ansible.builtin.service:
+            name: "{{ apache_md_cert_cp.name }}"
+            state: restarted
 
-    - name: "Run the Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
-      ansible.builtin.command: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
-      vars:
-        apache_md_cert_cp_script_run_changed: "{{ apache_md_cert_cp.name }} restarted for new cert"
+        - name: "Template Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+          ansible.builtin.template:
+            src: apache_md_cert_cp.sh.j2
+            dest: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+            owner: root
+            group: root
+            mode: "0750"
+
+        - name: "Stat the Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+          ansible.builtin.stat:
+            path: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+          register: apache_md_cert_cp_script
+
+        - name: "Run the Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+          ansible.builtin.command: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+          vars:
+            apache_md_cert_cp_script_run_changed: "{{ apache_md_cert_cp.name }} restarted for new cert"
+          when:
+            - apache_md_cert_cp_privkey_src.stat.exists | bool
+            - apache_md_cert_cp_pubcert_src.stat.exists | bool
+          register: apache_md_cert_cp_script_run
+          changed_when: apache_md_cert_cp_script_run.stdout == apache_md_cert_cp_script_run_changed
+
+        - name: "Crontab for Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+          ansible.builtin.cron:
+            name: "Apache mod_md cert copy and service restart {{ apache_md_cert_cp.name }}"
+            special_time: "{{ apache_md_cert_cp.special_time }}"
+            job: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+
       when:
         - apache_md_cert_cp_privkey_src.stat.exists | bool
         - apache_md_cert_cp_pubcert_src.stat.exists | bool
-      register: apache_md_cert_cp_script_run
-      changed_when: apache_md_cert_cp_script_run.stdout == apache_md_cert_cp_script_run_changed
 
-    - name: "Crontab for Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
+    - name: "Crontab absent for Apache mod_md cert script absent for {{ apache_md_cert_cp.name }}"
       ansible.builtin.cron:
         name: "Apache mod_md cert copy and service restart {{ apache_md_cert_cp.name }}"
-        special_time: "{{ apache_md_cert_cp.special_time }}"
-        job: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+        state: absent
+      when:
+        - not apache_md_cert_cp_privkey_src.stat.exists | bool
+        - not apache_md_cert_cp_pubcert_src.stat.exists | bool
 
   tags:
     - apache
