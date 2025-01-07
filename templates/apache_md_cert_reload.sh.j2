@@ -22,6 +22,13 @@ if [[ "$(id -u)" != "0" ]] ; then
   exit 1
 fi
 
+# Check that apache2ctl is available
+if ! command -v /usr/sbin/apache2ctl &> /dev/null
+then
+  echo "apache2ctl could not be found"
+  exit 1
+fi
+
 # Check that jp is available
 if ! command -v jp &> /dev/null
 then
@@ -38,7 +45,7 @@ fi
 
 # Set an array for the Apache VirtualHost ServerName's
 declare -a namevhosts
-readarray -t namevhosts < <(apachectl -S | grep -e '^         port 443 namevhost ' | awk '{ print $4 }' | sort)
+readarray -t namevhosts < <(/usr/sbin/apache2ctl -S | grep -e '^         port 443 namevhost ' | awk '{ print $4 }' | sort)
 
 # Get the certificate-status renewal for each VirtualHost
 for namevhost in "${namevhosts[@]}"
