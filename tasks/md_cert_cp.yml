@@ -84,7 +84,9 @@
 
       when:
         - apache_md_cert_cp_privkey_src.stat.exists | bool
+        - apache_md_cert_cp_privkey_src.stat.size > 0
         - apache_md_cert_cp_pubcert_src.stat.exists | bool
+        - apache_md_cert_cp_pubcert_src.stat.size > 0
 
     - name: "Crontab absent for Apache mod_md cert script absent for {{ apache_md_cert_cp.name }}"
       ansible.builtin.cron:

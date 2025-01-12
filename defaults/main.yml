@@ -188,13 +188,13 @@ apache_md_cert_copy:
   # Copy the mod_md key pair for Exim4
   - name: exim4
     privkey:
-      src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.pem"
+      src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.secp384r1.pem"
       dest: /etc/exim4/exim.key
       owner: Debian-exim
       group: ssl-cert
       mode: "0640"
     pubcert:
-      src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem"
+      src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.secp384r1.pem"
       dest: /etc/exim4/exim.crt
       owner: Debian-exim
       group: ssl-cert

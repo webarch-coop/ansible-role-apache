@@ -27,6 +27,14 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_mdomain_status.json is defined
 
+  rescue:
+
+    - name: "Check cert failed for {{ apache_mdomain }}"
+      ansible.builtin.debug:
+        msg: >-
+          There was a failure when checking for a HTTPS cert at https://{{ apache_mdomain }}/.httpd/certificate-status
+          please wait a few minutes for mod_md to provision a cert and then re-run this role.
+
   tags:
     - apache
 ...
