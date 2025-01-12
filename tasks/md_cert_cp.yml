@@ -21,7 +21,26 @@
         path: "{{ apache_md_cert_cp.pubcert.src }}"
       register: apache_md_cert_cp_pubcert_src
 
-    - name: Copy the private key and certificate when they exist
+    - name: Query OpenSSL X.509 certificate
+      block:
+
+        - name: "Query OpenSSL X.509 certificate {{ apache_md_cert_cp.privkey.src }}"
+          community.crypto.x509_certificate_info:
+            path: "{{ apache_md_cert_cp.pubcert.src }}"
+          register: apache_md_cert_cp_pubcert_info
+
+        - name: "Debug all the OpenSSL X.509 certificate info for {{ apache_md_cert_cp.privkey.src }}"
+          ansible.builtin.debug:
+            var: apache_md_cert_cp_pubcert_info
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+      when:
+        - apache_md_cert_cp_privkey_src.stat.exists | bool
+        - apache_md_cert_cp_privkey_src.stat.size > 0
+        - apache_md_cert_cp_pubcert_src.stat.exists | bool
+        - apache_md_cert_cp_pubcert_src.stat.size > 0
+
+    - name: Copy the private key and certificate when they exist and the cert is valid
       block:
 
         - name: "Copy the Apache mod_md private key for {{ apache_md_cert_cp.name }}"
@@ -87,6 +106,8 @@
         - apache_md_cert_cp_privkey_src.stat.size > 0
         - apache_md_cert_cp_pubcert_src.stat.exists | bool
         - apache_md_cert_cp_pubcert_src.stat.size > 0
+        - not apache_md_cert_cp_pubcert_info.expired | bool
+        - not apache_md_cert_cp_pubcert_info.failed | bool
 
     - name: "Crontab absent for Apache mod_md cert script absent for {{ apache_md_cert_cp.name }}"
       ansible.builtin.cron:
