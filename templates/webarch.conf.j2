@@ -37,7 +37,7 @@ SetEnv PHPMYADMIN_PATH "/"
 SetEnv PIWIK_DOMAIN "{{ apache_matomo_domain }}"
 {% endif %}
 SetEnv HOME_DOMAIN "webarch.net"
-SetEnv SITE_TITLE "Webarchitects Shared Hosting"
+SetEnv SITE_TITLE "{{ apache_webarch.site_title }}"
 SetEnv STATIC_DIR "/wsh/"
 SetEnv STATIC_TOP "top.shtml"
 SetEnv STATIC_BOT "bot.shtml"

@@ -361,6 +361,15 @@ argument_specs:
         type: bool
         required: false
         description: Verify all variables that start with apache_.
+      apache_webarch:
+        type: dict
+        required: false
+        description: Dictionary of setting for the Apache Webarch config.
+        options:
+          site_title:
+            type: str
+            required: true
+            description: The Webarchitects site title.
       apache_which_phpquery:
         type: dict
         required: false
