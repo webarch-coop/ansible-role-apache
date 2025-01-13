@@ -44,7 +44,7 @@
         apache_version: >-
           {{- ansible_facts.packages['apache2'] |
           community.general.json_query('[0].version') |
-          ansible.builtin.regex_replace('-.*$') -}}
+          ansible.builtin.regex_replace('-.*$') | string -}}
 
     - name: Debug apache_version
       ansible.builtin.debug:
@@ -52,7 +52,7 @@
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
 
     # https://packages.ubuntu.com/focal-updates/apache2
-    - name: The Apache version string should be a semvar and the minium version should be the Ubuntu Focal version
+    - name: "The Apache version string should be a semvar >= 2.4.41, it is {{ apache_version }}"
       ansible.builtin.assert:
         that:
           - apache_version is ansible.builtin.version('2.4.41', '>=', version_type='semver')
@@ -60,7 +60,7 @@
         fail_msg: "The apache_version variable should be a semvar >= 2.4.41 however it is set to {{ apache_version }}"
 
     # https://github.com/icing/mod_md?tab=readme-ov-file#versions-and-releases
-    - name: When mod_md is enabled the Apache version required is >= 2.4.48
+    - name: "When mod_md is enabled the Apache version required is >= 2.4.48, it is {{ apache_version }}"
       ansible.builtin.assert:
         that:
           - apache_version is ansible.builtin.version('2.4.48', '>=', version_type='semver')
