@@ -364,7 +364,7 @@ argument_specs:
       apache_webarch:
         type: dict
         required: false
-        description: Dictionary of setting for the Apache Webarch config.
+        description: Dictionary of settings for the Apache Webarch config.
         options:
           site_title:
             type: str
