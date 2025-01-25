@@ -23,6 +23,8 @@
       when:
         - apache_verify is defined
         - apache_verify | bool
+      tags:
+        - apache_local_facts
 
     - name: Include apt role local fact tasks
       ansible.builtin.include_role:
@@ -32,6 +34,8 @@
         ( ansible_facts.ansible_local.dpkg.arch is not defined ) or
         ( ansible_facts.ansible_local.gpg.version is not defined ) or
         ( ansible_facts.ansible_local.bash.path is not defined )
+      tags:
+        - apache_local_facts
 
     - name: Packages present and absent
       block:
@@ -66,10 +70,14 @@
       when: >-
         ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) ) or
         ( ( apache_pkgs_present is defined ) and ( apache_pkgs_present != [] ) )
+      tags:
+        - apache_local_facts
 
     - name: Include local facts tasks
       ansible.builtin.include_tasks: local_facts.yml
       when: ansible_facts.ansible_local.a2query is not defined
+      tags:
+        - apache_local_facts
 
     - name: Include Apache checks
       ansible.builtin.include_tasks: checks.yml
