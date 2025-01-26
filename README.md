@@ -10,7 +10,7 @@ By default this role uses [mod_md](https://github.com/icing/mod_md/) for HTTPS c
 
 ## Usage
 
-Run this role using the `apache_local_facts` tag for the intial install.
+Run this role using the `apache_install` tag for the intial install, once `apache2` has been installed the role can be run in check mode.
 
 ## Role variables
 

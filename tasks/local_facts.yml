@@ -38,4 +38,5 @@
   tags:
     - apache
     - apache_local_facts
+    - apache_install
 ...

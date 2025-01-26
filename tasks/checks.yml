@@ -39,6 +39,15 @@
         manager: apt
       when: ansible_facts.packages is not defined
 
+    - name: The apache2 package is required to be installed for the tasks in this role to run
+      ansible.builtin.assert:
+        that:
+          - ( "apache2" in ansible_facts.packages.keys() )
+        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+        fail_msg: >-
+          Please run this role with the apache_install tag to just install apache2, once apache2 is installed
+          this role can be run in check mode.
+
     - name: Set a fact for the Apache apt package version
       ansible.builtin.set_fact:
         apache_version: >-

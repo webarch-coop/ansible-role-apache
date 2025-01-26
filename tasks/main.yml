@@ -14,6 +14,8 @@
   when: not apache | bool
   tags:
     - apache
+    - apache_install
+    - apache_local_facts
 
 - name: Install and configure Apache
   block:
@@ -24,6 +26,7 @@
         - apache_verify is defined
         - apache_verify | bool
       tags:
+        - apache_install
         - apache_local_facts
 
     - name: Include apt role local fact tasks
@@ -35,6 +38,7 @@
         ( ansible_facts.ansible_local.gpg.version is not defined ) or
         ( ansible_facts.ansible_local.bash.path is not defined )
       tags:
+        - apache_install
         - apache_local_facts
 
     - name: Packages present and absent
@@ -71,12 +75,14 @@
         ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) ) or
         ( ( apache_pkgs_present is defined ) and ( apache_pkgs_present != [] ) )
       tags:
+        - apache_install
         - apache_local_facts
 
     - name: Include local facts tasks
       ansible.builtin.include_tasks: local_facts.yml
       when: ansible_facts.ansible_local.a2query is not defined
       tags:
+        - apache_install
         - apache_local_facts
 
     - name: Include Apache checks
