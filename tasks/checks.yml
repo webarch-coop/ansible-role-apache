@@ -37,7 +37,6 @@
     - name: Read package facts when not defined
       ansible.builtin.package_facts:
         manager: apt
-      when: ansible_facts.packages is not defined
 
     - name: The apache2 package is required to be installed for the tasks in this role to run
       ansible.builtin.assert:
