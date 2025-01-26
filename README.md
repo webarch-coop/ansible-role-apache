@@ -8,6 +8,10 @@ If you use this role please use a tagged release, see [the release notes](https:
 
 By default this role uses [mod_md](https://github.com/icing/mod_md/) for HTTPS certifiates, in addition the cert and key matching the `inventory_hostname` are be copied for use by other applications, specifically Exim, see the `apache_md_cert_copy` list of dictionaries.
 
+## Usage
+
+Run this role using the `apache_local_facts` tag for the intial install.
+
 ## Role variables
 
 See the [defaults/main.yml](defaults/main.yml) file for the default variables, the [vars/main.yml](vars/main.yml) file for the preset variables and the [meta/argument_specs.yml](meta/argument_specs.yml) file for the variable specification.
