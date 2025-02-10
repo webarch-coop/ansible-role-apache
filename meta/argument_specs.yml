@@ -111,6 +111,27 @@ argument_specs:
         required: false
         description: A list of other services that mod_md key pairs should be copied for.
         options:
+          dest_dir:
+            type: dict
+            required: true
+            description: The destination directory for the private key and certificate.
+            options:
+              path:
+                type: str
+                required: true
+                description: The destination directory path.
+              owner:
+                type: str
+                required: true
+                description: The destination directory owner.
+              group:
+                type: str
+                required: true
+                description: The destination directory group.
+              mode:
+                type: str
+                required: true
+                description: The destination directory mode.
           name:
             type: str
             required: true

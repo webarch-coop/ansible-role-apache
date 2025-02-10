@@ -187,6 +187,11 @@ apache_mods_disabled: []
 apache_md_cert_copy:
   # Copy the mod_md key pair for Exim4
   - name: exim4
+    dest_dir:
+      path: /etc/exim4
+      owner: root
+      group: root
+      mode: "0755"
     pkgs:
       - exim4-config
       - exim4-daemon-light

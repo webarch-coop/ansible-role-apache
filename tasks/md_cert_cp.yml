@@ -40,6 +40,22 @@
         - apache_md_cert_cp_pubcert_src.stat.exists | bool
         - apache_md_cert_cp_pubcert_src.stat.size > 0
 
+    - name: Certificate directory present
+      ansible.builtin.file:
+        path: "{{ apache_md_cert_cp.pubcert.dest | ansible.builtin.dirname }}"
+        state: directory
+        owner: "{{ apache_md_cert_cp.pubcert.owner }}"
+        group: "{{ apache_md_cert_cp.pubcert.group }}"
+        mode: "0750"
+
+    - name: Private key directory present
+      ansible.builtin.file:
+        path: "{{ apache_md_cert_cp.privkey.dest | ansible.builtin.dirname }}"
+        state: directory
+        owner: "{{ apache_md_cert_cp.privkey.owner }}"
+        group: "{{ apache_md_cert_cp.privkey.group }}"
+        mode: "0750"
+
     - name: Copy the private key and certificate when they exist and the cert is valid
       block:
 

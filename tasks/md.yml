@@ -19,6 +19,23 @@
       tags:
         - apache_install
 
+    - name: Debug ansible_facts.packages.keys()
+      ansible.builtin.debug:
+        var: ansible_facts.packages.keys()
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}2{% else %}3{% endif %}"
+
+    - name: Debug Apache mod_md cert copy test
+      ansible.builtin.debug:
+        msg:
+          - "apache_md_cert_cp.pkgs: {{ apache_md_cert_cp.pkgs }}"
+          - "ansible_facts.packages.keys(): {{ ansible_facts.packages.keys() }}"
+          - "apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.packages.keys()): {{ apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.packages.keys()) }}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      loop: "{{ apache_md_cert_copy }}"
+      loop_control:
+        loop_var: apache_md_cert_cp
+        label: "{{ apache_md_cert_cp.name }}"
+
     - name: Include Apache mod_md cert copy tasks
       ansible.builtin.include_tasks: md_cert_cp.yml
       loop: "{{ apache_md_cert_copy }}"
@@ -28,7 +45,7 @@
       when:
         - apache_md_cert_copy is defined
         - apache_md_cert_copy != []
-        - apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.services.keys()) == []
+        - apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.packages.keys()) == []
 
     - name: Apache reload script in place
       ansible.builtin.template:

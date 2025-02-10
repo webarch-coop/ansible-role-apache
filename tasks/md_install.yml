@@ -19,7 +19,6 @@
           - git
           - libcurl4-openssl-dev
           - libjansson-dev
-          - git
         state: present
       notify: Restart Apache
 
