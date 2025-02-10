@@ -36,6 +36,20 @@
         loop_var: apache_md_cert_cp
         label: "{{ apache_md_cert_cp.name }}"
 
+    - name: Skip Apache mod_md cert copy tasks
+      ansible.builtin.debug:
+        msg: "Copying of the certificate for {{ apache_md_cert_cp.name }} is being skipped as there are missing packages, {{ apache_md_cert_cp_pkgs_missing | join(', ') }}"
+      vars:
+        apache_md_cert_cp_pkgs_missing: "{{ apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.packages.keys()) }}"
+      loop: "{{ apache_md_cert_copy }}"
+      loop_control:
+        loop_var: apache_md_cert_cp
+        label: "{{ apache_md_cert_cp.name }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.packages.keys()) != []
+
     - name: Include Apache mod_md cert copy tasks
       ansible.builtin.include_tasks: md_cert_cp.yml
       loop: "{{ apache_md_cert_copy }}"
