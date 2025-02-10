@@ -109,7 +109,9 @@
       loop_control:
         loop_var: apache_md_cert_copy_service
         label: "{{ apache_md_cert_copy_service.name }}"
-      when: apache_md_cert_copy != []
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
 
     - name: Debug the JMESPath query for services that certs are to be copied for
       ansible.builtin.debug:
@@ -121,9 +123,25 @@
       loop_control:
         loop_var: apache_md_cert_copy_service
         label: "{{ apache_md_cert_copy_service.name }}"
-      when: apache_md_cert_copy != []
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
 
-    - name: Check that the services that certs are to be copied for are running
+    - name: Cert copied tasks to be skipped as packages are not present
+      ansible.builtin.debug:
+        msg: >-
+          The packages {{ apache_md_cert_copy_service.pkgs | join(', ') }} are not present so the cert copy tasks for
+          {{ apache_md_cert_copy_service.name }} will be skipped.
+      loop: "{{ apache_md_cert_copy }}"
+      loop_control:
+        loop_var: apache_md_cert_copy_service
+        label: "{{ apache_md_cert_copy_service.name }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_copy_service.pkgs | ansible.builtin.difference(ansible_facts.services.keys()) == []
+
+    - name: Check that the services that certs are to be copied for are running when installed
       ansible.builtin.assert:
         that:
           - apache_md_cert_copy_service_name in ansible_facts.services.keys()
@@ -137,7 +155,10 @@
       loop_control:
         loop_var: apache_md_cert_copy_service
         label: "{{ apache_md_cert_copy_service.name }}"
-      when: apache_md_cert_copy != []
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_copy_service.pkgs | ansible.builtin.difference(ansible_facts.services.keys()) == []
 
     - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
       ansible.builtin.assert:

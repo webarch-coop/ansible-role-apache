@@ -18,6 +18,7 @@
           - apache2-ssl-dev
           - libcurl4-openssl-dev
           - libjansson-dev
+          - git
         state: present
       notify: Restart Apache
 
@@ -112,4 +113,5 @@
   when: apache_md_version != "default"
   tags:
     - apache
+    - apache_install
 ...

@@ -115,6 +115,11 @@ argument_specs:
             type: str
             required: true
             description: The name of the service that the key is being copied for and which will be restarted.
+          pkgs:
+            type: list
+            elements: str
+            required: true
+            description: A list of packages that are required to be present before the key pair is copied.
           privkey:
             type: dict
             required: true

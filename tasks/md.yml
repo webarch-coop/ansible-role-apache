@@ -16,6 +16,8 @@
       when:
         - apache_md_version is defined
         - apache_md_version != "default"
+      tags:
+        - apache_install
 
     - name: Include Apache mod_md cert copy tasks
       ansible.builtin.include_tasks: md_cert_cp.yml
@@ -26,6 +28,7 @@
       when:
         - apache_md_cert_copy is defined
         - apache_md_cert_copy != []
+        - apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.services.keys()) == []
 
     - name: Apache reload script in place
       ansible.builtin.template:

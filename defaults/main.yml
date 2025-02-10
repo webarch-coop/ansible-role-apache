@@ -187,6 +187,9 @@ apache_mods_disabled: []
 apache_md_cert_copy:
   # Copy the mod_md key pair for Exim4
   - name: exim4
+    pkgs:
+      - exim4-config
+      - exim4-daemon-light
     privkey:
       src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.secp384r1.pem"
       dest: /etc/exim4/exim.key
