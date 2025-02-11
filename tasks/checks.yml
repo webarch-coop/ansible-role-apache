@@ -145,6 +145,121 @@
         - apache_md_cert_cp.pkgs is defined
         - apache_md_cert_cp.pkgs != []
 
+    - name: Getent users
+      ansible.builtin.getent:
+        database: passwd
+
+    - name: Debug getent users
+      ansible.builtin.debug:
+        var: ansible_facts.getent_passwd.keys()
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}2{% else %}3{% endif %}"
+
+    - name: Check that private key owners are present
+      ansible.builtin.assert:
+        that:
+          - apache_md_cert_privkey_owner in ansible_facts.getent_passwd.keys()
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          The user, {{ apache_md_cert_privkey_owner }} is specified as certificate private key owner so it need to exist.
+      loop: "{{ apache_md_cert_copy | community.general.json_query('[].privkey.owner') | unique }}"
+      loop_control:
+        loop_var: apache_md_cert_privkey_owner
+        label: "{{ apache_md_cert_privkey_owner }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_copy | community.general.json_query('[].privkey.owner') | unique != []
+
+    - name: Check that certificate key owners are present
+      ansible.builtin.assert:
+        that:
+          - apache_md_cert_pubcert_owner in ansible_facts.getent_passwd.keys()
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          The user, {{ apache_md_cert_pubcert_owner }} is specified as certificate private key owner so it need to exist.
+      loop: "{{ apache_md_cert_copy | community.general.json_query('[].pubcert.owner') | unique }}"
+      loop_control:
+        loop_var: apache_md_cert_pubcert_owner
+        label: "{{ apache_md_cert_pubcert_owner }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_copy | community.general.json_query('[].pubcert.owner') | unique != []
+
+    - name: Check that the certificate directories owners are present
+      ansible.builtin.assert:
+        that:
+          - apache_md_dir_owner in ansible_facts.getent_passwd.keys()
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          The user, {{ apache_md_dir_owner }} is specified as certificate private key owner so it need to exist.
+      loop: "{{ apache_md_cert_copy | community.general.json_query('[].dirs[].owner') | unique }}"
+      loop_control:
+        loop_var: apache_md_dir_owner
+        label: "{{ apache_md_dir_owner }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_copy | community.general.json_query('[].dirs[].owner') | unique != []
+
+    - name: Getent groups
+      ansible.builtin.getent:
+        database: group
+        split: ':'
+
+    - name: Debug getent groups
+      ansible.builtin.debug:
+        var: ansible_facts.getent_group.keys()
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}2{% else %}3{% endif %}"
+
+    - name: Check that private key groups are present
+      ansible.builtin.assert:
+        that:
+          - apache_md_cert_privkey_group in ansible_facts.getent_group.keys()
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          The user, {{ apache_md_cert_privkey_group }} is specified as certificate private key group so it need to exist.
+      loop: "{{ apache_md_cert_copy | community.general.json_query('[].privkey.group') | unique }}"
+      loop_control:
+        loop_var: apache_md_cert_privkey_group
+        label: "{{ apache_md_cert_privkey_group }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_copy | community.general.json_query('[].privkey.group') | unique != []
+
+    - name: Check that certificate key groups are present
+      ansible.builtin.assert:
+        that:
+          - apache_md_cert_pubcert_group in ansible_facts.getent_group.keys()
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          The user, {{ apache_md_cert_pubcert_group }} is specified as certificate private key group so it need to exist.
+      loop: "{{ apache_md_cert_copy | community.general.json_query('[].pubcert.group') | unique }}"
+      loop_control:
+        loop_var: apache_md_cert_pubcert_group
+        label: "{{ apache_md_cert_pubcert_group }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_copy | community.general.json_query('[].pubcert.group') | unique != []
+
+    - name: Check that the certificate directories groups are present
+      ansible.builtin.assert:
+        that:
+          - apache_md_dir_group in ansible_facts.getent_group.keys()
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          The user, {{ apache_md_dir_group }} is specified as certificate private key group so it need to exist.
+      loop: "{{ apache_md_cert_copy | community.general.json_query('[].dirs[].group') | unique }}"
+      loop_control:
+        loop_var: apache_md_dir_group
+        label: "{{ apache_md_dir_group }}"
+      when:
+        - apache_md_cert_copy is defined
+        - apache_md_cert_copy != []
+        - apache_md_cert_copy | community.general.json_query('[].dirs[].group') | unique != []
+
     - name: Check that the services that will be restarted when certs are copied are running
       ansible.builtin.assert:
         that:
