@@ -187,11 +187,7 @@ apache_mods_disabled: []
 apache_md_cert_copy:
   # Copy the mod_md key pair for Exim4
   - name: exim4
-    dest_dir:
-      path: /etc/exim4
-      owner: root
-      group: root
-      mode: "0755"
+    restart: true
     pkgs:
       - exim4-config
       - exim4-daemon-light
@@ -208,6 +204,31 @@ apache_md_cert_copy:
       group: ssl-cert
       mode: "0640"
     special_time: daily
+  # Copy the mod_md key pair for Authentik
+  # - name: docker
+  #   restart: false
+  #   dirs:
+  #     - path: "/home/authentik/authentik/certs/{{ inventory_hostname }}"
+  #       owner: authentik
+  #       group: authentik
+  #       mode: "0750"
+  #   pkgs:
+  #     - docker-ce
+  #     - docker-ce-cli
+  #     - docker-compose-plugin
+  #   privkey:
+  #     src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.secp384r1.pem"
+  #     dest: "/home/authentik/authentik/certs/{{ inventory_hostname }}/privkey.pem"
+  #     owner: authentik
+  #     group: authentik
+  #     mode: "0640"
+  #   pubcert:
+  #     src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.secp384r1.pem"
+  #     dest: "/home/authentik/authentik/certs/{{ inventory_hostname }}/fullchain.pem"
+  #     owner: authentik
+  #     group: authentik
+  #     mode: "0640"
+  #   special_time: daily
 # See this issue https://github.com/icing/mod_md/issues/260
 apache_md_private_keys:
   - rsa3072

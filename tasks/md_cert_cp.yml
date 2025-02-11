@@ -21,6 +21,22 @@
         path: "{{ apache_md_cert_cp.pubcert.src }}"
       register: apache_md_cert_cp_pubcert_src
 
+    - name: "The privatekey / certificate doesn't exist for {{ apache_md_cert_cp.name }}"
+      ansible.builtin.debug:
+        msg: >-
+          {% if not apache_md_cert_cp_privkey_src.stat.exists %}
+          There is no private key at {{ apache_md_cert_cp.privkey.src }}.
+          {% endif %}
+          {% if apache_md_cert_cp_privkey_src.stat.size == 0 %}
+          Theere is an empty file at {{ apache_md_cert_cp.privkey.src }}.
+          {% endif %}
+          {% if not apache_md_cert_cp_pubcert_src.stat.exists %}
+          There is no private key at {{ apache_md_cert_cp.pubcert.src }}.
+          {% endif %}
+          {% if apache_md_cert_cp_pubcert_src.stat.size == 0 %}
+          Theere is an empty file at {{ apache_md_cert_cp.pubcert.src }}.
+          {% endif %}
+
     - name: Query OpenSSL X.509 certificate
       block:
 
@@ -32,7 +48,26 @@
         - name: "Debug all the OpenSSL X.509 certificate info for {{ apache_md_cert_cp.privkey.src }}"
           ansible.builtin.debug:
             var: apache_md_cert_cp_pubcert_info
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+
+        - name: "Debug the commonName for the OpenSSL X.509 certificate at {{ apache_md_cert_cp.privkey.src }}"
+          ansible.builtin.debug:
+            var: apache_md_cert_cp_pubcert_info.subject.commonName
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+        - name: "Ensure that the OpenSSL X.509 certificate is valid and the check didn't fail for {{ apache_md_cert_cp.privkey.src }}"
+          ansible.builtin.assert:
+            that:
+              - not apache_md_cert_cp_pubcert_info.expired | bool
+              - not apache_md_cert_cp_pubcert_info.failed | bool
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              {% if apache_md_cert_cp_pubcert_info.expired | bool %}
+              The certificate at {{ apache_md_cert_cp.privkey.src }} has expired.
+              {% endif %}
+              {% if apache_md_cert_cp_pubcert_info.failed | bool %}
+              The certificate check for {{ apache_md_cert_cp.privkey.src }} has failed.
+              {% endif %}
 
       when:
         - apache_md_cert_cp_privkey_src.stat.exists | bool
@@ -40,21 +75,20 @@
         - apache_md_cert_cp_pubcert_src.stat.exists | bool
         - apache_md_cert_cp_pubcert_src.stat.size > 0
 
-    - name: Certificate directory present
+    - name: Certificate directories present
       ansible.builtin.file:
-        path: "{{ apache_md_cert_cp.pubcert.dest | ansible.builtin.dirname }}"
+        path: "{{ apache_md_cert_cp_dir.path }}"
         state: directory
-        owner: "{{ apache_md_cert_cp.pubcert.owner }}"
-        group: "{{ apache_md_cert_cp.pubcert.group }}"
-        mode: "0750"
-
-    - name: Private key directory present
-      ansible.builtin.file:
-        path: "{{ apache_md_cert_cp.privkey.dest | ansible.builtin.dirname }}"
-        state: directory
-        owner: "{{ apache_md_cert_cp.privkey.owner }}"
-        group: "{{ apache_md_cert_cp.privkey.group }}"
-        mode: "0750"
+        owner: "{{ apache_md_cert_cp_dir.owner }}"
+        group: "{{ apache_md_cert_cp_dir.group }}"
+        mode: "{{ apache_md_cert_cp_dir.mode }}"
+      loop: "{{ apache_md_cert_cp.dirs }}"
+      loop_control:
+        loop_var: apache_md_cert_cp_dir
+        label: "{{ apache_md_cert_cp_dir.path }}"
+      when:
+        - apache_md_cert_cp.dirs is defined
+        - apache_md_cert_cp.dirs != []
 
     - name: Copy the private key and certificate when they exist and the cert is valid
       block:
@@ -87,6 +121,7 @@
           ansible.builtin.service:
             name: "{{ apache_md_cert_cp.name }}"
             state: restarted
+          when: apache_md_cert_cp.restart | bool
 
         - name: "Template Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
           ansible.builtin.template:

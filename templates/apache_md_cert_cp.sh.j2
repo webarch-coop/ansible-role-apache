@@ -16,7 +16,9 @@ set -eE
 
 jc_min_version="1.22.0"
 
+{% if apache_md_cert_cp.restart | bool %}
 service="{{ apache_md_cert_cp.name }}"
+{% endif %}
 privkey_src="{{ apache_md_cert_cp.privkey.src }}"
 privkey_dest="{{ apache_md_cert_cp.privkey.dest }}"
 privkey_owner="{{ apache_md_cert_cp.privkey.owner }}"
@@ -164,6 +166,7 @@ else
   exit 1
 fi
 
+{% if apache_md_cert_cp.restart | bool %}
 # Get the service started date
 started=$(systemctl show "${service}" | jc -q -m --ini | jq -r . | jp -c -u ActiveEnterTimestamp | jc -q -m --date | jq -r . | jp -c -u epoch)
 # Check that the service started date is a positive number
@@ -178,5 +181,6 @@ else
   echo "${started}"
   exit 1
 fi
+{% endif %}
 
 # vim: syntax=bash{# vim: syntax=jinja2 #}
