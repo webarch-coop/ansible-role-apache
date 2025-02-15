@@ -1,6 +1,8 @@
 # {{ ansible_managed }}
 
 <IfModule md_module>
+  # Note that tls-alpn-01 and acme-tls/1 won't work with Cloudflare but mod_md should fall back to http-01 and http
+  MDCAChallenges tls-alpn-01 http-01
   MDCertificateAgreement accepted
   MDContactEmail "{{ apache_server_admin }}"
   MDRenewMode always
