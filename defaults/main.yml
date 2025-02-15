@@ -187,8 +187,9 @@ apache_mods_disabled: []
 apache_md_cert_copy: []
 # apache_md_cert_copy is an empty list by default as when Apache is first
 # installed cert's won't exist so the tasks to copy the certs will fail.  In
-# addition the paths for the Apache MD certs might well need adjusting for each
-# server.
+# addition the paths for the Apache MD certs might need adjusting for each
+# server if a cert is not generated for the inventory_hostname, enabling the
+# webarch conf causes one to be generated.
 # apache_md_cert_copy:
 #   # Copy the mod_md key pair for Exim4
 #   - name: exim4
