@@ -187,7 +187,7 @@ apache_mods_disabled: []
 apache_md_cert_copy: []
 # apache_md_cert_copy is an empty list by default as when Apache is first
 # installed cert's won't exist so the tasks to copy the certs will fail.  In
-# addition the paths for the Apache MD verts might well need adjusting for each
+# addition the paths for the Apache MD certs might well need adjusting for each
 # server.
 # apache_md_cert_copy:
 #   # Copy the mod_md key pair for Exim4
