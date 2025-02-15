@@ -105,6 +105,11 @@ argument_specs:
         type: str
         required: false
         description: An optional Matomo domain name for the webarch.conf template.
+      apache_md_ca_challenges:
+        type: list
+        elements: str
+        required: true
+        description: A list of MDCAChallenges for mod_md.
       apache_md_cert_copy:
         type: list
         elements: dict
