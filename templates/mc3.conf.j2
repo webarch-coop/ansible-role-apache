@@ -1,18 +1,18 @@
 # {{ ansible_managed }}
-# WSH Settings for all sites
+# mc3 settings for all sites
 
 # Log formats
 LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
 LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedioproxy
 LogFormat "%I %O" bandwidth
 
-{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled %}
 # HTTP/2 https://httpd.apache.org/docs/trunk/mod/mod_http2.html
-Protocols h2 h2c http/1.1
-ProtocolsHonorOrder Off
-{% elif apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" in apache_mods_enabled %}
+{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" in apache_mods_enabled %}
 Protocols h2 h2c http/1.1 acme-tls/1
 ProtocolsHonorOrder On
+{% elif apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" not in apache_mods_enabled %}
+Protocols h2 h2c http/1.1
+ProtocolsHonorOrder Off
 {% endif %}
 # Let's Encrypt
 # Alias "/.well-known/acme-challenge" "/var/www/html/.well-known/acme-challenge"
@@ -24,6 +24,14 @@ Alias /icons /usr/share/apache2/icons
 # env vars for the default index page, mc3.shtml
 {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
 SetEnv PHPMYADMIN_DOMAIN "{{ inventory_hostname }}"
+SetEnv PHPMYADMIN_PATH "/phpmyadmin/"
+{% elif apache_phpmyadmin_domain is defined %}
+SetEnv PHPMYADMIN_DOMAIN "{{ apache_phpmyadmin_domain }}"
+{%     if apache_phpmyadmin_path is defined %}
+SetEnv PHPMYADMIN_PATH "{{ apache_phpmyadmin_path }}"
+{%     else %}
+SetEnv PHPMYADMIN_PATH "/"
+{%     endif %}
 {% endif %}
 SetEnv HOME_DOMAIN "mc3.coop"
 SetEnv SITE_TITLE "MC3 Co-operative Hosting"
@@ -67,16 +75,17 @@ SetEnv PAGE_DESC  ""
     ExpiresByType text/javascript "now plus 1 week"
     ExpiresByType text/css "now plus 1 week"
   </IfModule>
-</Directory>
-<Directory "/var/www/html/.well-known">
-  Options None
-  AllowOverride None
-  ForceType text/plain
+  RedirectMatch 404 /\\.(svn|git|hg|bzr|cvs)(/|$)
 </Directory>
 <Directory "/var/www/html/.git">
   Options None
   AllowOverride None
   Require all denied
+</Directory>
+<Directory "/var/www/html/.well-known">
+  Options None
+  AllowOverride None
+  ForceType text/plain
 </Directory>
 <Directory "/home/*/sites/*">
   DirectoryIndex mc3.shtml
@@ -101,31 +110,44 @@ ErrorDocument 403 /mc3/403.shtml
     SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin graham@mc3.coop
-  #SetEnv PIWIK_SITE_ID "1"
-  #SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   DocumentRoot "/var/www/mc3"
-  {% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+{% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   RedirectPermanent /phpmyadmin https://{{ inventory_hostname }}/phpmyadmin
-  {% endif %}
+{% elif apache_phpmyadmin_domain is defined %}
+{%     if apache_phpmyadmin_path is defined %}
+  RedirectPermanent /phpmyadmin https://{{ apache_phpmyadmin_domain }}{{ apache_phpmyadmin_path }}
+{%     else %}
+  RedirectPermanent /phpmyadmin https://{{ apache_phpmyadmin_domain }}
+{%     endif %}
+{% endif %}
+  <IfModule ssl_module>
+    RedirectMatch 301 ^(?!/\.well-known/acme-challenge/).* https://{{ inventory_hostname }}$0
+  </IfModule>
   ErrorLog ${APACHE_LOG_DIR}/mc3-error.log
   LogLevel warn
   CustomLog ${APACHE_LOG_DIR}/mc3-access.log combined
 </VirtualHost>
 
-{% if "md" in apache_mods_enabled or apache_cert.stat.exists %}
-{%     if "md" in apache_mods_enabled %}
+# https://github.com/icing/mod_md
 <IfModule md_module>
-  <MDomain {{ inventory_hostname }}>
-    MDStapling on
-    MDRequireHttps permanent
-    MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
-    MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
-    MDContactEmail graham@mc3.coop
-  </MDomain>
+  <IfFile /etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem>
+    MDomain {{ inventory_hostname }}
+  </IfFile>
+  <IfFile !/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem>
+    <IfFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
+      <MDomain {{ inventory_hostname }}>
+        MDCertificateFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem
+        MDCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
+      </MDomain>
+    </IfFile>
+    <IfFile !/etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
+      MDomain {{ inventory_hostname }}
+    </IfFile>
+  </IfFile>
 </IfModule>
-{%     endif %}
+
 # The default virtual host for port 443
-<IfModule mod_ssl.c>
+<IfModule ssl_module>
 <VirtualHost *:443>
   ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
@@ -133,19 +155,21 @@ ErrorDocument 403 /mc3/403.shtml
     SuexecUserGroup www-data www-data
   </IfModule>
   ServerAdmin graham@mc3.coop
-  #SetEnv PIWIK_SITE_ID "1"
-  #SetEnv PIWIK_SITE_DOMAIN "stats.{{ inventory_hostname }}"
   SSLEngine on
-{#     if "md" not in apache_mods_enabled #}
-  # <IfModule !md_module>
-    SSLCertificateFile       /etc/ssl/le/{{ inventory_hostname }}.cert.pem
-    SSLCertificateKeyFile    /etc/ssl/le/{{ inventory_hostname }}.key.pem
-    SSLCertificateChainFile  /etc/ssl/le/{{ inventory_hostname }}.ca.pem
-  # </IfModule>
-  <IfModule headers_module>
-    Header set Strict-Transport-Security "max-age=31536000" env=HTTPS
+  <IfModule !md_module>
+    <IfFile /etc/ssl/le/{{ inventory_hostname }}.cert.pem>
+      SSLCertificateFile /etc/ssl/le/{{ inventory_hostname }}.cert.pem
+    </IfFile>
+    <IfFile /etc/ssl/le/{{ inventory_hostname }}.key.pem>
+      SSLCertificateKeyFile /etc/ssl/le/{{ inventory_hostname }}.key.pem
+    </IfFile>
+    <IfFile /etc/ssl/le/{{ inventory_hostname }}.ca.pem>
+      SSLCertificateChainFile /etc/ssl/le/{{ inventory_hostname }}.ca.pem
+    </IfFile>
   </IfModule>
-{#     endif #}
+  <IfModule headers_module>
+    Header set Strict-Transport-Security "max-age=63072000" env=HTTPS
+  </IfModule>
   DocumentRoot "/var/www/mc3"
   <FilesMatch "\.(cgi|shtml|phtml|php)$">
     SSLOptions +StdEnvVars
@@ -153,13 +177,12 @@ ErrorDocument 403 /mc3/403.shtml
   ErrorLog ${APACHE_LOG_DIR}/mc3-error.log
   LogLevel warn
   CustomLog ${APACHE_LOG_DIR}/mc3-ssl_access.log combined
-{%     if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
+{% if apache_conf_enabled is defined and "phpmyadmin" in apache_conf_enabled %}
   # phpmyadmin log for fail2ban, see https://www.phryneas.de/fail2ban-phpmyadmin/
   LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %{userID}n %{userStatus}n" pma_combined
   CustomLog ${APACHE_LOG_DIR}/phpmyadmin_access.log pma_combined
-{%     endif %}
+{% endif %}
 </VirtualHost>
 </IfModule>
-{% endif %}
 
-# vim: syntax=apache
+# vim: syntax=apache{# vim: syntax=jinja2 #}
