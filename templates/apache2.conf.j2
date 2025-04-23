@@ -89,10 +89,10 @@ PidFile ${APACHE_PID_FILE}
 #
 # ChrootDir: Directory for apache to run chroot(8) after startup.
 #
-{% if apache_chroot is defined and apache_chroot %}
+{% if apache_chroot is defined and apache_chroot | bool %}
 ChrootDir {{ apache_chroot_dir }}
 {% else %}
-# ChrootDir {{ apache_chroot_dir | default('/var/www') }}
+# ChrootDir {{ apache_chroot_dir }}
 {% endif %}
 
 #
@@ -230,4 +230,4 @@ IncludeOptional conf-enabled/*.conf
 # Include the virtual host configurations:
 IncludeOptional sites-enabled/*.conf
 
-# vim: syntax=apache
+# vim: syntax=apache{# vim: syntax=jinja2 #}

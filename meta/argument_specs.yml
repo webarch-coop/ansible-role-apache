@@ -28,11 +28,11 @@ argument_specs:
         description: Internal result of stating certificate path.
       apache_chroot_dir:
         type: str
-        required: false
+        required: true
         description: The directory to chroot Apache into when it is set to be chrooted.
       apache_chroot:
         type: bool
-        required: false
+        required: true
         description: Chroot Apache.
       apache_conf_available_paths:
         type: dict
