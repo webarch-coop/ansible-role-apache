@@ -91,8 +91,10 @@ PidFile ${APACHE_PID_FILE}
 #
 {% if apache_chroot is defined and apache_chroot | bool %}
 ChrootDir {{ apache_chroot_dir }}
+Define apache_chroot_dir {{ apache_chroot_dir }}
 {% else %}
 # ChrootDir {{ apache_chroot_dir }}
+# Define apache_chroot_dir {{ apache_chroot_dir }}
 {% endif %}
 
 #
