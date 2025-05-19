@@ -34,6 +34,10 @@ argument_specs:
         type: bool
         required: true
         description: Chroot Apache.
+      apache_chroot_dir_path:
+        type: dict
+        required: false
+        description: Internal veriable for the stat results from statting apache_chroot_dir.
       apache_conf_available_paths:
         type: dict
         required: false
@@ -397,6 +401,10 @@ argument_specs:
         type: bool
         required: false
         description: Verify all variables that start with apache_.
+      apache_version:
+        type: str
+        required: false
+        description: Internal variable for the Apache version.
       apache_webarch:
         type: dict
         required: false
