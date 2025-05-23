@@ -163,7 +163,9 @@
     - name: Print the apache2ctl configtest standard error
       ansible.builtin.debug:
         msg: "{{ apache_configtest.stderr }}"
-        verbosity: 1
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Fail if Apache configtest is not OK
       ansible.builtin.fail:

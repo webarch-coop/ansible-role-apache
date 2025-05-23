@@ -28,6 +28,8 @@
       ansible.builtin.debug:
         var: apache_mods_available
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Check that all mods to be enabled are available
       ansible.builtin.assert:
@@ -52,7 +54,9 @@
     - name: Debug the conf available
       ansible.builtin.debug:
         var: apache_conf_available
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Check that all conf to be enabled is available
       ansible.builtin.assert:
@@ -76,7 +80,9 @@
     - name: Debug the sites available
       ansible.builtin.debug:
         var: apache_sites_available
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Check that all sites to be enabled are available
       ansible.builtin.assert:

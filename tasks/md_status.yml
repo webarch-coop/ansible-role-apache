@@ -26,6 +26,8 @@
         var: apache_mdomain_status.json
         verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
       when: apache_mdomain_status.json is defined
+      tags:
+        - debug
 
   rescue:
 

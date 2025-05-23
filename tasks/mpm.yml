@@ -14,7 +14,9 @@
     - name: Debug Apache modules enabled
       ansible.builtin.debug:
         var: ansible_facts.ansible_local.a2query.modules_enabled
-        verbosity: 1
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     # The Ansible module does not to work here so use command
     # - name: "Disable Apache module {{ apache_phpfpm_mod }}"

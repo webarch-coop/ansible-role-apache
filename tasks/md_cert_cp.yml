@@ -54,11 +54,15 @@
           ansible.builtin.debug:
             var: apache_md_cert_cp_pubcert_info
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+          tags:
+            - debug
 
         - name: "Debug the commonName for the OpenSSL X.509 certificate at {{ apache_md_cert_cp.privkey.src }}"
           ansible.builtin.debug:
             var: apache_md_cert_cp_pubcert_info.subject.commonName
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+          tags:
+            - debug
 
         - name: "Ensure that the OpenSSL X.509 certificate is valid and the check didn't fail for {{ apache_md_cert_cp.privkey.src }}"
           ansible.builtin.assert:

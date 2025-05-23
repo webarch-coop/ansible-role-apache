@@ -46,6 +46,8 @@
           ansible.builtin.debug:
             var: apache_md_version
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+          tags:
+            - debug
 
       when: apache_md_version == "latest"
 

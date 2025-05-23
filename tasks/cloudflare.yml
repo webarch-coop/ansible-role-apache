@@ -32,7 +32,9 @@
     - name: Debug Cloudflare IP array
       ansible.builtin.debug:
         msg: "apache_cloudflare_ips: {{ apache_cloudflare_ips }}"
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Apache Cloudflare config generated
       ansible.builtin.template:
