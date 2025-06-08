@@ -97,6 +97,7 @@ apache_mods_enabled:
   - reqtimeout
   - remoteip
   - rewrite
+  - security2
   - setenvif
   - socache_shmcb
   - ssl

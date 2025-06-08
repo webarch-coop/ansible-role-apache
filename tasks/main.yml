@@ -118,6 +118,12 @@
       tags:
         - apache_install
 
+    - name: Include mod_security2 tasks
+      ansible.builtin.include_tasks: security2.yml
+      when: ( "security2" in apache_mods_enabled )
+      tags:
+        - apache_install
+
     - name: Apache config available
       ansible.builtin.include_tasks: config.yml
 

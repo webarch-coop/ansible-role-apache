@@ -69,7 +69,7 @@
     #   check_mode: false
     #   changed_when: ( "not changed" not in apache_gpg_import.stderr )
 
-    - name: Source code present
+    - name: Apache mod_md source code present
       ansible.builtin.git:
         repo: https://github.com/icing/mod_md.git
         dest: /usr/local/src/mod_md
