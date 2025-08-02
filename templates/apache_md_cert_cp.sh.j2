@@ -132,38 +132,55 @@ if [[ ! -d "${pubcert_dest_dir}" ]]; then
   exit 1
 fi
 
-# Get the date the src cert was created in UNIX time
-src_created=$(jc -q -m --x509-cert < "${pubcert_src}" | jq -r . | jp -c -u '[].tbs_certificate.validity.not_before | [0]')
-# Get the date the dest cert was created in UNIX time
-dest_created=$(jc -q -m --x509-cert < "${pubcert_dest}" | jq -r . | jp -c -u '[].tbs_certificate.validity.not_before | [0]')
-# Check that the src cert created date is a positive number
-if [[ "${src_created}" == +([0-9]) ]]; then
-  # Check that the dest cert created date is a positive number
-  if [[ "${dest_created}" == +([0-9]) ]]; then
-    # Check if the dest cert created date is older that the src cert created date
-    if (( src_created > dest_created )); then
-      # Copy the pubcert_src to the pubcert_dest
-      cp --remove-destination -a "${pubcert_src}" "${pubcert_dest}"
-      # Chown the pubcert_dest
-      chown ${pubcert_owner}:${pubcert_group} "${pubcert_dest}"
-      # Chmod the pubcert_dest
-      chmod ${pubcert_mode} "${pubcert_dest}"
-      # Copy the privkey_src to the privkey_dest
-      cp --remove-destination -a "${privkey_src}" "${privkey_dest}"
-      # Chown the privkey_dest
-      chown ${privkey_owner}:${privkey_group} "${privcert_dest}"
-      # Chmod the privkey_dest
-      chmod ${privkey_mode} "${privkey_dest}"
+# If the public key destination exists check dates and conditionally update the key and cert
+if [[ -d "${pubcert_dest}" ]]; then
+  # Get the date the dest cert was created in UNIX time
+  dest_created=$(jc -q -m --x509-cert < "${pubcert_dest}" | jq -r . | jp -c -u '[].tbs_certificate.validity.not_before | [0]')
+  # Get the date the src cert was created in UNIX time
+  src_created=$(jc -q -m --x509-cert < "${pubcert_src}" | jq -r . | jp -c -u '[].tbs_certificate.validity.not_before | [0]')
+  # Check that the src cert created date is a positive number
+  if [[ "${src_created}" == +([0-9]) ]]; then
+    # Check that the dest cert created date is a positive number
+    if [[ "${dest_created}" == +([0-9]) ]]; then
+      # Check if the dest cert created date is older that the src cert created date
+      if (( src_created > dest_created )); then
+        # Copy the pubcert_src to the pubcert_dest
+        cp --remove-destination -a "${pubcert_src}" "${pubcert_dest}"
+        # Chown the pubcert_dest
+        chown ${pubcert_owner}:${pubcert_group} "${pubcert_dest}"
+        # Chmod the pubcert_dest
+        chmod ${pubcert_mode} "${pubcert_dest}"
+        # Copy the privkey_src to the privkey_dest
+        cp --remove-destination -a "${privkey_src}" "${privkey_dest}"
+        # Chown the privkey_dest
+        chown ${privkey_owner}:${privkey_group} "${privcert_dest}"
+        # Chmod the privkey_dest
+        chmod ${privkey_mode} "${privkey_dest}"
+      fi
+    else
+      echo "Error the dest cert created date should be a positive number"
+      echo "${dest_created}"
+      exit 1
     fi
   else
-    echo "Error the dest cert created date should be a positive number"
-    echo "${dest_created}"
+    echo "Error the src cert created date should be a positive number"
+    echo "${src_created}"
     exit 1
   fi
+# If the public key destination doesn't exist copy the key and cert
 else
-  echo "Error the src cert created date should be a positive number"
-  echo "${src_created}"
-  exit 1
+  # Copy the pubcert_src to the pubcert_dest
+  cp -a "${pubcert_src}" "${pubcert_dest}"
+  # Chown the pubcert_dest
+  chown ${pubcert_owner}:${pubcert_group} "${pubcert_dest}"
+  # Chmod the pubcert_dest
+  chmod ${pubcert_mode} "${pubcert_dest}"
+  # Copy the privkey_src to the privkey_dest
+  cp -a "${privkey_src}" "${privkey_dest}"
+  # Chown the privkey_dest
+  chown ${privkey_owner}:${privkey_group} "${privcert_dest}"
+  # Chmod the privkey_dest
+  chmod ${privkey_mode} "${privkey_dest}"
 fi
 
 {% if apache_md_cert_cp.restart | bool %}
