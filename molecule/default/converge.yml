@@ -66,6 +66,7 @@
           - reqtimeout
           - remoteip
           - rewrite
+          - security2
           - setenvif
           - socache_shmcb
           - status
