@@ -153,7 +153,7 @@ if [[ -d "${pubcert_dest}" ]]; then
         # Copy the privkey_src to the privkey_dest
         cp --remove-destination -a "${privkey_src}" "${privkey_dest}"
         # Chown the privkey_dest
-        chown ${privkey_owner}:${privkey_group} "${privcert_dest}"
+        chown ${privkey_owner}:${privkey_group} "${privkey_dest}"
         # Chmod the privkey_dest
         chmod ${privkey_mode} "${privkey_dest}"
       fi
@@ -178,7 +178,7 @@ else
   # Copy the privkey_src to the privkey_dest
   cp -a "${privkey_src}" "${privkey_dest}"
   # Chown the privkey_dest
-  chown ${privkey_owner}:${privkey_group} "${privcert_dest}"
+  chown ${privkey_owner}:${privkey_group} "${privkey_dest}"
   # Chmod the privkey_dest
   chmod ${privkey_mode} "${privkey_dest}"
 fi
