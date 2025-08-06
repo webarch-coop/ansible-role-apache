@@ -33,7 +33,7 @@
         - ( "apache2-suexec-pristine" in ansible_facts.ansible_local.dpkg.installed )
       notify: Restart Apache
 
-    - name: "Apache package absent {{ apache_phpfpm_mod }}"
+    - name: Apache package absent
       ansible.builtin.apt:
         pkg:
           - "{{ apache_mod_php_pkg }}"
