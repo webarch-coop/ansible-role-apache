@@ -97,7 +97,7 @@
 
     - name: Apache localhost site available
       ansible.builtin.template:
-        src: "templates/localhost.conf.j2"
+        src: "localhost.conf.j2"
         dest: "/etc/apache2/sites-available/localhost.conf"
         owner: root
         group: root
@@ -139,7 +139,7 @@
 
     - name: Expires and robots conf available
       ansible.builtin.template:
-        src: "templates/{{ file }}.j2"
+        src: "{{ file }}.j2"
         dest: "/etc/apache2/conf-available/{{ file }}"
         owner: root
         group: root
@@ -159,7 +159,7 @@
 
     - name: Apache mpm_prefork.conf in place
       ansible.builtin.template:
-        src: templates/mpm_prefork.conf.j2
+        src: mpm_prefork.conf.j2
         dest: /etc/apache2/mods-available/mpm_prefork.conf
         owner: root
         group: root
@@ -170,7 +170,7 @@
 
     - name: Apache ratelimit conf present
       ansible.builtin.template:
-        src: templates/ratelimit.conf.j2
+        src: ratelimit.conf.j2
         dest: /etc/apache2/mods-available/ratelimit.conf
         owner: root
         group: root

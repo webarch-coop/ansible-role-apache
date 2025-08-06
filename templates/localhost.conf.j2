@@ -25,7 +25,7 @@
 {%         endif %}
   </IfModule>
 {%     endif %}
-{%     if apache_php and "proxy_fcgi" in apache_mods_enabled %}
+{%     if apache_php | bool and apache_php_version is defined and "proxy_fcgi" in apache_mods_enabled %}
   <Location /status>
     SetHandler "proxy:unix:/run/php/php{{ apache_php_version }}-fpm.sock|fcgi://localhost/"
     Require local
@@ -39,7 +39,7 @@
     AllowOverride AuthConfig Indexes FileInfo Limit
     Require local
 {% if apache_mods_enabled is defined %}
-{%     if apache_php and apache_phpfpm_mod is defined and apache_phpfpm_mod in apache_mods_enabled %}
+{%     if apache_php | bool and apache_phpfpm_mod is defined and apache_phpfpm_mod in apache_mods_enabled %}
     <IfModule php7_module>
       php_admin_value doc_root /var/www/localhost
       php_admin_value open_basedir /var/www/localhost/:/tmp/:/usr/share/php/
@@ -48,7 +48,7 @@
       </FilesMatch>
     </IfModule>
 {%     endif %}
-{%     if apache_php and "proxy_fcgi" in apache_mods_enabled %}
+{%     if apache_php | bool and apache_php_version is defined and "proxy_fcgi" in apache_mods_enabled %}
     # https://wiki.apache.org/httpd/PHP-FPM#Proxy_via_handler
     <IfModule proxy_fcgi_module>
       <IfModule setenvif_module>
