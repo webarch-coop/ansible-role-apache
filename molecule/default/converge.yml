@@ -82,5 +82,5 @@
     - name: Include role verify argument spec tasks
       ansible.builtin.include_role:
         name: "{{ lookup('ansible.builtin.env', 'CI_PROJECT_NAME') }}"
-        tasks_from: varify.yml
+        tasks_from: verify.yml
 ...
