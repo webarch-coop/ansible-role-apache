@@ -18,6 +18,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal dictionary for the results of copying the a2query local facts script into place.
+      apache_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the argument spec.
       apache_cert:
         type: dict
         required: false
@@ -25,7 +29,20 @@ argument_specs:
       apache_chroot_dir_path:
         type: dict
         required: false
-        description: Internal veriable for the stat results from statting apache_chroot_dir.
+        description: Internal variable for the stat results from statting apache_chroot_dir.
+      apache_cloudflare_ips:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of Cloudflare IP addresses.
+      apache_cloudflare_ips_v4_b64encoded:
+        type: dict
+        required: false
+        description: Internal dictionary for the result of slurping the Cloudflare IPv4 file.
+      apache_combined_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the combined argument spec.
       apache_conf_available_paths:
         type: dict
         required: false
@@ -47,6 +64,10 @@ argument_specs:
         type: str
         required: false
         description: Internal variable for the init system.
+      apache_internal_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the internal argument spec.
       apache_mods_available_paths:
         type: dict
         required: false
