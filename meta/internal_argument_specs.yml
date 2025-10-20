@@ -1,0 +1,137 @@
+# Copyright 2018-2025 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+argument_specs:
+  main:
+    author: Chris Croome
+    description: An Ansible role for installing and configuring the Apache HTTP server.
+    short_description: The main entry point for the Apache role.
+    options:
+      apache_a2query_facts:
+        type: dict
+        required: false
+        description: Internal dictionary for the results of copying the a2query local facts script into place.
+      apache_cert:
+        type: dict
+        required: false
+        description: Internal result of stating certificate path.
+      apache_chroot_dir_path:
+        type: dict
+        required: false
+        description: Internal veriable for the stat results from statting apache_chroot_dir.
+      apache_conf_available_paths:
+        type: dict
+        required: false
+        description: Internal variable for the results of finding .conf files in /etc/apache2/conf-available.
+      apache_conf_available:
+        type: list
+        elements: str
+        required: false
+        description: Internal variable for the Apache conf available.
+      apache_conf_path:
+        type: dict
+        required: false
+        description: Internal result of stating a conf available path.
+      apache_configtest:
+        type: dict
+        required: false
+        description: Internal result from running apache2ctl configtest.
+      apache_init:
+        type: str
+        required: false
+        description: Internal variable for the init system.
+      apache_mods_available_paths:
+        type: dict
+        required: false
+        description: Internal variable for the results of finding .conf files in /etc/apache2/mods-available.
+      apache_mods_available:
+        type: list
+        elements: str
+        required: false
+        description: Internal variable for the Apache mods available.
+      apache_mod_path:
+        type: dict
+        required: false
+        description: Internal result from stating mods-available .load file.
+      apache_mpm_event_enabled:
+        type: dict
+        required: false
+        description: Internal result from enabling the mpm_event module.
+      apache_mpm_prefork_enabled:
+        type: dict
+        required: false
+        description: Internal result from enabling the mpm_prefork module.
+      apache_php:
+        type: bool
+        required: false
+        description: Internal boolean to indicate if PHP is installed or not.
+      apache_php_update_alt_q:
+        type: dict
+        required: false
+        description: Internal JSON version of the result of running update-alternatives --query php.
+      apache_php_update_alt_q_value_path:
+        type: dict
+        required: false
+        description: Internal result from stating the PHP alternatives value path.
+      apache_php_version:
+        type: str
+        required: false
+        description: Internal variable for the PHP default version.
+      apache_php_versions:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of PHP versions installed.
+      apache_phpfpm_conf:
+        type: str
+        required: false
+        description: Internal variable for the PHP-FPM module name.
+      apache_phpfpm_mod:
+        type: str
+        required: false
+        description: Internal variable for the mod-php module name.
+      apache_phpquery_versions:
+        type: str
+        required: false
+        description: Internal variable for the PHP version.
+      apache_ps:
+        type: dict
+        required: false
+        description: Internal dictionary for the result from running ps to check init system.
+      apache_sites_available_paths:
+        type: dict
+        required: false
+        description: Internal variable for the results of finding .conf files in /etc/apache2/sites-available.
+      apache_sites_available:
+        type: list
+        elements: str
+        required: false
+        description: Internal variable for the Apache sites available.
+      apache_site_path:
+        type: dict
+        required: false
+        description: Internal result from stating a sites-available conf file.
+      apache_tls1_3:
+        type: bool
+        required: false
+        description: Internal boolean to indicate that Apache is a version greater than or equal to version 2.4.41.
+      apache_update_alternatives_query_php:
+        type: dict
+        required: false
+        description: Internal result from running update-alternatives --query php.
+      apache_version:
+        type: str
+        required: false
+        description: Internal variable for the Apache version.
+      apache_which_phpquery:
+        type: dict
+        required: false
+        description: Internal result from running which phpquery.
+...

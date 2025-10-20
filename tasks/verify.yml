@@ -25,11 +25,19 @@
       tags:
         - debug
 
-    - name: Check apache_ variables using meta/argument_specs.yml
-      ansible.builtin.validate_argument_spec:
-        argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
-        provided_arguments: "{{ apachehostvars }}"
+    - name: Set a fact for the argument spec and internal argument spec
+      ansible.builtin.set_fact:
+        apache_argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml) }}"
+        apache_internal_argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/internal_argument_specs.yml') | from_yaml) }}"
 
+    - name: Set a fact for the combined argument spec and internal argument spec
+      ansible.builtin.set_fact:
+        apache_combined_argument_spec: "{{ apache_argument_spec | ansible.builtin.combine(apache_internal_argument_spec, recursive=true) }}"
+
+    - name: Check apache_ variables using the combined argument spec
+      ansible.builtin.validate_argument_spec:
+        argument_spec: "{{ apache_combined_argument_spec['argument_specs']['main']['options'] }}"
+        provided_arguments: "{{ apachehostvars }}"
 
   when: apache_verify | bool
   tags:

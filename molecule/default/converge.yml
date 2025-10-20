@@ -30,7 +30,7 @@
       ansible.builtin.debug:
         var: ansible_facts.user_dir
 
-    - name: Include role as root
+    - name: Include role
       ansible.builtin.include_role:
         name: "{{ lookup('ansible.builtin.env', 'CI_PROJECT_NAME') }}"
       vars:  # noqa var-naming[no-role-prefix]
@@ -78,4 +78,9 @@
           - other-vhosts-access-log
           - security
           - version-control
+
+    - name: Include role verify argument spec tasks
+      ansible.builtin.include_role:
+        name: "{{ lookup('ansible.builtin.env', 'CI_PROJECT_NAME') }}"
+        tasks_from: varify.yml
 ...
