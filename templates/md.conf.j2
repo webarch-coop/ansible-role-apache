@@ -14,10 +14,16 @@
     Protocols http/1.1 acme-tls/1
   </IfModule>
   ProtocolsHonorOrder On
-  MDStapling on
-  MDStapleOthers on
-  MDCheckInterval 1h
-  MDStaplingRenewWindow 6h
+  # Stapling requires mod_watchdog, libcurl and libjansson
+  # https://github.com/icing/mod_md?tab=readme-ov-file#how-to-know-which-stapling-you-want
+  # But enabling it doesn't seem to work...
+  MDStapling off
+  MDStapleOthers off
+  # MDCheckInterval 1h
+  # MDStaplingRenewWindow 6h
+  # <IfModule ssl_module>
+  #   SSLUseStapling on
+  # </IfModule>
   MDPrivateKeys {{ apache_md_private_keys | join(' ') }}
   MDRenewWindow {{ apache_md_renew_window }}
 </IfModule>
