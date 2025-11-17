@@ -88,11 +88,11 @@
 	SSLCompression          off
 	SSLSessionTickets       off
 
-	# OCSP Stapling, only in httpd 2.3.3 and later
-	SSLUseStapling          on
-	SSLStaplingResponderTimeout 5
-	SSLStaplingReturnResponderErrors off
-	SSLStaplingCache        shmcb:/var/run/ocsp(128000)
+	# OCSP stapling is not supported by Let's Encrypt
+	SSLUseStapling          off
+	# SSLStaplingResponderTimeout 5
+	# SSLStaplingReturnResponderErrors off
+	# SSLStaplingCache        shmcb:/var/run/ocsp(128000)
 
 	# https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslopensslconfcmd
 	SSLOpenSSLConfCmd DHParameters {{ apache_dhparam_path }}

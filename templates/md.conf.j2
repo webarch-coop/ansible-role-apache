@@ -14,9 +14,7 @@
     Protocols http/1.1 acme-tls/1
   </IfModule>
   ProtocolsHonorOrder On
-  # Stapling requires mod_watchdog, libcurl and libjansson
-  # https://github.com/icing/mod_md?tab=readme-ov-file#how-to-know-which-stapling-you-want
-  # But enabling it doesn't seem to work...
+  # Let's Encrypt doesn't support stapling
   MDStapling off
   MDStapleOthers off
   # MDCheckInterval 1h
