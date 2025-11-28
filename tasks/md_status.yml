@@ -11,15 +11,30 @@
 - name: Check the status of a mod_md cert
   block:
 
-    - name: "Query the status for {{ apache_mdomain }}"
-      ansible.builtin.uri:
-        url: "https://{{ apache_mdomain }}/.httpd/certificate-status"
-        return_content: true
-        status_code:
-          - 200
-          - 404
-      check_mode: false
-      register: apache_mdomain_status
+    - name: Check the MD status in a block to fall back to port 80 when 443 fails
+      block:
+
+        - name: "Query the status using HTTPS for {{ apache_mdomain }}"
+          ansible.builtin.uri:
+            url: "https://{{ apache_mdomain }}/.httpd/certificate-status"
+            return_content: true
+            status_code:
+              - 200
+              - 404
+          check_mode: false
+          register: apache_mdomain_status
+
+      rescue:
+
+        - name: "Query the status using HTTP for {{ apache_mdomain }}"
+          ansible.builtin.uri:
+            url: "http://{{ apache_mdomain }}/.httpd/certificate-status"
+            return_content: true
+            status_code:
+              - 200
+              - 404
+          check_mode: false
+          register: apache_mdomain_status
 
     - name: "Debug the mdomain status for {{ apache_mdomain }}"
       ansible.builtin.debug:

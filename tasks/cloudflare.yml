@@ -13,8 +13,8 @@
 
     - name: Download Cloudflare IPv4 list
       ansible.builtin.get_url:
-        url: "https://www.cloudflare.com/ips-v4"
-        dest: "/root/cloudflare_ips_v4.txt"
+        url: https://www.cloudflare.com/ips-v4
+        dest: /root/cloudflare_ips_v4.txt
         owner: root
         group: root
         mode: "0644"
@@ -22,8 +22,8 @@
 
     - name: Slurp Cloudflare IPv4 list
       ansible.builtin.slurp:
-        src: "/root/cloudflare_ips_v4.txt"
-      register: "apache_cloudflare_ips_v4_b64encoded"
+        src: /root/cloudflare_ips_v4.txt
+      register: apache_cloudflare_ips_v4_b64encoded
 
     - name: Create an array from the Cloudflare IP lists
       ansible.builtin.set_fact:
