@@ -131,6 +131,7 @@ ErrorDocument 506 /wsh/506.shtml
 <VirtualHost *:80>
   ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
+  StrictHostCheck on
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data
   </IfModule>
@@ -183,6 +184,7 @@ ErrorDocument 506 /wsh/506.shtml
 <VirtualHost *:443>
   ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
+  StrictHostCheck on
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data
   </IfModule>
