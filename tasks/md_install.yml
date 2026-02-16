@@ -67,7 +67,7 @@
     #   ansible.builtin.command: gpg --import /root/github.asc
     #   register: apache_gpg_import
     #   check_mode: false
-    #   changed_when: ( "not changed" not in apache_gpg_import.stderr )
+    #   changed_when: ("not changed" not in apache_gpg_import.stderr)
 
     - name: Apache mod_md source code present
       ansible.builtin.git:

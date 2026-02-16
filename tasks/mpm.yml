@@ -60,7 +60,7 @@
 
   when:
     - ansible_facts.ansible_local.a2query.mpm == "prefork"
-    - ( "mpm_event" in apache_mods_enabled )
+    - ("mpm_event" in apache_mods_enabled)
   tags:
     - apache
 
@@ -92,7 +92,7 @@
 
   when:
     - ansible_facts.ansible_local.a2query.mpm == "event"
-    - ( "mpm_prefork" in apache_mods_enabled )
+    - ("mpm_prefork" in apache_mods_enabled)
   tags:
     - apache
 

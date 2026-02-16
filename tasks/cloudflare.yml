@@ -27,7 +27,7 @@
 
     - name: Create an array from the Cloudflare IP lists
       ansible.builtin.set_fact:
-        apache_cloudflare_ips: "{{ ( apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | trim ).split('\n') }}"
+        apache_cloudflare_ips: "{{ (apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | trim).split('\n') }}"
 
     - name: Debug Cloudflare IP array
       ansible.builtin.debug:

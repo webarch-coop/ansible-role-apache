@@ -44,7 +44,7 @@
     - name: The apache2 package is required to be installed for the tasks in this role to run
       ansible.builtin.assert:
         that:
-          - ( "apache2" in ansible_facts.packages.keys() )
+          - ("apache2" in ansible_facts.packages.keys())
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
         fail_msg: >-
           Please run this role with the apache_install tag to just install apache2, once apache2 is installed
@@ -80,7 +80,7 @@
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
         fail_msg: "The apache_version variable should be a semvar >= 2.4.48 when mod_md is enabled but it is {{ apache_version }}"
       when:
-        - ( "md" in apache_mods_enabled )
+        - ("md" in apache_mods_enabled)
         - apache_md_version is defined
         - apache_md_version != "default"
 
@@ -88,13 +88,13 @@
     - name: When mod_md is enabled mod_ssl is required
       ansible.builtin.assert:
         that:
-          - ( "ssl" in apache_mods_enabled )
+          - ("ssl" in apache_mods_enabled)
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
         fail_msg: >-
           Apache module ssl is required when md is enabled, apache_mods_enabled is a list containing
           {{ apache_mods_enabled | join(', ') }}
       when:
-        - ( "md" in apache_mods_enabled )
+        - ("md" in apache_mods_enabled)
         - apache_md_version is defined
         - apache_md_version != "default"
 
@@ -297,26 +297,26 @@
     - name: Check that at least one module is in apache_mods_enabled and that either mpm_event or mpm_prefork is enabled
       ansible.builtin.assert:
         that:
-          - ( apache_mods_enabled is defined ) and ( apache_mods_enabled[0] is defined )
-          - ( "mpm_prefork" in apache_mods_enabled ) or ( "mpm_event" in apache_mods_enabled )
+          - (apache_mods_enabled is defined) and (apache_mods_enabled[0] is defined)
+          - ("mpm_prefork" in apache_mods_enabled) or ("mpm_event" in apache_mods_enabled)
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Checks when mpm_event enabled
       ansible.builtin.assert:
         that:
-          - ( "mpm_prefork" not in apache_mods_enabled )
-          - ( "mpm_event" not in apache_mods_disabled )
-          - ( "mpm_itk" not in apache_mods_disabled )
+          - ("mpm_prefork" not in apache_mods_enabled)
+          - ("mpm_event" not in apache_mods_disabled)
+          - ("mpm_itk" not in apache_mods_disabled)
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ( "mpm_event" in apache_mods_enabled )
+      when: ("mpm_event" in apache_mods_enabled)
 
     - name: Checks when mpm_prefork enabled
       ansible.builtin.assert:
         that:
-          - ( "mpm_event" not in apache_mods_enabled )
-          - ( "mpm_prefork" not in apache_mods_disabled )
+          - ("mpm_event" not in apache_mods_enabled)
+          - ("mpm_prefork" not in apache_mods_disabled)
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-      when: ( "mpm_prefork" in apache_mods_enabled )
+      when: ("mpm_prefork" in apache_mods_enabled)
 
     - name: Check that there are no duplicates in the mods arrays
       ansible.builtin.assert:
@@ -529,7 +529,7 @@
           tags:
             - debug
 
-      when: ( apache_php is defined ) and ( apache_php | bool )
+      when: (apache_php is defined) and (apache_php | bool)
 
     - name: Debug the enabled MPM
       ansible.builtin.debug:
@@ -543,7 +543,7 @@
         path: "/etc/ssl/le/{{ inventory_hostname }}.cert.pem"
       check_mode: false
       register: apache_cert
-      when: ( "md" not in apache_mods_enabled )
+      when: ("md" not in apache_mods_enabled)
 
     - name: Chroot checks
       block:

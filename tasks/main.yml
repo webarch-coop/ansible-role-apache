@@ -34,9 +34,9 @@
         name: apt
         tasks_from: local_facts.yml
       when: >-
-        ( ansible_facts.ansible_local.dpkg.arch is not defined ) or
-        ( ansible_facts.ansible_local.gpg.version is not defined ) or
-        ( ansible_facts.ansible_local.bash.path is not defined )
+        (ansible_facts.ansible_local.dpkg.arch is not defined) or
+        (ansible_facts.ansible_local.gpg.version is not defined) or
+        (ansible_facts.ansible_local.bash.path is not defined)
       tags:
         - apache_install
         - apache_local_facts
@@ -72,8 +72,8 @@
           notify: Restart Apache
 
       when: >-
-        ( ( apache_pkgs_absent is defined ) and ( apache_pkgs_absent != [] ) ) or
-        ( ( apache_pkgs_present is defined ) and ( apache_pkgs_present != [] ) )
+        ((apache_pkgs_absent is defined) and (apache_pkgs_absent != [])) or
+        ((apache_pkgs_present is defined) and (apache_pkgs_present != []))
       tags:
         - apache_install
         - apache_local_facts
@@ -114,13 +114,13 @@
 
     - name: Include mod_md tasks
       ansible.builtin.include_tasks: md.yml
-      when: ( "md" in apache_mods_enabled )
+      when: ("md" in apache_mods_enabled)
       tags:
         - apache_install
 
     - name: Include mod_security2 tasks
       ansible.builtin.include_tasks: security2.yml
-      when: ( "security2" in apache_mods_enabled )
+      when: ("security2" in apache_mods_enabled)
       tags:
         - apache_install
 
@@ -142,15 +142,15 @@
 
     - name: Apache modules disabled and enabled
       ansible.builtin.include_tasks: a2mod.yml
-      when: ( apache_mods_disabled is defined ) or ( apache_mods_enabled is defined )
+      when: (apache_mods_disabled is defined) or (apache_mods_enabled is defined)
 
     - name: Apache conf disabled and enabled
       ansible.builtin.include_tasks: a2conf.yml
-      when: ( apache_sites_disabled is defined ) or ( apache_conf_enabled is defined )
+      when: (apache_sites_disabled is defined) or (apache_conf_enabled is defined)
 
     - name: Apache sites disabled and enabled
       ansible.builtin.include_tasks: a2site.yml
-      when: ( apache_sites_disabled is defined ) or ( apache_sites_enabled is defined )
+      when: (apache_sites_disabled is defined) or (apache_sites_enabled is defined)
 
     - name: Apache enabled for systemd servers
       ansible.builtin.systemd:
@@ -176,7 +176,7 @@
     - name: Fail if Apache configtest is not OK
       ansible.builtin.fail:
         msg: "{{ apache_configtest.stdout_lines }}"
-      when: ( "Syntax OK" not in apache_configtest.stderr ) or ( apache_configtest.rc == 1 )
+      when: ("Syntax OK" not in apache_configtest.stderr) or (apache_configtest.rc == 1)
 
   when: apache | bool
   tags:

@@ -37,10 +37,10 @@
           There is an empty file at {{ apache_md_cert_cp.pubcert.src }}.
           {% endif %}
       when: >-
-        ( not apache_md_cert_cp_privkey_src.stat.exists | bool ) or
-        ( apache_md_cert_cp_privkey_src.stat.size == 0 ) or
-        ( not apache_md_cert_cp_pubcert_src.stat.exists | bool ) or
-        ( apache_md_cert_cp_pubcert_src.stat.size == 0 )
+        (not apache_md_cert_cp_privkey_src.stat.exists | bool) or
+        (apache_md_cert_cp_privkey_src.stat.size == 0) or
+        (not apache_md_cert_cp_pubcert_src.stat.exists | bool) or
+        (apache_md_cert_cp_pubcert_src.stat.size == 0)
 
     - name: Query OpenSSL X.509 certificate
       block:
@@ -132,7 +132,7 @@
             state: restarted
           when:
             - apache_md_cert_cp.restart | bool
-            - ( apache_md_cert_cp_privkey.changed | bool ) or ( apache_md_cert_cp_pubcert.changed | bool )
+            - (apache_md_cert_cp_privkey.changed | bool) or (apache_md_cert_cp_pubcert.changed | bool)
 
         - name: "Template Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
           ansible.builtin.template:

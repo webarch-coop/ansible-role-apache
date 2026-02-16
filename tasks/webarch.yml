@@ -29,7 +29,7 @@
       ansible.builtin.include_tasks: md_status.yml
       vars:
         apache_mdomain: "{{ inventory_hostname }}"
-      when: ( "md" in apache_mods_enabled )
+      when: ("md" in apache_mods_enabled)
 
     - name: WSH Apache config in place
       ansible.builtin.template:
