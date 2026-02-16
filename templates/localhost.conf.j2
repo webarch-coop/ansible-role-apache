@@ -2,7 +2,8 @@
 
 # localhost virtual host for server-status and other things for munin stats
 <VirtualHost 127.0.0.1:{{ apache_localhost_port | default('80') }}>
-  ServerName localhost
+  ServerName 127.0.0.1
+  ServerAlias localhost
   StrictHostCheck on
 {% if apache_mods_enabled is defined %}
 {%     if "suexec" in apache_mods_enabled %}

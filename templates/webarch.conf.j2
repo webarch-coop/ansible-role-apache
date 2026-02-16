@@ -129,9 +129,12 @@ ErrorDocument 506 /wsh/506.shtml
 
 # The default virtual host for port 80
 <VirtualHost *:80>
-  ServerName {{ inventory_hostname }}
+  ServerName {{ ansible_facts.default_ipv4.address }}
+  ServerAlias {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
-  StrictHostCheck on
+  <IfModule md_module>
+    StrictHostCheck on
+  </IfModule>
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data
   </IfModule>
@@ -182,7 +185,8 @@ ErrorDocument 506 /wsh/506.shtml
 # The default virtual host for port 443
 <IfModule ssl_module>
 <VirtualHost *:443>
-  ServerName {{ inventory_hostname }}
+  ServerName {{ ansible_facts.default_ipv4.address }}
+  ServerAlias {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
   StrictHostCheck on
   <IfModule suexec_module>
