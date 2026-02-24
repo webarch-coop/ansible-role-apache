@@ -107,9 +107,6 @@ ErrorDocument 403 /mc3/403.shtml
   ServerName {{ ansible_facts.default_ipv4.address }}
   ServerAlias {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
-  <IfModule md_module>
-    StrictHostCheck on
-  </IfModule>
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data
   </IfModule>
