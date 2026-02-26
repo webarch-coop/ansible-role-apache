@@ -43,9 +43,10 @@ then
   exit 1
 fi
 
-# Set an array for the Apache VirtualHost ServerName's
+# Set an array for the Apache VirtualHost ServerName's omitting the
+# default IPv4 address
 declare -a namevhosts
-readarray -t namevhosts < <(/usr/sbin/apache2ctl -S | grep -e '^         port 443 namevhost ' | awk '{ print $4 }' | sort)
+readarray -t namevhosts < <(/usr/sbin/apache2ctl -S | grep -e '^         port 443 namevhost ' | awk '{ print $4 }' | grep -v '{{ ansible_facts.default_ipv4.address }}' | sort)
 
 # Get the certificate-status renewal for each VirtualHost
 for namevhost in "${namevhosts[@]}"
