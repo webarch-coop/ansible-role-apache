@@ -38,6 +38,18 @@
         group: root
         mode: "0750"
 
+    - name: Stat the Apache reload script path
+      ansible.builtin.stat:
+        path: /usr/local/bin/apache_md_cert_reload.sh
+      register: apache_md_cert_reload_path
+
+    - name: Check the Apache reload script
+      ansible.builtin.command:
+        cmd: /usr/local/bin/apache_md_cert_reload.sh
+      check_mode: false
+      changed_when: false
+      when: apache_md_cert_reload_path.stat.exists | ansible.builtin.bool
+
     - name: Crontab for Apache reload script in place
       ansible.builtin.cron:
         name: "Apache mod_md certificate reload"
