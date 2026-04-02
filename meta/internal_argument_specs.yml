@@ -14,6 +14,17 @@ argument_specs:
     description: An Ansible role for installing and configuring the Apache HTTP server.
     short_description: The main entry point for the Apache role.
     options:
+      # TODO
+      # apache_md_cert_cp_privkey:
+      # apache_md_cert_cp_privkey_src:
+      # apache_md_cert_cp_pubcert:
+      # apache_md_cert_cp_pubcert_info:
+      # apache_md_cert_cp_pubcert_src:
+      # apache_md_cert_cp_script:
+      # apache_md_cert_cp_script_run:
+      # apache_md_latest_headers:
+      # apache_md_repo:
+      # apache_md_repo_path:
       apache_a2query_facts:
         type: dict
         required: false
@@ -68,6 +79,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal variable for the internal argument spec.
+      apache_md_cert_reload_path:
+        type: dict
+        required: false
+        description: Internal result of stating /usr/local/bin/apache_md_cert_reload.sh.
       apache_mods_available_paths:
         type: dict
         required: false
