@@ -178,6 +178,15 @@
         msg: "{{ apache_configtest.stdout_lines }}"
       when: ("Syntax OK" not in apache_configtest.stderr) or (apache_configtest.rc == 1)
 
+    - name: Verify variables that start with apache_
+      ansible.builtin.include_tasks: verify.yml
+      when:
+        - apache_verify is defined
+        - apache_verify | bool
+      tags:
+        - apache_install
+        - apache_local_facts
+
   when: apache | bool
   tags:
     - apache

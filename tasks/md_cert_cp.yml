@@ -148,7 +148,8 @@
           register: apache_md_cert_cp_script
 
         - name: "Run the Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
-          ansible.builtin.command: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
+          ansible.builtin.command:
+            cmd: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
           vars:
             apache_md_cert_cp_script_run_changed: "{{ apache_md_cert_cp.name }} restarted for new cert"
           when:

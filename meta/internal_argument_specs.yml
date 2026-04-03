@@ -14,17 +14,50 @@ argument_specs:
     description: An Ansible role for installing and configuring the Apache HTTP server.
     short_description: The main entry point for the Apache role.
     options:
-      # TODO
-      # apache_md_cert_cp_privkey:
-      # apache_md_cert_cp_privkey_src:
-      # apache_md_cert_cp_pubcert:
-      # apache_md_cert_cp_pubcert_info:
-      # apache_md_cert_cp_pubcert_src:
-      # apache_md_cert_cp_script:
-      # apache_md_cert_cp_script_run:
-      # apache_md_latest_headers:
-      # apache_md_repo:
-      # apache_md_repo_path:
+      apache_mdomain_status:
+        type: dict
+        required: false
+        description: results from running the ansible.builtin.uri module.
+      apache_md_cert_cp_privkey:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.copy module.
+      apache_md_cert_cp_privkey_src:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.stat module.
+      apache_md_cert_cp_pubcert:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.copy module.
+      apache_md_cert_cp_pubcert_info:
+        type: dict
+        required: false
+        description: Results from running the community.crypto.x509_certificate_info module.
+      apache_md_cert_cp_pubcert_src:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.stat module.
+      apache_md_cert_cp_script:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.stat module.
+      apache_md_cert_cp_script_run:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.command module.
+      apache_md_latest_headers:
+        type: dict
+        required: false
+        description: results from running the ansible.builtin.uri module.
+      apache_md_repo:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.git module.
+      apache_md_repo_path:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.stat module.
       apache_a2query_facts:
         type: dict
         required: false
