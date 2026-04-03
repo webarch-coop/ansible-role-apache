@@ -129,9 +129,9 @@ ErrorDocument 506 /wsh/506.shtml
 
 # The default virtual host for port 80
 <VirtualHost *:80>
-  ServerName {{ ansible_facts.default_ipv4.address }}
-  ServerAlias {{ inventory_hostname }}
+  ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
+  ServerAlias {{ ansible_facts.default_ipv4.address }}
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data
   </IfModule>
@@ -164,7 +164,7 @@ ErrorDocument 506 /wsh/506.shtml
 # https://github.com/icing/mod_md
 <IfModule md_module>
   <IfFile /etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem>
-    MDomain {{ inventory_hostname }}
+    MDomain {{ inventory_hostname }} www.{{ inventory_hostname }} manual
   </IfFile>
   <IfFile !/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.pem>
     <IfFile /etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
@@ -182,9 +182,9 @@ ErrorDocument 506 /wsh/506.shtml
 # The default virtual host for port 443
 <IfModule ssl_module>
 <VirtualHost *:443>
-  ServerName {{ ansible_facts.default_ipv4.address }}
-  ServerAlias {{ inventory_hostname }}
+  ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
+  ServerAlias {{ ansible_facts.default_ipv4.address }}
   StrictHostCheck on
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data
