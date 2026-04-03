@@ -13,9 +13,10 @@
 
     # When in a docker container apache_init.stdout is usually sh or bash
     - name: Check if system has been booted with systemd as init system
-      ansible.builtin.command: "ps -p 1 -o comm="
-      changed_when: false
+      ansible.builtin.command:
+        cmd: "ps -p 1 -o comm="
       check_mode: false
+      changed_when: false
       register: apache_ps
       failed_when: apache_ps.rc is not regex('^0|47$')
 
@@ -442,7 +443,8 @@
       when: ansible_facts.ansible_local.a2query.version is ansible.builtin.version('2.4.41', 'ge')
 
     - name: Check if phpquery is installed
-      ansible.builtin.command: which phpquery
+      ansible.builtin.command:
+        cmd: which phpquery
       check_mode: false
       changed_when: false
       register: apache_which_phpquery
@@ -456,8 +458,8 @@
       block:
 
         - name: Run phpquery to get the PHP versions
-          ansible.builtin.command: phpquery -V
-          args:
+          ansible.builtin.command:
+            cmd: phpquery -V
             strip_empty_ends: true
           check_mode: false
           changed_when: false
@@ -468,8 +470,8 @@
             apache_php_versions: "{{ apache_phpquery_versions.stdout_lines }}"
 
         - name: Run update-alternatives to find the default version of PHP
-          ansible.builtin.command: update-alternatives --query php
-          args:
+          ansible.builtin.command:
+            cmd: update-alternatives --query php
             strip_empty_ends: true
           check_mode: false
           changed_when: false

@@ -160,7 +160,8 @@
       notify: Restart Apache
 
     - name: Apache configtest
-      ansible.builtin.command: apache2ctl configtest
+      ansible.builtin.command:
+        cmd: apache2ctl configtest
       check_mode: false
       changed_when: false
       register: apache_configtest

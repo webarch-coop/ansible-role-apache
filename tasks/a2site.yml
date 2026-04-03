@@ -12,8 +12,8 @@
   block:
 
     - name: Apache sites disabled
-      ansible.builtin.command: "a2dissite {{ apache_site }}"
-      args:
+      ansible.builtin.command:
+        cmd: "a2dissite {{ apache_site }}"
         removes: "/etc/apache2/sites-enabled/{{ apache_site }}.conf"
       when:
         - apache_sites_disabled is defined
@@ -39,8 +39,8 @@
     #     label: "{{ apache_site }}"
 
     - name: Apache sites enabled
-      ansible.builtin.command: "a2ensite {{ apache_site }}"
-      args:
+      ansible.builtin.command:
+        cmd: "a2ensite {{ apache_site }}"
         creates: "/etc/apache2/sites-enabled/{{ apache_site }}.conf"
       when:
         - apache_sites_enabled is defined

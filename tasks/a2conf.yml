@@ -12,8 +12,8 @@
   block:
 
     - name: Apache conf disabled
-      ansible.builtin.command: "a2disconf {{ apache_conf }}"
-      args:
+      ansible.builtin.command:
+        cmd: "a2disconf {{ apache_conf }}"
         removes: "/etc/apache2/conf-enabled/{{ apache_conf }}.conf"
       when:
         - apache_conf_disabled is defined
@@ -39,8 +39,8 @@
         label: "{{ apache_conf }}"
 
     - name: Apache conf enabled
-      ansible.builtin.command: "a2enconf {{ apache_conf }}"
-      args:
+      ansible.builtin.command:
+        cmd: "a2enconf {{ apache_conf }}"
         creates: "/etc/apache2/conf-enabled/{{ apache_conf }}.conf"
       when:
         - apache_conf_enabled is defined
