@@ -413,7 +413,7 @@
       tags:
         - debug
 
-    - name: Check that no conf is enabled and disabled
+    - name: Check that no conf is enabled and disabled  # noqa: jinja[spacing]
       ansible.builtin.assert:
         that:
           - apache_conf_enabled | ansible.builtin.intersect(apache_conf_disabled) == []
@@ -442,7 +442,7 @@
       tags:
         - debug
 
-    - name: Check that no sites are enabled and disabled
+    - name: Check that no sites are enabled and disabled  # noqa: jinja[spacing]
       ansible.builtin.assert:
         that:
           - apache_sites_enabled | ansible.builtin.intersect(apache_sites_disabled) == []

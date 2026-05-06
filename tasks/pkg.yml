@@ -41,48 +41,42 @@
         - apache_install
         - apache_local_facts
 
-    - name: Include Apache apt tasks
-      ansible.builtin.include_tasks: apt.yml
+    - name: Packages present and absent
+      block:
 
-    - name: Include Apache package tasks
-      ansible.builtin.include_tasks: pkg.yml
+        - name: Apache packages absent
+          ansible.builtin.apt:
+            pkg: "{{ apache_pkgs_absent }}"
+            state: absent
+            update_cache: true
+            cache_valid_time: 60
+          when:
+            - apache_pkgs_absent is defined
+            - apache_pkgs_absent != []
+            - ansible_facts.ansible_local.dpkg.installed is defined
+            - apache_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
+          notify: Restart Apache
 
-    # - name: Packages present and absent
-    #   block:
+        - name: Apache packages present
+          ansible.builtin.apt:
+            pkg: "{{ apache_pkgs_present }}"
+            state: present
+            install_recommends: true
+            update_cache: true
+            cache_valid_time: 60
+          when:
+            - apache_pkgs_present is defined
+            - apache_pkgs_present != []
+            - ansible_facts.ansible_local.dpkg.installed is defined
+            - apache_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
+          notify: Restart Apache
 
-    #     - name: Apache packages absent
-    #       ansible.builtin.apt:
-    #         pkg: "{{ apache_pkgs_absent }}"
-    #         state: absent
-    #         update_cache: true
-    #         cache_valid_time: 60
-    #       when:
-    #         - apache_pkgs_absent is defined
-    #         - apache_pkgs_absent != []
-    #         - ansible_facts.ansible_local.dpkg.installed is defined
-    #         - apache_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
-    #       notify: Restart Apache
-
-    #     - name: Apache packages present
-    #       ansible.builtin.apt:
-    #         pkg: "{{ apache_pkgs_present }}"
-    #         state: present
-    #         install_recommends: true
-    #         update_cache: true
-    #         cache_valid_time: 60
-    #       when:
-    #         - apache_pkgs_present is defined
-    #         - apache_pkgs_present != []
-    #         - ansible_facts.ansible_local.dpkg.installed is defined
-    #         - apache_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
-    #       notify: Restart Apache
-
-    #   when: >-
-    #     ((apache_pkgs_absent is defined) and (apache_pkgs_absent != [])) or
-    #     ((apache_pkgs_present is defined) and (apache_pkgs_present != []))
-    #   tags:
-    #     - apache_install
-    #     - apache_local_facts
+      when: >-
+        ((apache_pkgs_absent is defined) and (apache_pkgs_absent != [])) or
+        ((apache_pkgs_present is defined) and (apache_pkgs_present != []))
+      tags:
+        - apache_install
+        - apache_local_facts
 
     - name: Include local facts tasks
       ansible.builtin.include_tasks: local_facts.yml

@@ -39,13 +39,59 @@ apache_dhparam_size: 2048
 apache_localhost_port: 80
 apache_ulimit: 65536
 apache_a2query: /usr/sbin/a2query
-apache_pkgs_absent: []
-apache_pkgs_present:
-  - apache2
-  - jo
-  - lynx
-  # - libapache2-mod-fcgid
-  # - libapache2-mod-geoip
+
+apache_pkgs:
+  - name: bookworm
+    pkgs_absent: []
+    pkgs_present:
+      - jo
+      - lynx
+      # - libapache2-mod-fcgid
+      # - libapache2-mod-geoip
+    pkgs_present_backports: []
+    pkgs_present_sury:
+      - apache2
+      - apache2-utils
+      # apache2-suexec-custom
+      - debsuryorg-archive-keyring
+      - libapache2-mod-md
+  - name: forky
+    pkgs_absent: []
+    pkgs_present:
+      - jo
+      - lynx
+      # - libapache2-mod-fcgid
+      # - libapache2-mod-geoip
+    pkgs_present_backports: []
+    pkgs_present_sury:
+      - apache2
+      - apache2-utils
+      # apache2-suexec-custom
+      - debsuryorg-archive-keyring
+      - libapache2-mod-md
+  - name: trixie
+    pkgs_absent: []
+    pkgs_present:
+      - jo
+      - lynx
+      # - libapache2-mod-fcgid
+      # - libapache2-mod-geoip
+    pkgs_present_backports: []
+    pkgs_present_sury:
+      - apache2
+      - apache2-utils
+      # apache2-suexec-custom
+      - debsuryorg-archive-keyring
+      - libapache2-mod-md
+
+# apache_pkgs_absent: []
+# apache_pkgs_present:
+#   - apache2
+#   - jo
+#   - lynx
+#   # - libapache2-mod-fcgid
+#   # - libapache2-mod-geoip
+
 apache_sites_enabled:
   - localhost
   - 000-default

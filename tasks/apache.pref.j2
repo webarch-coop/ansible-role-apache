@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+
+{% if ansible_facts.distribution_release == "bookworm" %}
+{%     for apache_pkg in apache_debian_bookworm_pkg %}
+Package: {{ apache_pkg }}
+Pin: origin packages.sury.org
+Pin-Priority: 500
+
+{%     endfor %}
+{% elif ansible_facts.distribution_release == "trixie" %}
+{%     for apache_pkg in apache_debian_trixie_pkg %}
+Package: {{ apache_pkg }}
+Pin: origin packages.sury.org
+Pin-Priority: 500
+
+{%     endfor %}
+{% endif %}
+# vim: ft=debsources{# vim: syntax=jinja2 #}
