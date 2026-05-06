@@ -43,18 +43,68 @@
         path: /usr/local/bin/apache_md_cert_reload.sh
       register: apache_md_cert_reload_path
 
-    - name: Check the Apache reload script
-      ansible.builtin.command:
-        cmd: /usr/local/bin/apache_md_cert_reload.sh
-      check_mode: false
-      changed_when: false
-      when: apache_md_cert_reload_path.stat.exists | ansible.builtin.bool
+    - name: Check loaded Apache modules
+      block:
 
-    - name: Crontab for Apache reload script in place
-      ansible.builtin.cron:
-        name: "Apache mod_md certificate reload"
-        special_time: daily
-        job: /usr/local/bin/apache_md_cert_reload.sh
+        - name: Register the loaded Apache modules
+          ansible.builtin.command:
+            cmd: a2query -m
+          check_mode: false
+          changed_when: false
+          register: apache_modules_check
+
+      rescue:
+
+        - name: No mods enabled
+          ansible.builtin.set_fact:
+            apache_modules_loaded: []
+          when: ("No module matches" in apache_modules_check.stderr)
+
+
+    - name: Set an array of loaded Apache modules
+      block:
+
+        - name: Debug the loaded modules
+          ansible.builtin.debug:
+            var: apache_modules_check.stdout_lines
+            verbosity: 3
+          tags:
+            - debug
+
+        - name: Set an array of the loaded modules
+          ansible.builtin.set_fact:
+            apache_modules_loaded: >-
+              {{- apache_modules_check.stdout_lines | map('ansible.builtin.regex_replace', '[ ].*$') | sort -}}
+
+      when:
+        - apache_modules_check.stdout is defined
+        - apache_modules_check.stderr | length == 0
+
+    - name: Debug loaded modules
+      ansible.builtin.debug:
+        var: apache_modules_loaded
+        verbosity: 3
+      tags:
+        - debug
+
+    - name: Apavche reload script checked and cron job in place
+      block:
+
+        - name: Check the Apache reload script
+          ansible.builtin.command:
+            cmd: /usr/local/bin/apache_md_cert_reload.sh
+          check_mode: false
+          changed_when: false
+
+        - name: Crontab for Apache reload script in place
+          ansible.builtin.cron:
+            name: "Apache mod_md certificate reload"
+            special_time: daily
+            job: /usr/local/bin/apache_md_cert_reload.sh
+
+      when:
+        - ("md" in apache_modules_loaded)
+        - apache_md_cert_reload_path.stat.exists | ansible.builtin.bool
 
   when: apache_md_version != "default"
   tags:

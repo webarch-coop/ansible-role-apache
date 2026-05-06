@@ -58,6 +58,15 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.stat module.
+      apache_modules_check:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.command module.
+      apache_modules_loaded:
+        type: list
+        elements: str
+        required: false
+        description: List of enabled Apache modules.
       apache_a2query_facts:
         type: dict
         required: false
