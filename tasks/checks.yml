@@ -301,6 +301,9 @@
           - (apache_mods_enabled is defined) and (apache_mods_enabled[0] is defined)
           - ("mpm_prefork" in apache_mods_enabled) or ("mpm_event" in apache_mods_enabled)
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          The apache_mods_enabled list should contain, at least, mpm_event or mpm_prefork, but it contains
+          {{ apache_mods_enabled | join(', ') }}."
 
     - name: Checks when mpm_event enabled
       ansible.builtin.assert:
@@ -309,6 +312,8 @@
           - ("mpm_event" not in apache_mods_disabled)
           - ("mpm_itk" not in apache_mods_disabled)
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          When mpm_event is enabled, mpm_prefork, mpm_event and mpm_itk should not be in apache_mods_disabled.
       when: ("mpm_event" in apache_mods_enabled)
 
     - name: Checks when mpm_prefork enabled
@@ -317,6 +322,8 @@
           - ("mpm_event" not in apache_mods_enabled)
           - ("mpm_prefork" not in apache_mods_disabled)
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          When mpm_prefork is enabled mpm_event and mpm_prefork shoudl not be in apache_mods_disabled.
       when: ("mpm_prefork" in apache_mods_enabled)
 
     - name: Check that there are no duplicates in the mods arrays
@@ -325,6 +332,13 @@
           - apache_mods_enabled | unique | count == apache_mods_enabled | count
           - apache_mods_disabled | unique | count == apache_mods_disabled | count
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          {% if apache_mods_enabled | unique | count != apache_mods_enabled | count %}
+          There shouldn't be duplicates in apache_mods_enabled.
+          {% endif %}
+          {% if apache_mods_disabled | unique | count != apache_mods_disabled | count %}
+          There shouldn't be duplicates in apache_mods_disabled.
+          {% endif %}
 
     - name: Check that there are no duplicates in the conf arrays
       ansible.builtin.assert:
@@ -332,6 +346,13 @@
           - apache_conf_enabled | unique | count == apache_conf_enabled | count
           - apache_conf_disabled | unique | count == apache_conf_disabled | count
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          {% if apache_conf_enabled | unique | count != apache_conf_enabled | count %}
+          There shouldn't be duplicates in apache_conf_enabled.
+          {% endif %}
+          {% if apache_conf_disabled | unique | count != apache_conf_disabled | count %}
+          There shouldn't be duplicates in apache_conf_disabled.
+          {% endif %}
 
     - name: Check that there are no duplicates in the sites arrays
       ansible.builtin.assert:
@@ -339,6 +360,13 @@
           - apache_sites_enabled | unique | count == apache_sites_enabled | count
           - apache_sites_disabled | unique | count == apache_sites_disabled | count
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          {% if apache_sites_enabled | unique | count != apache_sites_enabled | count %}
+          There shouldn't be duplicates in apache_sites_enabled.
+          {% endif %}
+          {% if apache_sites_disabled | unique | count != apache_sites_disabled | count %}
+          There shouldn't be duplicates in apache_sites_disabled.
+          {% endif %}
 
     - name: Debug apache_mods_enabled array
       ansible.builtin.debug:
@@ -361,6 +389,10 @@
         that:
           - apache_mods_enabled | ansible.builtin.intersect(apache_mods_disabled) == []
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          Apache mods can't be enabled and disabled at the same time, the module(s)
+          {{ apache_mods_enabled | ansible.builtin.intersect(apache_mods_disabled) | join(', ') }}
+          are in both lists.
       when:
         - apache_mods_enabled != []
         - apache_mods_disabled != []
@@ -381,11 +413,15 @@
       tags:
         - debug
 
-    - name: Check that no conf are enabled and disabled
+    - name: Check that no conf is enabled and disabled
       ansible.builtin.assert:
         that:
           - apache_conf_enabled | ansible.builtin.intersect(apache_conf_disabled) == []
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          Apache conf can't be enabled and disabled at the same time but the conf
+          {{ apache_conf_enabled | ansible.builtin.intersect(apache_conf_disabled) | join (', ') }}
+          is set to be enabled and disabled.
       when:
         - apache_conf_enabled != []
         - apache_conf_disabled != []
@@ -411,6 +447,10 @@
         that:
           - apache_sites_enabled | ansible.builtin.intersect(apache_sites_disabled) == []
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: >-
+          Apache sites can't be enabled and disabled at the same time but the sites
+          {{ apache_sites_enabled | ansible.builtin.intersect(apache_sites_disabled) | join (', ') }}
+          are set to be enabled and disabled.
       when:
         - apache_sites_enabled != []
         - apache_sites_disabled != []
@@ -561,6 +601,8 @@
               - apache_chroot_dir_path.stat.isdir is defined
               - apache_chroot_dir_path.stat.isdir | bool
             quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+            fail_msg: >-
+              The directory {{ apache_chroot_dir }} must exist before Apache can be chrooted into it.
 
       when: apache_chroot | bool
 
