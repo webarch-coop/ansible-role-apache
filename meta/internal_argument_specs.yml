@@ -14,6 +14,10 @@ argument_specs:
     description: An Ansible role for installing and configuring the Apache HTTP server.
     short_description: The main entry point for the Apache role.
     options:
+      apache_apt_key_path:
+        type: dict
+        required: false
+        description: results from running the ansible.builtin.stat module.
       apache_mdomain_status:
         type: dict
         required: false
@@ -179,6 +183,10 @@ argument_specs:
         type: str
         required: false
         description: Internal variable for the PHP version.
+      apache_preferences:
+        type: dict
+        required: false
+        description: results from running the ansible.builtin.template module.
       apache_ps:
         type: dict
         required: false
@@ -196,6 +204,18 @@ argument_specs:
         type: dict
         required: false
         description: Internal result from stating a sites-available conf file.
+      apache_sources:
+        type: dict
+        required: false
+        description: results from running the ansible.builtin.deb822_repository module.
+      apache_sources_check:
+        type: dict
+        required: false
+        description: results from running the ansible.builtin.deb822_repository module.
+      apache_sources_path:
+        type: dict
+        required: false
+        description: results from running the ansible.builtin.stat module.
       apache_tls1_3:
         type: bool
         required: false

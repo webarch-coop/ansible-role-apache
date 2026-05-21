@@ -18,6 +18,10 @@ argument_specs:
         type: bool
         required: true
         description: Run the tasks in this role.
+      apache_apt_backports:
+        type: str
+        required: true
+        description: String that will be present in the apt cache policy when backports are enabled.
       apache_a2query:
         type: str
         required: true
@@ -72,6 +76,35 @@ argument_specs:
         type: str
         required: true
         description: The group that the Apache process should run as.
+      apache_jpq:
+        type: dict
+        required: true
+        description: Dictionary of JMESPath queries.
+        options:
+          pkgs_absent:
+            type: str
+            required: true
+            description: JMESPath query for packages absent.
+          pkgs_absent_backports:
+            type: str
+            required: true
+            description: JMESPath query for backports packages absent.
+          pkgs_absent_sury:
+            type: str
+            required: true
+            description: JMESPath query for Sury packages absent.
+          pkgs_present:
+            type: str
+            required: true
+            description: JMESPath query for packages present.
+          pkgs_present_backports:
+            type: str
+            required: true
+            description: JMESPath query for backports packages present.
+          pkgs_present_sury:
+            type: str
+            required: true
+            description: JMESPath query for Sury packages present.
       apache_localhost_port:
         type: int
         required: true
@@ -230,16 +263,63 @@ argument_specs:
         type: str
         required: false
         description: Optional phpMyAdmin path for the webarch.conf template.
-      apache_pkgs_absent:
+      apache_pkg_bookworm:
         type: list
         elements: str
         required: false
-        description: A list of Apache packages that should be removed if present.
-      apache_pkgs_present:
+        description: Packages that should be present on Bookworm.
+      apache_pkg_forky:
         type: list
         elements: str
         required: false
-        description: A list of Apache packages that should be installed if abesnt.
+        description: Packages that should be present on Forky.
+      apache_pkg_noble:
+        type: list
+        elements: str
+        required: false
+        description: Packages that should be present on Noble.
+      apache_pkg_resolute:
+        type: list
+        elements: str
+        required: false
+        description: Packages that should be present on Resolute.
+      apache_pkg_trixie:
+        type: list
+        elements: str
+        required: false
+        description: Packages that should be present on trixie.
+      apache_pkgs:
+        type: list
+        elements: dict
+        required: true
+        description: A list of distros and deb packages that should be absent and present.
+        options:
+          name:
+            type: str
+            required: true
+            description: The Linux distro name.
+            choices:
+              - bookworm
+              - forky
+              - noble
+              - resolute
+              - trixie
+          pkgs_absent:
+            type: list
+            required: false
+            description: A list of deb packages that should be absent.
+          pkgs_present:
+            type: list
+            required: false
+            description: A list of deb packages that should be present.
+          pkgs_present_backports:
+            type: list
+            required: true
+            description: A list of deb packages that should be present from backports.
+          pkgs_present_sury:
+            type: list
+            required: true
+            description: A list of deb packages that should be present from the Sury repo.
       apache_server_admin:
         type: str
         required: true

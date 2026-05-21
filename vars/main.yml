@@ -17,11 +17,16 @@ apachehostvars: "{{ dict(apachevarnames | list | zip(q('vars', *apachevarnames))
 apache_github_gpg_url: https://github.com/web-flow.gpg
 apache_github_gpg_checksum: sha256:6e8af687f60cf3f403151c8fb1b26e95e6f9e424ca60cc8f3787bd4466a3ef84
 
+# Distro backports string
+apache_apt_backports: "{{ ansible_facts.distribution_release }}-backports"
+
 # JMESPath queries
 apache_jpq:
   pkgs_absent: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_absent|[0]"
+  pkgs_absent_backports: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_absent_backports|[0]"
   pkgs_absent_sury: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_absent_sury|[0]"
   pkgs_present: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_present|[0]"
+  pkgs_present_backports: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_present_backports|[0]"
   pkgs_present_sury: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_present_sury|[0]"
 
 # The following lists can be generated using the sury-packages.sh script in this directory.
@@ -29,8 +34,8 @@ apache_jpq:
 # For example delete the lines and run:
 # bash ./sury-packages.sh >> main.yml
 
-# Debian bookworm packages
-apache_debian_bookworm_pkg:
+# bookworm packages
+apache_pkg_bookworm:
   - apache2
   - apache2-bin
   - apache2-data
@@ -54,8 +59,28 @@ apache_debian_bookworm_pkg:
   - libbrotli1
   - python3-brotli
 
-# Debian trixie packages
-apache_debian_trixie_pkg:
+# noble packages
+apache_pkg_noble:
+  - apache2
+  - apache2-bin
+  - apache2-data
+  - apache2-doc
+  - apache2-suexec-custom
+  - apache2-suexec-pristine
+  - apache2-utils
+
+# resolute packages
+apache_pkg_resolute:
+  - apache2
+  - apache2-bin
+  - apache2-data
+  - apache2-doc
+  - apache2-suexec-custom
+  - apache2-suexec-pristine
+  - apache2-utils
+
+# trixie packages
+apache_pkg_trixie:
   - apache2
   - apache2-bin
   - apache2-data

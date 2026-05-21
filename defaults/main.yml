@@ -44,45 +44,73 @@ apache_pkgs:
   - name: bookworm
     pkgs_absent: []
     pkgs_present:
+      - apache2
+      # - apache2-suexec-custom
+      - apache2-utils
+      - debsuryorg-archive-keyring
       - jo
-      - lynx
       # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
-    pkgs_present_backports: []
-    pkgs_present_sury:
-      - apache2
-      - apache2-utils
-      # apache2-suexec-custom
-      - debsuryorg-archive-keyring
       - libapache2-mod-md
+      - lynx
+    pkgs_present_backports: []
+    pkgs_present_sury: []
   - name: forky
     pkgs_absent: []
     pkgs_present:
+      - apache2
+      # - apache2-suexec-custom
+      - apache2-utils
+      - debsuryorg-archive-keyring
       - jo
-      - lynx
       # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
-    pkgs_present_backports: []
-    pkgs_present_sury:
-      - apache2
-      - apache2-utils
-      # apache2-suexec-custom
-      - debsuryorg-archive-keyring
       - libapache2-mod-md
+      - lynx
+    pkgs_present_backports: []
+    pkgs_present_sury: []
+  - name: noble
+    pkgs_absent: []
+    pkgs_present:
+      - apache2
+      # - apache2-suexec-custom
+      - apache2-utils
+      - debsuryorg-archive-keyring
+      - jo
+      # - libapache2-mod-fcgid
+      # - libapache2-mod-geoip
+      - libapache2-mod-md
+      - lynx
+    pkgs_present_backports: []
+    pkgs_present_sury: []
+  - name: resolute
+    pkgs_absent: []
+    pkgs_present:
+      - apache2
+      # - apache2-suexec-custom
+      - apache2-utils
+      - debsuryorg-archive-keyring
+      - jo
+      # - libapache2-mod-fcgid
+      # - libapache2-mod-geoip
+      - libapache2-mod-md
+      - lynx
+    pkgs_present_backports: []
+    pkgs_present_sury: []
   - name: trixie
     pkgs_absent: []
     pkgs_present:
+      - apache2
+      # - apache2-suexec-custom
+      - apache2-utils
+      - debsuryorg-archive-keyring
       - jo
-      - lynx
       # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
-    pkgs_present_backports: []
-    pkgs_present_sury:
-      - apache2
-      - apache2-utils
-      # apache2-suexec-custom
-      - debsuryorg-archive-keyring
       - libapache2-mod-md
+      - lynx
+    pkgs_present_backports: []
+    pkgs_present_sury: []
 
 # apache_pkgs_absent: []
 # apache_pkgs_present:

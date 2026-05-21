@@ -1,14 +1,28 @@
 # {{ ansible_managed }}
 
 {% if ansible_facts.distribution_release == "bookworm" %}
-{%     for apache_pkg in apache_debian_bookworm_pkg %}
+{%     for apache_pkg in apache_pkg_bookworm %}
+Package: {{ apache_pkg }}
+Pin: origin packages.sury.org
+Pin-Priority: 500
+
+{%     endfor %}
+{% elif ansible_facts.distribution_release == "noble" %}
+{%     for apache_pkg in apache_pkg_noble %}
+Package: {{ apache_pkg }}
+Pin: origin packages.sury.org
+Pin-Priority: 500
+
+{%     endfor %}
+{% elif ansible_facts.distribution_release == "resolute" %}
+{%     for apache_pkg in apache_pkg_resolute %}
 Package: {{ apache_pkg }}
 Pin: origin packages.sury.org
 Pin-Priority: 500
 
 {%     endfor %}
 {% elif ansible_facts.distribution_release == "trixie" %}
-{%     for apache_pkg in apache_debian_trixie_pkg %}
+{%     for apache_pkg in apache_pkg_trixie %}
 Package: {{ apache_pkg }}
 Pin: origin packages.sury.org
 Pin-Priority: 500

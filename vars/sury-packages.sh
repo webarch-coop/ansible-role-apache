@@ -13,15 +13,15 @@
 
 set -euo pipefail
 
-# debian_distros=(bookworm trixie forky)
-debian_distros=(bookworm trixie)
+# distros=(bookworm trixie forky)
+distros=(bookworm noble resolute trixie)
 
-for distro in "${debian_distros[@]}"; do
+for distro in "${distros[@]}"; do
   # shellcheck disable=SC2016 disable=SC2086
   packages="$(wget -q https://packages.sury.org/apache2/dists/${distro}/main/binary-amd64/Packages.gz -O - | gunzip - | grep -e '^Package' | grep -ve '-dbgsym$' -e '-dbg$' -e '-dev$' | sed 's/^Package: /  - /' | sort )"
   echo ""
-  echo "# Debian ${distro} packages"
-  echo "apache_debian_${distro}_pkg:"
+  echo "# ${distro} packages"
+  echo "apache_pkg_${distro}:"
   echo "${packages}"
 done
 echo "..."
