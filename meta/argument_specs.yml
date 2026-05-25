@@ -64,6 +64,11 @@ argument_specs:
         type: str
         required: true
         description: The default DocumentRoot.
+      apache_empty_list:
+        type: list
+        elements: str
+        required: true
+        description: A variable for an empty list.
       apache_github_gpg_url:
         type: str
         required: true
@@ -349,6 +354,16 @@ argument_specs:
         type: bool
         required: false
         description: Install Apache suEXEC.
+      apache_sury_pkg_absent:
+        type: list
+        elements: str
+        required: true
+        description: A list of Sury repo packages that are to be absent.
+      apache_sury_pkg_present:
+        type: list
+        elements: str
+        required: true
+        description: A list of Sury repo packages that are to be present.
       apache_timeout:
         type: int
         required: true

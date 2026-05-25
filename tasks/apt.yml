@@ -14,34 +14,26 @@
     - name: Sury Apache apt repo is required for packages present
       ansible.builtin.debug:
         var: apache_sury_pkg_present
-      vars:
-        apache_sury_pkg_present: "{{ apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) }}"
-      when: >-
-        (apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) != []) or
-        (apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) is not none)
+      when: apache_sury_pkg_present != []
 
     - name: Sury Apache apt repo is required for packages absent
       ansible.builtin.debug:
         var: apache_sury_pkg_absent
-      vars:
-        apache_sury_pkg_absent: "{{ apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) }}"
-      when: >-
-        (apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) != []) or
-        (apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) is not none)
+      when: apache_sury_pkg_absent != []
 
     - name: Sury Apache apt repo is not required
       ansible.builtin.debug:
-        msg: No Apache apt packages are to be installed or removed
+        msg: No Sury Apache apt packages are to be installed or removed
       when:
-        - (apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) == []) or
-          (apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) is none)
-        - (apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) == []) or
-          (apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) is none)
+        - apache_sury_pkg_absent == []
+        - apache_sury_pkg_present == []
 
   tags:
     - apache
     - apache_apt
     - debug
+
+# TODO Remove Sury packages present when none are to be installed
 
 - name: Sury Apache apt repo present
   block:
@@ -204,9 +196,7 @@
 
       when: apache_apt_key_path.stat.exists | bool
 
-  when: >-
-    ((apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury)) != []) or
-    ((apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury)) != [])
+  when: (apache_sury_pkg_absent != []) or (apache_sury_pkg_present != [])
 
   tags:
     - apache
@@ -240,8 +230,8 @@
         - molecule-idempotence-notest
 
   when:
-    - (apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury)) == []
-    - (apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury)) == []
+    - apache_sury_pkg_absent == []
+    - apache_sury_pkg_present == []
   tags:
     - apache
     - apache_apt

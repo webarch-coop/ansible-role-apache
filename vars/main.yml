@@ -29,6 +29,21 @@ apache_jpq:
   pkgs_present_backports: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_present_backports|[0]"
   pkgs_present_sury: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_present_sury|[0]"
 
+# Apt packages
+apache_empty_list: []
+apache_sury_pkg_absent: >-
+  {%- if apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) is none -%}
+  {{- apache_empty_list -}}
+  {%- else -%}
+  {{- apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) -}}
+  {%- endif %}
+apache_sury_pkg_present: >-
+  {%- if apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) is none -%}
+  {{- apache_empty_list -}}
+  {%- else -%}
+  {{- apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) -}}
+  {%- endif %}
+
 # The following lists can be generated using the sury-packages.sh script in this directory.
 # To update them delete everything after this comment and inset the results of the script.
 # For example delete the lines and run:
