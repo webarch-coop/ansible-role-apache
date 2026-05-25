@@ -16,21 +16,27 @@
         var: apache_sury_pkg_present
       vars:
         apache_sury_pkg_present: "{{ apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) }}"
-      when: apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) != []
+      when: >-
+        (apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) != []) or
+        ((apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) is not none)
 
     - name: Sury Apache apt repo is required for packages absent
       ansible.builtin.debug:
         var: apache_sury_pkg_absent
       vars:
         apache_sury_pkg_absent: "{{ apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) }}"
-      when: apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) != []
+      when: >-
+        (apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) != []) or
+        ((apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) is not none)
 
     - name: Sury Apache apt repo is not required
       ansible.builtin.debug:
         msg: No Apache apt packages are to be installed or removed
       when:
-        - apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) == []
-        - apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) == []
+        - (apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) == []) or
+          (apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) is none)
+        - (apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) == []) or
+          (apache_pkgs | community.general.json_query(apache_jpq.pkgs_present_sury) is none)
 
   tags:
     - apache
