@@ -2,7 +2,7 @@
 
 # {{ ansible_managed }}
 
-# Copyright 2018-2023 Chris Croome
+# Copyright 2018-2026 Chris Croome
 #
 # This file is part of the Webarchitects Apache Ansible role.
 #
@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 
-set -euo pipefail
+set -uo pipefail
 IFS=$'\n'
 
 a2query_path="$(type -p a2query)"
@@ -20,17 +20,23 @@ jo_path="$(type -p jo)"
 gawk_path="$(type -p gawk)"
 sort_path="$(type -p sort)"
 
-if [[ -e "${jo_path}" ]]
+if [[ -e "${gawk_path}" && -e "${sort_path=}" ]]
 then
-  if [[ -f "${a2query_path}" ]]
+  if [[ -e "${jo_path}" ]]
   then
-    # shellcheck disable=SC2016,SC2046
-    "${jo_path}" state=present version=$("${a2query_path}" -v) mpm=$("${a2query_path}" -M) \
-       conf_enabled=$("${a2query_path}" -c | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a) \
-       modules_enabled=$("${a2query_path}" -m | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a) \
-       sites_enabled=$("${a2query_path}" -s | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a)
+    if [[ -f "${a2query_path}" ]]
+    then
+      # shellcheck disable=SC2016,SC2046
+      "${jo_path}" state=present version=$("${a2query_path}" -v) mpm=$("${a2query_path}" -M) \
+         conf_enabled=$("${a2query_path}" -c | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a) \
+         modules_enabled=$("${a2query_path}" -m | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a) \
+         sites_enabled=$("${a2query_path}" -s | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a)
+    else
+      jo 'state=absent'
+      exit 0
+    fi
   else
-    jo 'state=absent'
+    echo '{"state":"absent"}'
     exit 0
   fi
 else
