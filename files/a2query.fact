@@ -30,10 +30,12 @@ then
        modules_enabled=$("${a2query_path}" -m | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a) \
        sites_enabled=$("${a2query_path}" -s | "${gawk_path}" '{ print $1 }' | "${sort_path}" | "${jo_path}" -a)
   else
-    jo state=absent
+    jo 'state=absent'
+    exit 0
   fi
 else
   echo '{"state":"absent"}'
+  exit 0
 fi
 
 # vim: syntax=bash
