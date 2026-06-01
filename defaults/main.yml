@@ -112,14 +112,6 @@ apache_pkgs:
     pkgs_present_backports: []
     pkgs_present_sury: []
 
-# apache_pkgs_absent: []
-# apache_pkgs_present:
-#   - apache2
-#   - jo
-#   - lynx
-#   # - libapache2-mod-fcgid
-#   # - libapache2-mod-geoip
-
 apache_sites_enabled:
   - localhost
   - 000-default

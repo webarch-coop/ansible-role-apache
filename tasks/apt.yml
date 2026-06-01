@@ -8,25 +8,53 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Debug tasks required
+- name: Fact set for apt version
+  block:
+
+    - name: Get the apt package facts
+      ansible.builtin.package_facts:
+        manager: apt
+      when: ansible_facts.packages is not defined
+
+    - name: Set a fact for the apt package version
+      ansible.builtin.set_fact:
+        apache_apt_version: "{{ ansible_facts.packages.apt[0].version }}"
+
+    - name: Debug apache_apt_version
+      ansible.builtin.debug:
+        var: apache_apt_version
+      tags:
+        - debug
+
+    - name: Check that apache_apt_version is a semver >= 2.0.0
+      ansible.builtin.assert:
+        that:
+          - apache_apt_version is ansible.builtin.version('2.0.0', 'gt', version_type='semver')
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+
+  tags:
+    - apache
+    - apache_apt
+
+- name: Debug apt packages
   block:
 
     - name: Sury Apache apt repo is required for packages present
       ansible.builtin.debug:
-        var: apache_sury_pkg_present
-      when: apache_sury_pkg_present != []
+        var: apache_pkg_present_sury
+      when: apache_pkg_present_sury != []
 
     - name: Sury Apache apt repo is required for packages absent
       ansible.builtin.debug:
-        var: apache_sury_pkg_absent
-      when: apache_sury_pkg_absent != []
+        var: apache_pkg_absent_sury
+      when: apache_pkg_absent_sury != []
 
     - name: Sury Apache apt repo is not required
       ansible.builtin.debug:
         msg: No Sury Apache apt packages are to be installed or removed
       when:
-        - apache_sury_pkg_absent == []
-        - apache_sury_pkg_present == []
+        - apache_pkg_absent_sury == []
+        - apache_pkg_present_sury == []
 
   tags:
     - apache
@@ -56,7 +84,7 @@
     - name: The GPG key provided by the debsuryorg-archive-keyring.deb package is required
       ansible.builtin.assert:
         that:
-          - apache_apt_key_path.stat.exists | bool
+          - apache_apt_key_path.stat.exists | ansible.builtin.bool
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
         fail_msg: >-
           The GPG key provided by https://packages.sury.org/debsuryorg-archive-keyring.deb is required to configure the Sury PHP repo.
@@ -81,7 +109,7 @@
                 apache_sources_contents_prior: "{{ apache_sources_contents }}"
               when: apache_sources_contents is defined
 
-            - name: Check Apache repository sources file present
+            - name: Check Apache repository sources file present for apt < 3.1.0
               ansible.builtin.deb822_repository:
                 allow_downgrade_to_insecure: false
                 allow_insecure: false
@@ -100,11 +128,34 @@
               check_mode: true
               changed_when: false
               register: apache_sources_check
+              when: apache_apt_version is ansible.builtin.version('3.1.0', '<')
+
+            - name: Check Apache repository sources file present for apt >= 3.1.0
+              ansible.builtin.deb822_repository:
+                allow_downgrade_to_insecure: false
+                allow_insecure: false
+                allow_weak: false
+                architectures: "{{ ansible_facts.ansible_local.dpkg.arch }}"
+                check_date: true
+                check_valid_until: true
+                components: main
+                enabled: true
+                include: "{{ apache_pkg_present_sury }}"
+                name: apache
+                pdiffs: true
+                signed_by: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
+                suites: "{{ ansible_facts.distribution_release }}"
+                types: deb
+                uris: https://packages.sury.org/apache/
+              check_mode: true
+              changed_when: false
+              register: apache_sources_check
+              when: apache_apt_version is ansible.builtin.version('3.1.0', '>=')
 
             - name: Debug proposed apache_sources_check.repo
               ansible.builtin.debug:
                 var: apache_sources_check.repo
-                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+                verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
               tags:
                 - debug
 
@@ -121,9 +172,9 @@
                 apache_date_timestamp: "{{ ansible_facts.date_time.iso8601_basic_short }}"
               when: apache_sources_contents_prior != apache_sources_check.repo | string | community.general.jc('ini')
 
-          when: apache_sources_path.stat.exists | bool
+          when: apache_sources_path.stat.exists | ansible.builtin.bool
 
-        - name: Apache repository sources file present
+        - name: Apache repository sources file present for apt < 3.1.0
           ansible.builtin.deb822_repository:
             allow_downgrade_to_insecure: false
             allow_insecure: false
@@ -140,6 +191,27 @@
             types: deb
             uris: https://packages.sury.org/apache/
           register: apache_sources
+          when: apache_apt_version is ansible.builtin.version('3.1.0', '<')
+
+        - name: Apache repository sources file present for apt >= 3.1.0
+          ansible.builtin.deb822_repository:
+            allow_downgrade_to_insecure: false
+            allow_insecure: false
+            allow_weak: false
+            architectures: "{{ ansible_facts.ansible_local.dpkg.arch }}"
+            check_date: true
+            check_valid_until: true
+            components: main
+            enabled: true
+            include: "{{ apache_pkg_present_sury }}"
+            name: apache
+            pdiffs: true
+            signed_by: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
+            suites: "{{ ansible_facts.distribution_release }}"
+            types: deb
+            uris: https://packages.sury.org/apache/
+          register: apache_sources
+          when: apache_apt_version is ansible.builtin.version('3.1.0', '>=')
 
         - name: Print the changes in the Apache repository sources file  # noqa: no-handler
           block:
@@ -147,7 +219,7 @@
             - name: Debug updated apache_sources.repo
               ansible.builtin.debug:
                 var: apache_sources.repo
-                verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+                verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
               tags:
                 - debug
 
@@ -156,11 +228,11 @@
                 before: "{{ apache_sources_contents_prior | ansible.builtin.to_nice_yaml }}"
                 after: "{{ apache_sources.repo | string | community.general.jc('ini') | ansible.builtin.to_nice_yaml }}"
               when:
-                - (ansible_check_mode | bool) or (ansible_diff_mode | bool)
+                - (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool)
                 - apache_sources_contents_prior is defined
                 - apache_sources.repo is defined
 
-          when: apache_sources.changed | bool
+          when: apache_sources.changed | ansible.builtin.bool
 
         - name: Apache apt preferences present
           ansible.builtin.template:
@@ -189,14 +261,14 @@
                 update_cache: false
 
           when: >-
-            (apache_sources.changed | bool) or
-            (apache_preferences.changed | bool)
+            (apache_sources.changed | ansible.builtin.bool) or
+            (apache_preferences.changed | ansible.builtin.bool)
           tags:
             - molecule-idempotence-notest
 
-      when: apache_apt_key_path.stat.exists | bool
+      when: apache_apt_key_path.stat.exists | ansible.builtin.bool
 
-  when: (apache_sury_pkg_absent != []) or (apache_sury_pkg_present != [])
+  when: (apache_pkg_absent_sury != []) or (apache_pkg_present_sury != [])
 
   tags:
     - apache
@@ -230,8 +302,36 @@
         - molecule-idempotence-notest
 
   when:
-    - apache_sury_pkg_absent == []
-    - apache_sury_pkg_present == []
+    - apache_pkg_absent_sury == []
+    - apache_pkg_present_sury == []
   tags:
     - apache
     - apache_apt
+
+- name: Apache apt package tasks
+  block:
+
+    - name: Apache packages absent
+      ansible.builtin.apt:
+        pkg: "{{ apache_pkg_absent + apache_pkg_absent_sury }}"
+        state: absent
+        update_cache: true
+        cache_valid_time: 60
+      when: apache_pkg_absent + apache_pkg_absent_sury != []
+      notify: Restart Apache
+
+    - name: Apache packages present
+      ansible.builtin.apt:
+        pkg: "{{ apache_pkg_present + apache_pkg_present_sury }}"
+        state: present
+        install_recommends: true
+        update_cache: true
+        cache_valid_time: 60
+      when: apache_pkg_present + apache_pkg_present_sury != []
+      notify: Restart Apache
+
+  tags:
+    - apache
+    - apache_install
+    - apache_local_facts
+...

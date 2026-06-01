@@ -18,6 +18,10 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.stat module.
+      apache_apt_version:
+        type: str
+        required: false
+        description: The apt package version string.
       apache_file_absent_path:
         type: dict
         required: false

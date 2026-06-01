@@ -354,12 +354,22 @@ argument_specs:
         type: bool
         required: false
         description: Install Apache suEXEC.
-      apache_sury_pkg_absent:
+      apache_pkg_absent:
+        type: list
+        elements: str
+        required: true
+        description: A list of packages that are to be absent.
+      apache_pkg_absent_sury:
         type: list
         elements: str
         required: true
         description: A list of Sury repo packages that are to be absent.
-      apache_sury_pkg_present:
+      apache_pkg_present:
+        type: list
+        elements: str
+        required: true
+        description: A list of packages that are to be present.
+      apache_pkg_present_sury:
         type: list
         elements: str
         required: true
