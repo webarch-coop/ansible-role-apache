@@ -25,12 +25,15 @@ apache_jpq:
   pkgs_absent: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_absent|[0]"
   pkgs_absent_backports: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_absent_backports|[0]"
   pkgs_absent_sury: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_absent_sury|[0]"
+  pkgs_available_sury: "[?name=='{{ ansible_facts.distribution_release }}'].pkg|[0]"
   pkgs_present: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_present|[0]"
   pkgs_present_backports: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_present_backports|[0]"
   pkgs_present_sury: "[?name=='{{ ansible_facts.distribution_release }}'].pkgs_present_sury|[0]"
 
 # Apt packages
 apache_empty_list: []
+# apache_pkg_available_sury: "{{ ansible.builtin.lookup('vars', 'apache_pkg_' ~ ansible_facts.distribution_release) }}"
+apache_pkg_available_sury: "{{ apache_pkgs_sury | community.general.json_query(apache_jpq.pkgs_available_sury) }}"
 apache_pkg_absent_sury: >-
   {%- if apache_pkgs | community.general.json_query(apache_jpq.pkgs_absent_sury) is none -%}
   {{- apache_empty_list -}}
@@ -61,67 +64,65 @@ apache_pkg_present: >-
 # For example delete the lines and run:
 # bash ./sury-packages.sh >> main.yml
 
-# bookworm packages
-apache_pkg_bookworm:
-  - apache2
-  - apache2-bin
-  - apache2-data
-  - apache2-doc
-  - apache2-suexec-custom
-  - apache2-suexec-pristine
-  - apache2-utils
-  - brotli
-  - debsuryorg-archive-keyring
-  - libapache2-mod-md
-  - libapache2-mod-proxy-uwsgi
-  - libapr1
-  - libapr1t64
-  - libaprutil1
-  - libaprutil1-dbd-mysql
-  - libaprutil1-dbd-odbc
-  - libaprutil1-dbd-pgsql
-  - libaprutil1-dbd-sqlite3
-  - libaprutil1-ldap
-  - libaprutil1t64
-  - libbrotli1
-  - python3-brotli
-
-# noble packages
-apache_pkg_noble:
-  - apache2
-  - apache2-bin
-  - apache2-data
-  - apache2-doc
-  - apache2-suexec-custom
-  - apache2-suexec-pristine
-  - apache2-utils
-
-# resolute packages
-apache_pkg_resolute:
-  - apache2
-  - apache2-bin
-  - apache2-data
-  - apache2-doc
-  - apache2-suexec-custom
-  - apache2-suexec-pristine
-  - apache2-utils
-
-# trixie packages
-apache_pkg_trixie:
-  - apache2
-  - apache2-bin
-  - apache2-data
-  - apache2-doc
-  - apache2-suexec-custom
-  - apache2-suexec-pristine
-  - apache2-utils
-  - debsuryorg-archive-keyring
-  - libapr1
-  - libapr1t64
-  - libaprutil1-dbd-mysql
-  - libaprutil1-dbd-odbc
-  - libaprutil1-dbd-pgsql
-  - libaprutil1-dbd-sqlite3
-  - libaprutil1-ldap
-  - libaprutil1t64
+apache_pkgs_sury:
+  - name: bookworm
+    pkg:
+      - apache2
+      - apache2-bin
+      - apache2-data
+      - apache2-doc
+      - apache2-suexec-custom
+      - apache2-suexec-pristine
+      - apache2-utils
+      - brotli
+      - debsuryorg-archive-keyring
+      - libapache2-mod-md
+      - libapache2-mod-proxy-uwsgi
+      - libapr1
+      - libapr1t64
+      - libaprutil1
+      - libaprutil1-dbd-mysql
+      - libaprutil1-dbd-odbc
+      - libaprutil1-dbd-pgsql
+      - libaprutil1-dbd-sqlite3
+      - libaprutil1-ldap
+      - libaprutil1t64
+      - libbrotli1
+      - python3-brotli
+  - name: noble
+    pkg:
+      - apache2
+      - apache2-bin
+      - apache2-data
+      - apache2-doc
+      - apache2-suexec-custom
+      - apache2-suexec-pristine
+      - apache2-utils
+  - name: resolute
+    pkg:
+      - apache2
+      - apache2-bin
+      - apache2-data
+      - apache2-doc
+      - apache2-suexec-custom
+      - apache2-suexec-pristine
+      - apache2-utils
+  - name: trixie
+    pkg:
+      - apache2
+      - apache2-bin
+      - apache2-data
+      - apache2-doc
+      - apache2-suexec-custom
+      - apache2-suexec-pristine
+      - apache2-utils
+      - debsuryorg-archive-keyring
+      - libapr1
+      - libapr1t64
+      - libaprutil1-dbd-mysql
+      - libaprutil1-dbd-odbc
+      - libaprutil1-dbd-pgsql
+      - libaprutil1-dbd-sqlite3
+      - libaprutil1-ldap
+      - libaprutil1t64
 ...

@@ -16,12 +16,13 @@ set -euo pipefail
 # distros=(bookworm trixie forky)
 distros=(bookworm noble resolute trixie)
 
+# Apache packages from packages.sury.org
+echo "apache_pkgs_sury:"
 for distro in "${distros[@]}"; do
   # shellcheck disable=SC2016 disable=SC2086
-  packages="$(wget -q https://packages.sury.org/apache2/dists/${distro}/main/binary-amd64/Packages.gz -O - | gunzip - | grep -e '^Package' | grep -ve '-dbgsym$' -e '-dbg$' -e '-dev$' | sed 's/^Package: /  - /' | sort )"
-  echo ""
-  echo "# ${distro} packages"
-  echo "apache_pkg_${distro}:"
+  packages="$(wget -q https://packages.sury.org/apache2/dists/${distro}/main/binary-amd64/Packages.gz -O - | gunzip - | grep -e '^Package' | grep -ve '-dbgsym$' -e '-dbg$' -e '-dev$' | sed 's/^Package: /      - /' | sort )"
+  echo "  - name: ${distro}"
+  echo "    pkg:"
   echo "${packages}"
 done
 echo "..."

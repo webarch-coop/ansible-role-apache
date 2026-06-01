@@ -98,6 +98,10 @@ argument_specs:
             type: str
             required: true
             description: JMESPath query for Sury packages absent.
+          pkgs_available_sury:
+            type: str
+            required: true
+            description: JMESPath query for Sury packages available.
           pkgs_present:
             type: str
             required: true
@@ -260,6 +264,11 @@ argument_specs:
         type: int
         required: false
         description: Apache MPM MaxRequestWorkers.
+      apache_pkg_available_sury:
+        type: list
+        elements: str
+        required: false
+        description: Apache packages provided by the Sury apt repo.
       apache_phpmyadmin_domain:
         type: str
         required: false
@@ -268,31 +277,6 @@ argument_specs:
         type: str
         required: false
         description: Optional phpMyAdmin path for the webarch.conf template.
-      apache_pkg_bookworm:
-        type: list
-        elements: str
-        required: false
-        description: Packages that should be present on Bookworm.
-      apache_pkg_forky:
-        type: list
-        elements: str
-        required: false
-        description: Packages that should be present on Forky.
-      apache_pkg_noble:
-        type: list
-        elements: str
-        required: false
-        description: Packages that should be present on Noble.
-      apache_pkg_resolute:
-        type: list
-        elements: str
-        required: false
-        description: Packages that should be present on Resolute.
-      apache_pkg_trixie:
-        type: list
-        elements: str
-        required: false
-        description: Packages that should be present on trixie.
       apache_pkgs:
         type: list
         elements: dict
@@ -325,6 +309,21 @@ argument_specs:
             type: list
             required: true
             description: A list of deb packages that should be present from the Sury repo.
+      apache_pkgs_sury:
+        type: list
+        elements: dict
+        required: true
+        description: A list of dictionaries of packages available from packages.sury.org.
+        options:
+          name:
+            type: str
+            required: true
+            description: The Linux distro name.
+          pkg:
+            type: list
+            elements: str
+            required: true
+            description: Apt packages.
       apache_server_admin:
         type: str
         required: true

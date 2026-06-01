@@ -66,6 +66,25 @@
 - name: Sury Apache apt repo present
   block:
 
+    - name: Debug apache_pkg_available_sury
+      ansible.builtin.debug:
+        var: apache_pkg_available_sury
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Sury Apache apt packages should be available
+      ansible.builtin.assert:
+        that:
+          - apache_pkg_present_sury | ansible.builtin.difference(apache_pkg_available_sury) == []
+        fail_msg: >-
+          The following packages,
+          {{ apache_pkg_present_sury | ansible.builtin.difference(apache_pkg_available_sury) | ansible.builtin.join(', ') }}
+          are not listed as being available from the Sury apt repo, the available packages are
+          {{ apache_pkg_available_sury | ansible.builtin.join(', ') }}.
+      vars:
+        apache_pkg_var: "apache_pkg_{{ ansible_facts.distribution_release }}"
+
     - name: Python3 Debian present for deb822 module
       ansible.builtin.apt:
         pkg: python3-debian
