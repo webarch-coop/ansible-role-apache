@@ -47,7 +47,6 @@ apache_pkgs:
       - apache2
       # - apache2-suexec-custom
       - apache2-utils
-      - debsuryorg-archive-keyring
       - jo
       # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
@@ -55,13 +54,13 @@ apache_pkgs:
       - lynx
     pkgs_present_backports: []
     pkgs_present_sury: []
+      # - debsuryorg-archive-keyring
   - name: forky
     pkgs_absent: []
     pkgs_present:
       - apache2
       # - apache2-suexec-custom
       - apache2-utils
-      - debsuryorg-archive-keyring
       - jo
       # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
@@ -69,13 +68,13 @@ apache_pkgs:
       - lynx
     pkgs_present_backports: []
     pkgs_present_sury: []
+      # - debsuryorg-archive-keyring
   - name: noble
     pkgs_absent: []
     pkgs_present:
       - apache2
       # - apache2-suexec-custom
       - apache2-utils
-      - debsuryorg-archive-keyring
       - jo
       # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
@@ -83,13 +82,13 @@ apache_pkgs:
       - lynx
     pkgs_present_backports: []
     pkgs_present_sury: []
+      # - debsuryorg-archive-keyring
   - name: resolute
     pkgs_absent: []
     pkgs_present:
       - apache2
       # - apache2-suexec-custom
       - apache2-utils
-      - debsuryorg-archive-keyring
       - jo
       # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
@@ -97,13 +96,13 @@ apache_pkgs:
       - lynx
     pkgs_present_backports: []
     pkgs_present_sury: []
+      # - debsuryorg-archive-keyring
   - name: trixie
     pkgs_absent: []
     pkgs_present:
       - apache2
       # - apache2-suexec-custom
       - apache2-utils
-      - debsuryorg-archive-keyring
       - jo
       # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
@@ -111,6 +110,7 @@ apache_pkgs:
       - lynx
     pkgs_present_backports: []
     pkgs_present_sury: []
+      # - debsuryorg-archive-keyring
 
 apache_sites_enabled:
   - localhost
