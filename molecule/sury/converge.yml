@@ -91,7 +91,6 @@
               - apache2-suexec-custom
               - apache2-utils
               - debsuryorg-archive-keyring
-              - libapache2-mod-md
           - name: forky
             pkgs_absent:
               - libapache2-mod-md

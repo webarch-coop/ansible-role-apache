@@ -274,7 +274,7 @@
 - name: Apache apt package tasks
   block:
 
-    - name: Apache packages absent
+    - name: "Apache packages absent {{ apache_pkg_absent + apache_pkg_absent_sury | ansible.builtin.join(', ') }}"
       ansible.builtin.apt:
         pkg: "{{ apache_pkg_absent + apache_pkg_absent_sury }}"
         state: absent
@@ -283,7 +283,7 @@
       when: apache_pkg_absent + apache_pkg_absent_sury != []
       notify: Restart Apache
 
-    - name: Apache packages present
+    - name: "Apache packages present {{ apache_pkg_present + apache_pkg_present_sury | ansible.builtin.join(', ') }}"
       ansible.builtin.apt:
         pkg: "{{ apache_pkg_present + apache_pkg_present_sury }}"
         state: present
