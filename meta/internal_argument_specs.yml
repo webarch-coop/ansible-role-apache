@@ -224,6 +224,18 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.deb822_repository module.
+      apache_sources_contents:
+        type: dict
+        required: false
+        description: Dictionary of the contents of the apache.sources file.
+      apache_sources_contents_b64encoded:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.slurp module.
+      apache_sources_contents_prior:
+        type: dict
+        required: false
+        description: Dictionary of the contents of the apache.sources file.
       apache_sources_path:
         type: dict
         required: false
