@@ -85,9 +85,12 @@
       vars:
         apache_pkg_var: "apache_pkg_{{ ansible_facts.distribution_release }}"
 
-    - name: Python3 Debian present for deb822 module
+    - name: Required apt packages present
       ansible.builtin.apt:
-        pkg: python3-debian
+        pkg:
+          - ca-certificates
+          - lsb-release
+          - python3-debian
         state: present
 
     - name: Package debsuryorg-archive-keyring.deb present
@@ -128,53 +131,21 @@
                 apache_sources_contents_prior: "{{ apache_sources_contents }}"
               when: apache_sources_contents is defined
 
-            - name: Check Apache repository sources file present for apt < 3.1.0
-              ansible.builtin.deb822_repository:
-                allow_downgrade_to_insecure: false
-                allow_insecure: false
-                allow_weak: false
-                architectures: "{{ ansible_facts.ansible_local.dpkg.arch }}"
-                check_date: true
-                check_valid_until: true
-                components: main
-                enabled: true
-                name: apache
-                pdiffs: true
-                signed_by: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
-                suites: "{{ ansible_facts.distribution_release }}"
-                types: deb
-                uris: https://packages.sury.org/apache/
-              check_mode: true
-              changed_when: false
-              register: apache_sources_check
+            - name: Include check Apache repository sources file present for apt < 3.1.0
+              ansible.builtin.include_tasks:
+                file: deb822_check_legacy.yml
               when: apache_apt_version is ansible.builtin.version('3.1.0', '<')
 
             - name: Check Apache repository sources file present for apt >= 3.1.0
-              ansible.builtin.deb822_repository:
-                allow_downgrade_to_insecure: false
-                allow_insecure: false
-                allow_weak: false
-                architectures: "{{ ansible_facts.ansible_local.dpkg.arch }}"
-                check_date: true
-                check_valid_until: true
-                components: main
-                enabled: true
-                include: "{{ apache_pkg_present_sury }}"
-                name: apache
-                pdiffs: true
-                signed_by: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
-                suites: "{{ ansible_facts.distribution_release }}"
-                types: deb
-                uris: https://packages.sury.org/apache/
-              check_mode: true
-              changed_when: false
-              register: apache_sources_check
+              ansible.builtin.include_tasks:
+                file: deb822_check.yml
               when: apache_apt_version is ansible.builtin.version('3.1.0', '>=')
 
             - name: Debug proposed apache_sources_check.repo
               ansible.builtin.debug:
                 var: apache_sources_check.repo
                 verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+              when: apache_sources_check.repo is defined
               tags:
                 - debug
 
@@ -189,47 +160,20 @@
                 removes: /etc/apt/sources.list.d/apache.sources
               vars:
                 apache_date_timestamp: "{{ ansible_facts.date_time.iso8601_basic_short }}"
-              when: apache_sources_contents_prior != apache_sources_check.repo | string | community.general.jc('ini')
+              when:
+                - apache_sources_contents_prior != apache_sources_check.repo | string | community.general.jc('ini')
+                - apache_sources_check.repo is defined
 
           when: apache_sources_path.stat.exists | ansible.builtin.bool
 
-        - name: Apache repository sources file present for apt < 3.1.0
-          ansible.builtin.deb822_repository:
-            allow_downgrade_to_insecure: false
-            allow_insecure: false
-            allow_weak: false
-            architectures: "{{ ansible_facts.ansible_local.dpkg.arch }}"
-            check_date: true
-            check_valid_until: true
-            components: main
-            enabled: true
-            name: apache
-            pdiffs: true
-            signed_by: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
-            suites: "{{ ansible_facts.distribution_release }}"
-            types: deb
-            uris: https://packages.sury.org/apache/
-          register: apache_sources
+        - name: Include Apache repository sources file present for apt < 3.1.0
+          ansible.builtin.include_tasks:
+            file: deb822_legacy.yml
           when: apache_apt_version is ansible.builtin.version('3.1.0', '<')
 
-        - name: Apache repository sources file present for apt >= 3.1.0
-          ansible.builtin.deb822_repository:
-            allow_downgrade_to_insecure: false
-            allow_insecure: false
-            allow_weak: false
-            architectures: "{{ ansible_facts.ansible_local.dpkg.arch }}"
-            check_date: true
-            check_valid_until: true
-            components: main
-            enabled: true
-            include: "{{ apache_pkg_present_sury }}"
-            name: apache
-            pdiffs: true
-            signed_by: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
-            suites: "{{ ansible_facts.distribution_release }}"
-            types: deb
-            uris: https://packages.sury.org/apache/
-          register: apache_sources
+        - name: Include Apache repository sources file present for apt >= 3.1.0
+          ansible.builtin.include_tasks:
+            file: deb822_legacy.yml
           when: apache_apt_version is ansible.builtin.version('3.1.0', '>=')
 
         - name: Print the changes in the Apache repository sources file  # noqa: no-handler

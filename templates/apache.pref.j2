@@ -1,32 +1,16 @@
 # {{ ansible_managed }}
 
-{% if ansible_facts.distribution_release == "bookworm" %}
-{%     for apache_pkg in apache_pkg_bookworm %}
+{% if apache_pkg_available_sury != [] %}
+# Packages available from packages.sury.org for {{ ansible_facts.distribution_release }}
+
+{%     for apache_pkg in apache_pkg_available_sury %}
 Package: {{ apache_pkg }}
 Pin: origin packages.sury.org
 Pin-Priority: 500
 
 {%     endfor %}
-{% elif ansible_facts.distribution_release == "noble" %}
-{%     for apache_pkg in apache_pkg_noble %}
-Package: {{ apache_pkg }}
-Pin: origin packages.sury.org
-Pin-Priority: 500
+{% else %}
+# No packages from packages.sury.org are available for {{ ansible_facts.distribution_release }}
 
-{%     endfor %}
-{% elif ansible_facts.distribution_release == "resolute" %}
-{%     for apache_pkg in apache_pkg_resolute %}
-Package: {{ apache_pkg }}
-Pin: origin packages.sury.org
-Pin-Priority: 500
-
-{%     endfor %}
-{% elif ansible_facts.distribution_release == "trixie" %}
-{%     for apache_pkg in apache_pkg_trixie %}
-Package: {{ apache_pkg }}
-Pin: origin packages.sury.org
-Pin-Priority: 500
-
-{%     endfor %}
 {% endif %}
 # vim: ft=debsources{# vim: syntax=jinja2 #}
