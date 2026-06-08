@@ -8,23 +8,9 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-dependency:
-  name: galaxy
-  options:
-    force: true
-platforms:
-  - name: instance
-provisioner:
-  name: ansible
-  config_options:
-    defaults:
-      duplicate_dict_key: error
-      inject_facts_as_vars: false
-    # host_vars:
-    #   instance:
-    #     ansible_user: ansible
-  options:
-    D: true
-verifier:
-  name: ansible
+- name: apt
+  src: https://git.coop/webarch/apt.git
+  # https://git.coop/webarch/apt/-/releases
+  version: 4.14.0  # apt
+  scm: git
 ...

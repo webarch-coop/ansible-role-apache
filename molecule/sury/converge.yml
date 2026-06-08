@@ -1,0 +1,143 @@
+# Copyright 2018-2026 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Run as root
+  # become: true
+  connection: local
+  # gather_facts: true
+  hosts:
+    - localhost
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+
+    - name: Debug ansible_facts.effective_user_id
+      ansible.builtin.debug:
+        var: ansible_facts.effective_user_id
+
+    - name: Debug ansible_facts.user_id
+      ansible.builtin.debug:
+        var: ansible_facts.user_id
+
+    - name: Debug ansible_facts.user_dir
+      ansible.builtin.debug:
+        var: ansible_facts.user_dir
+
+    - name: Include role
+      ansible.builtin.include_role:
+        name: "{{ lookup('ansible.builtin.env', 'CI_PROJECT_NAME') }}"
+      vars:  # noqa var-naming[no-role-prefix]
+        apache: true
+        apache_mods_disabled:
+          - ssl
+        apache_mods_enabled:
+          - access_compat
+          - alias
+          - auth_basic
+          - authn_core
+          - authn_file
+          - authz_core
+          - authz_host
+          - authz_user
+          - autoindex
+          - deflate
+          - dir
+          - env
+          - expires
+          - filter
+          - headers
+          - http2
+          - include
+          - mime
+          - mpm_event
+          - negotiation
+          - proxy
+          - proxy_fcgi
+          - proxy_http2
+          - proxy_http
+          - proxy_wstunnel
+          - reqtimeout
+          - remoteip
+          - rewrite
+          - security2
+          - setenvif
+          - socache_shmcb
+          - status
+        apache_conf_disabled:
+          - le
+        apache_conf_enabled:
+          - charset
+          - localized-error-pages
+          - other-vhosts-access-log
+          - security
+          - version-control
+        apache_pkgs:
+          - name: bookworm
+            pkgs_absent: []
+            pkgs_present:
+              - jo
+              - lynx
+            pkgs_present_backports: []
+            pkgs_present_sury:
+              - apache2
+              - apache2-suexec-custom
+              - apache2-utils
+              - debsuryorg-archive-keyring
+              - libapache2-mod-md
+          - name: forky
+            pkgs_absent: []
+            pkgs_present:
+              - jo
+              - lynx
+            pkgs_present_backports: []
+            pkgs_present_sury:
+              - debsuryorg-archive-keyring
+              - apache2
+              - apache2-suexec-custom
+              - apache2-utils
+          - name: noble
+            pkgs_absent: []
+            pkgs_present:
+              - jo
+              - lynx
+            pkgs_present_backports: []
+            pkgs_present_sury:
+              - debsuryorg-archive-keyring
+              - apache2
+              - apache2-suexec-custom
+              - apache2-utils
+          - name: resolute
+            pkgs_absent: []
+            pkgs_present:
+              - jo
+              - lynx
+            pkgs_present_backports: []
+            pkgs_present_sury:
+              - debsuryorg-archive-keyring
+              - apache2
+              - apache2-suexec-custom
+              - apache2-utils
+          - name: trixie
+            pkgs_absent: []
+            pkgs_present:
+              - jo
+              - lynx
+            pkgs_present_backports: []
+            pkgs_present_sury:
+              - debsuryorg-archive-keyring
+              - apache2
+              - apache2-suexec-custom
+              - apache2-utils
+
+    - name: Include role verify argument spec tasks
+      ansible.builtin.include_role:
+        name: "{{ lookup('ansible.builtin.env', 'CI_PROJECT_NAME') }}"
+        tasks_from: verify.yml
+...
