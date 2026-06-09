@@ -95,14 +95,18 @@
             pkgs_absent:
               - libapache2-mod-md
             pkgs_present:
-              - jo
-              - lynx
-            pkgs_present_backports: []
-            pkgs_present_sury:
-              - debsuryorg-archive-keyring
               - apache2
               - apache2-suexec-custom
               - apache2-utils
+              - jo
+              - lynx
+            pkgs_present_backports: []
+            # The Sury repo doesn't yet support forky
+            pkgs_present_sury: []
+              # - debsuryorg-archive-keyring
+              # - apache2
+              # - apache2-suexec-custom
+              # - apache2-utils
           - name: noble
             pkgs_absent:
               - libapache2-mod-md
