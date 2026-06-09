@@ -36,54 +36,15 @@
     - apache
     - apache_apt
 
-- name: Debug apt packages
+- name: Apache Sury repo enabled
   block:
 
-    - name: Sury Apache apt repo is required for packages present
-      ansible.builtin.debug:
-        var: apache_pkg_present_sury
-      when: apache_pkg_present_sury != []
-
-    - name: Sury Apache apt repo is required for packages absent
-      ansible.builtin.debug:
-        var: apache_pkg_absent_sury
-      when: apache_pkg_absent_sury != []
-
-    - name: Sury Apache apt repo is not required
-      ansible.builtin.debug:
-        msg: No Sury Apache apt packages are to be installed or removed
-      when:
-        - apache_pkg_absent_sury == []
-        - apache_pkg_present_sury == []
-
-  tags:
-    - apache
-    - apache_apt
-    - debug
-
-# TODO Remove Sury packages present when none are to be installed
-
-- name: Sury Apache apt repo present
-  block:
-
-    - name: Debug apache_pkg_available_sury
-      ansible.builtin.debug:
-        var: apache_pkg_available_sury
-        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
-      tags:
-        - debug
-
-    - name: Sury Apache apt packages should be available
+    - name: Linux distro check for Sury Apache apt repo
       ansible.builtin.assert:
         that:
-          - apache_pkg_present_sury | ansible.builtin.difference(apache_pkg_available_sury) == []
+          - ansible_facts.distribution_release in apache_sury_distros
         fail_msg: >-
-          The following packages,
-          {{ apache_pkg_present_sury | ansible.builtin.difference(apache_pkg_available_sury) | ansible.builtin.join(', ') }}
-          are not listed as being available from the Sury apt repo, the available packages are
-          {{ apache_pkg_available_sury | ansible.builtin.join(', ') }}.
-      vars:
-        apache_pkg_var: "apache_pkg_{{ ansible_facts.distribution_release }}"
+          The packages.sury.org Apache repo only supports {{ apache_sury_distros | ansible.builtin.join(', ') }}, not {{ ansible_facts.distribution_release }}.
 
     - name: Required apt packages present
       ansible.builtin.apt:
@@ -231,7 +192,7 @@
 
       when: apache_apt_key_path.stat.exists | ansible.builtin.bool
 
-  when: (apache_pkg_absent_sury != []) or (apache_pkg_present_sury != [])
+  when: apache_sury | ansible.builtin.bool
 
   tags:
     - apache
@@ -264,9 +225,7 @@
       tags:
         - molecule-idempotence-notest
 
-  when:
-    - apache_pkg_absent_sury == []
-    - apache_pkg_present_sury == []
+  when: not apache_sury | ansible.builtin.bool
   tags:
     - apache
     - apache_apt
@@ -274,23 +233,63 @@
 - name: Apache apt package tasks
   block:
 
-    - name: "Apache packages absent {{ apache_pkg_absent + apache_pkg_absent_sury | ansible.builtin.join(', ') }}"
+    - name: Debug apache_pkg_absent
+      ansible.builtin.debug:
+        var: apache_pkg_absent
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug apache_pkg_absent | ansible.builtin.type_debug
+      ansible.builtin.debug:
+        msg: "{{ apache_pkg_absent | ansible.builtin.type_debug }}"
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug apache_pkg_present
+      ansible.builtin.debug:
+        var: apache_pkg_present
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug apache_pkg_present | ansible.builtin.type_debug
+      ansible.builtin.debug:
+        msg: "{{ apache_pkg_present | ansible.builtin.type_debug }}"
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug Apache packages to be removed
+      ansible.builtin.debug:
+        msg: "The following packages are due to be removed: {{ apache_pkg_absent | ansible.builtin.join(', ') }}"
+
+    - name: Apache packages absent
       ansible.builtin.apt:
-        pkg: "{{ apache_pkg_absent + apache_pkg_absent_sury }}"
+        pkg: "{{ apache_pkg_absent }}"
         state: absent
         update_cache: true
         cache_valid_time: 60
-      when: apache_pkg_absent + apache_pkg_absent_sury != []
+      when:
+        - apache_pkg_absent != []
+        - apache_pkg_absent | ansible.builtin.type_debug != none
       notify: Restart Apache
 
-    - name: "Apache packages present {{ apache_pkg_present + apache_pkg_present_sury | ansible.builtin.join(', ') }}"
+    - name: Debug Apache packages to be installed
+      ansible.builtin.debug:
+        msg: "The following packages are due to be installed: {{ apache_pkg_present | ansible.builtin.join(', ') }}"
+
+    - name: Apache packages present
       ansible.builtin.apt:
-        pkg: "{{ apache_pkg_present + apache_pkg_present_sury }}"
+        pkg: "{{ apache_pkg_present }}"
         state: present
         install_recommends: true
         update_cache: true
         cache_valid_time: 60
-      when: apache_pkg_present + apache_pkg_present_sury != []
+      when:
+        - apache_pkg_present != []
+        - apache_pkg_present | ansible.builtin.type_debug != none
       notify: Restart Apache
 
   tags:

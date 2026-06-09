@@ -78,19 +78,19 @@
           - other-vhosts-access-log
           - security
           - version-control
+        # The Sury repo doesn't yet support forky
+        apache_sury: "{%- if ansible_facts.distribution_release == 'forky' -%}false{%- else -%}true{%- endif -%}"
         apache_pkgs:
           - name: bookworm
             pkgs_absent:
               - libapache2-mod-md
             pkgs_present:
-              - jo
-              - lynx
-            pkgs_present_backports: []
-            pkgs_present_sury:
               - apache2
               - apache2-suexec-custom
               - apache2-utils
               - debsuryorg-archive-keyring
+              - jo
+              - lynx
           - name: forky
             pkgs_absent:
               - libapache2-mod-md
@@ -100,49 +100,38 @@
               - apache2-utils
               - jo
               - lynx
-            pkgs_present_backports: []
-            # The Sury repo doesn't yet support forky
-            pkgs_present_sury: []
+              # The Sury repo doesn't yet support forky
               # - debsuryorg-archive-keyring
-              # - apache2
-              # - apache2-suexec-custom
-              # - apache2-utils
           - name: noble
             pkgs_absent:
               - libapache2-mod-md
             pkgs_present:
-              - jo
-              - lynx
-            pkgs_present_backports: []
-            pkgs_present_sury:
-              - debsuryorg-archive-keyring
               - apache2
               - apache2-suexec-custom
               - apache2-utils
+              - debsuryorg-archive-keyring
+              - jo
+              - lynx
           - name: resolute
             pkgs_absent:
               - libapache2-mod-md
             pkgs_present:
-              - jo
-              - lynx
-            pkgs_present_backports: []
-            pkgs_present_sury:
-              - debsuryorg-archive-keyring
               - apache2
               - apache2-suexec-custom
               - apache2-utils
+              - debsuryorg-archive-keyring
+              - jo
+              - lynx
           - name: trixie
             pkgs_absent:
               - libapache2-mod-md
             pkgs_present:
-              - jo
-              - lynx
-            pkgs_present_backports: []
-            pkgs_present_sury:
-              - debsuryorg-archive-keyring
               - apache2
               - apache2-suexec-custom
               - apache2-utils
+              - debsuryorg-archive-keyring
+              - jo
+              - lynx
 
     - name: Include role verify argument spec tasks
       ansible.builtin.include_role:

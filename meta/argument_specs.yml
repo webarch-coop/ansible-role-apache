@@ -18,10 +18,6 @@ argument_specs:
         type: bool
         required: true
         description: Run the tasks in this role.
-      apache_apt_backports:
-        type: str
-        required: true
-        description: String that will be present in the apt cache policy when backports are enabled.
       apache_a2query:
         type: str
         required: true
@@ -90,14 +86,6 @@ argument_specs:
             type: str
             required: true
             description: JMESPath query for packages absent.
-          pkgs_absent_backports:
-            type: str
-            required: true
-            description: JMESPath query for backports packages absent.
-          pkgs_absent_sury:
-            type: str
-            required: true
-            description: JMESPath query for Sury packages absent.
           pkgs_available_sury:
             type: str
             required: true
@@ -106,14 +94,6 @@ argument_specs:
             type: str
             required: true
             description: JMESPath query for packages present.
-          pkgs_present_backports:
-            type: str
-            required: true
-            description: JMESPath query for backports packages present.
-          pkgs_present_sury:
-            type: str
-            required: true
-            description: JMESPath query for Sury packages present.
       apache_localhost_port:
         type: int
         required: true
@@ -301,14 +281,6 @@ argument_specs:
             type: list
             required: false
             description: A list of deb packages that should be present.
-          pkgs_present_backports:
-            type: list
-            required: true
-            description: A list of deb packages that should be present from backports.
-          pkgs_present_sury:
-            type: list
-            required: true
-            description: A list of deb packages that should be present from the Sury repo.
       apache_pkgs_sury:
         type: list
         elements: dict
@@ -353,26 +325,25 @@ argument_specs:
         type: bool
         required: false
         description: Install Apache suEXEC.
+      apache_sury:
+        type: bool
+        required: false
+        description: Enable or disable the packages.sury.org Apache repo.
+      apache_sury_distros:
+        type: list
+        elements: str
+        required: false
+        description: List of distos that are supported by the Sury packages.sury.org Apache repo.
       apache_pkg_absent:
         type: list
         elements: str
         required: true
         description: A list of packages that are to be absent.
-      apache_pkg_absent_sury:
-        type: list
-        elements: str
-        required: true
-        description: A list of Sury repo packages that are to be absent.
       apache_pkg_present:
         type: list
         elements: str
         required: true
         description: A list of packages that are to be present.
-      apache_pkg_present_sury:
-        type: list
-        elements: str
-        required: true
-        description: A list of Sury repo packages that are to be present.
       apache_timeout:
         type: int
         required: true
