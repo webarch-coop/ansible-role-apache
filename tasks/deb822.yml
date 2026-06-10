@@ -18,7 +18,7 @@
     check_valid_until: true
     components: main
     enabled: true
-    include: "{{ apache_pkg_present_sury }}"
+    include: "{{ apache_pkg_available_sury }}"
     name: apache
     pdiffs: true
     signed_by: /usr/share/keyrings/debsuryorg-archive-keyring.gpg
