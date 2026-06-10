@@ -92,14 +92,14 @@
                 apache_sources_contents_prior: "{{ apache_sources_contents }}"
               when: apache_sources_contents is defined
 
-            - name: Include check Apache repository sources file present for apt < 3.1.0
+            - name: Include check Apache repository sources file present for ansible < 2.21.0 and / or apt < 3.1.0
               ansible.builtin.include_tasks:
                 file: deb822_check_legacy.yml
-                when: >-
-                  (apache_apt_version is ansible.builtin.version('3.1.0', '<')) or
-                  (ansible_version.full is ansible.builtin.version('2.21.0', '<'))
+              when: >-
+                (apache_apt_version is ansible.builtin.version('3.1.0', '<')) or
+                (ansible_version.full is ansible.builtin.version('2.21.0', '<'))
 
-            - name: Check Apache repository sources file present for apt >= 3.1.0
+            - name: Check Apache repository sources file present for ansible >= 2.21.0 and apt >= 3.1.0
               ansible.builtin.include_tasks:
                 file: deb822_check.yml
               when:
