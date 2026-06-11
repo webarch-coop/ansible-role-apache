@@ -110,7 +110,8 @@
               ansible.builtin.debug:
                 var: apache_sources_check
                 # verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
-              when: apache_sources_check
+              when:
+                - apache_sources_check is defined
               tags:
                 - debug
 
@@ -126,8 +127,9 @@
               vars:
                 apache_date_timestamp: "{{ ansible_facts.date_time.iso8601_basic_short }}"
               when:
-                - apache_sources_contents_prior != apache_sources_check.repo | string | community.general.jc('ini')
+                - apache_sources_check is defined
                 - apache_sources_check.repo is defined
+                - apache_sources_contents_prior != apache_sources_check.repo | string | community.general.jc('ini')
 
           when: apache_sources_path.stat.exists | ansible.builtin.bool
 
