@@ -126,6 +126,7 @@
               ansible.utils.fact_diff:
                 after: "{{ apache_sources_check.repo | community.general.jc('ini') }}"
                 before: "{{ apache_sources_contents_prior }}"
+              changed_when: false
               when:
                 - apache_sources_check is defined
                 - apache_sources_check.repo is defined
@@ -160,7 +161,7 @@
 
         - name: Include Apache repository sources file present for ansible >= 2.21.0 and apt >= 3.1.0
           ansible.builtin.include_tasks:
-            file: deb822_legacy.yml
+            file: deb822.yml
           when:
             - ansible_version.full is ansible.builtin.version('2.21.0', '>=')
             - apache_apt_version is ansible.builtin.version('3.1.0', '>=')
@@ -178,7 +179,7 @@
             - name: Diff Apache repository sources file update
               ansible.utils.fact_diff:
                 before: "{{ apache_sources_contents_prior | ansible.builtin.to_nice_yaml }}"
-                after: "{{ apache_sources.repo | string | community.general.jc('ini') | ansible.builtin.to_nice_yaml }}"
+                after: "{{ apache_sources.repo | community.general.jc('ini') | ansible.builtin.to_nice_yaml }}"
               when:
                 - (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool)
                 - apache_sources_contents_prior is defined
