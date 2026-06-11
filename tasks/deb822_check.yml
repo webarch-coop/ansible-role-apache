@@ -26,7 +26,7 @@
     types: deb
     uris: https://packages.sury.org/apache2/
   vars:
-    apache_task_name: "Apache repository sources file present for apt {{ apache_apt_version }} and ansible {{ ansible_version.full }}"
+    apache_task_name: "Check Apache repository sources file present for ansible {{ ansible_version.full }} and apt {{ apache_apt_version }}"
   check_mode: true
   changed_when: false
   register: apache_sources_check

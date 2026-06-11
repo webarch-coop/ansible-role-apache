@@ -122,6 +122,17 @@
               tags:
                 - debug
 
+            - name: Diff existing and proposed Apache sources file
+              ansible.utils.fact_diff:
+                after: "{{ apache_sources_check.repo | community.general.jc('ini') }}"
+                before: "{{ apache_sources_contents_prior }}"
+              when:
+                - apache_sources_check is defined
+                - apache_sources_check.repo is defined
+                - apache_sources_contents_prior != apache_sources_check.repo | community.general.jc('ini')
+              tags:
+                - debug
+
             - name: Backup old apache.sources file
               ansible.builtin.command:
                 cmd: >-
@@ -136,7 +147,7 @@
               when:
                 - apache_sources_check is defined
                 - apache_sources_check.repo is defined
-                - apache_sources_contents_prior != apache_sources_check.repo | string | community.general.jc('ini')
+                - apache_sources_contents_prior != apache_sources_check.repo | community.general.jc('ini')
 
           when: apache_sources_path.stat.exists | ansible.builtin.bool
 
