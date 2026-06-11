@@ -26,6 +26,12 @@
       tags:
         - debug
 
+    - name: Debug ansible_version.full
+      ansible.builtin.debug:
+        var: ansible_version.full
+      tags:
+        - debug
+
     - name: Check that apache_apt_version is a semver >= 2.0.0
       ansible.builtin.assert:
         that:
@@ -96,8 +102,8 @@
               ansible.builtin.include_tasks:
                 file: deb822_check_legacy.yml
               when: >-
-                (apache_apt_version is ansible.builtin.version('3.1.0', '<')) or
-                (ansible_version.full is ansible.builtin.version('2.21.0', '<'))
+                (ansible_version.full is ansible.builtin.version('2.21.0', '<')) or
+                (apache_apt_version is ansible.builtin.version('3.1.0', '<'))
 
             - name: Check Apache repository sources file present for ansible >= 2.21.0 and apt >= 3.1.0
               ansible.builtin.include_tasks:
@@ -133,15 +139,19 @@
 
           when: apache_sources_path.stat.exists | ansible.builtin.bool
 
-        - name: Include Apache repository sources file present for apt < 3.1.0
+        - name: Include Apache repository sources file present for ansible < 2.21.0 and / or apt < 3.1.0
           ansible.builtin.include_tasks:
             file: deb822_legacy.yml
-          when: apache_apt_version is ansible.builtin.version('3.1.0', '<')
+          when: >-
+            (ansible_version.full is ansible.builtin.version('2.21.0', '<')) or
+            (apache_apt_version is ansible.builtin.version('3.1.0', '<'))
 
-        - name: Include Apache repository sources file present for apt >= 3.1.0
+        - name: Include Apache repository sources file present for ansible >= 2.21.0 and apt >= 3.1.0
           ansible.builtin.include_tasks:
             file: deb822_legacy.yml
-          when: apache_apt_version is ansible.builtin.version('3.1.0', '>=')
+          when:
+            - ansible_version.full is ansible.builtin.version('2.21.0', '>=')
+            - apache_apt_version is ansible.builtin.version('3.1.0', '>=')
 
         - name: Print the changes in the Apache repository sources file  # noqa: no-handler
           block:
