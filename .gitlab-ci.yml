@@ -35,11 +35,11 @@ before_script:
   - which molecule
   - molecule --version
 stages:
+  - resolute
   - trixie
   - bookworm
   - forky
   - noble
-  - resolute
 forky:
   image: registry.git.coop/webarch/containers/images/forky:20260604
   stage: forky

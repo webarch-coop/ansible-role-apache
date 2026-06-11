@@ -27,7 +27,6 @@
   check_mode: true
   changed_when: false
   register: apache_sources_check
-  when: apache_apt_version is ansible.builtin.version('3.1.0', '<')
   tags:
     - apache
 ...

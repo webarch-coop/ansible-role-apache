@@ -106,11 +106,11 @@
                 - ansible_version.full is ansible.builtin.version('2.21.0', '>=')
                 - apache_apt_version is ansible.builtin.version('3.1.0', '>=')
 
-            - name: Debug proposed apache_sources_check.repo
+            - name: Debug apache_sources_check
               ansible.builtin.debug:
-                var: apache_sources_check.repo
-                verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
-              when: apache_sources_check.repo is defined
+                var: apache_sources_check
+                # verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+              when: apache_sources_check
               tags:
                 - debug
 
