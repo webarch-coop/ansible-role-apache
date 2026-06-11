@@ -8,7 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check Apache repository sources file present for apt >= 3.1.0
+- name: "{{ apache_task_name }}"
   ansible.builtin.deb822_repository:
     allow_downgrade_to_insecure: false
     allow_insecure: false
@@ -25,6 +25,8 @@
     suites: "{{ ansible_facts.distribution_release }}"
     types: deb
     uris: https://packages.sury.org/apache2/
+  vars:
+    apache_task_name: "Apache repository sources file present for apt {{ apache_apt_version }} and ansible {{ ansible_version.full }}"
   check_mode: true
   changed_when: false
   register: apache_sources_check

@@ -32,10 +32,11 @@
       tags:
         - debug
 
-    - name: Check that apache_apt_version is a semver >= 2.0.0
+    - name: Check that apache_apt_version and ansible_version.full are semver >= 2.0.0
       ansible.builtin.assert:
         that:
           - apache_apt_version is ansible.builtin.version('2.0.0', 'gt', version_type='semver')
+          - ansible_version.full is ansible.builtin.version('2.0.0', 'gt', version_type='semver')
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
   tags:
