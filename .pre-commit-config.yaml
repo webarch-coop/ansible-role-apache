@@ -37,7 +37,7 @@ repos:
         name: Markdown Lint
   # https://github.com/ansible/ansible-lint/releases
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v26.8.0
+    rev: v26.9.0
     hooks:
       - id: ansible-lint
         name: Ansible Lint
@@ -45,7 +45,7 @@ repos:
         language_version: python3
         additional_dependencies:
           # https://github.com/kellyjonbrazil/jc/releases
-          - jc==1.25.7
+          - jc==1.26.0
           # https://github.com/jmespath/jmespath.py/tags
           - jmespath==1.0.1
 ...
