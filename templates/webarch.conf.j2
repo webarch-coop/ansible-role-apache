@@ -7,13 +7,16 @@ LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-A
 LogFormat "%I %O" bandwidth
 
 # HTTP/2 https://httpd.apache.org/docs/trunk/mod/mod_http2.html
-{% if apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" in apache_mods_enabled %}
-Protocols h2 h2c http/1.1 acme-tls/1
-ProtocolsHonorOrder On
-{% elif apache_mods_enabled is defined and "http2" in apache_mods_enabled and "md" not in apache_mods_enabled %}
-Protocols h2 h2c http/1.1
-ProtocolsHonorOrder Off
-{% endif %}
+<IfModule http2>
+  <IfModule md_module>
+    Protocols h2 h2c http/1.1 acme-tls/1
+    ProtocolsHonorOrder On
+  </IfModule>
+  <IfModule !md_module>
+    Protocols h2 h2c http/1.1
+    ProtocolsHonorOrder Off
+  </IfModule>
+</IfModule>
 # Let's Encrypt
 # Alias "/.well-known/acme-challenge" "/var/www/html/.well-known/acme-challenge"
 # Webarchitects HTML/CSS
@@ -131,7 +134,9 @@ ErrorDocument 506 /wsh/506.shtml
 <VirtualHost *:80>
   ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
-  ServerAlias {{ ansible_facts.default_ipv4.address }}
+  <IfModule !md_module>
+    ServerAlias {{ ansible_facts.default_ipv4.address }}
+  </IfModule>
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data
   </IfModule>
@@ -184,7 +189,9 @@ ErrorDocument 506 /wsh/506.shtml
 <VirtualHost *:443>
   ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
-  ServerAlias {{ ansible_facts.default_ipv4.address }}
+  <IfModule !md_module>
+    ServerAlias {{ ansible_facts.default_ipv4.address }}
+  </IfModule>
   StrictHostCheck on
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data
