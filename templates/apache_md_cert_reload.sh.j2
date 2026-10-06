@@ -69,7 +69,7 @@ done
 if [[ "${apache_reload_required}" == "1" ]]
 then
   echo "Reloading Apache for new certificates"
-  service apache2 reload
+  /usr/sbin/service apache2 reload
   exit 0
 fi
 

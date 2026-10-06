@@ -191,7 +191,7 @@ if [[ "${started}" == +([0-9]) ]]; then
   # Check if the created date is more recent than the started date
   if (( src_created > started )); then
       # Restart the service
-      service "${service}" restart && echo "${service} restarted for new cert"
+      /usr/sbin/service "${service}" restart && echo "${service} restarted for new cert"
   fi
 else
   echo "Error getting the service started date"
