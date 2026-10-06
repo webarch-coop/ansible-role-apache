@@ -23,8 +23,8 @@
     - name: Verify variables that start with apache_
       ansible.builtin.include_tasks: verify.yml
       when:
-        - apache_verify is defined
-        - apache_verify | bool
+        - apache_verify is ansible.builtin.defined
+        - apache_verify | ansible.builtin.bool
       tags:
         - apache_install
         - apache_local_facts
@@ -34,9 +34,9 @@
         name: apt
         tasks_from: local_facts.yml
       when: >-
-        (ansible_facts.ansible_local.dpkg.arch is not defined) or
-        (ansible_facts.ansible_local.gpg.version is not defined) or
-        (ansible_facts.ansible_local.bash.path is not defined)
+        (ansible_facts.ansible_local.dpkg.arch is not ansible.builtin.defined) or
+        (ansible_facts.ansible_local.gpg.version is not ansible.builtin.defined) or
+        (ansible_facts.ansible_local.bash.path is not ansible.builtin.defined)
       tags:
         - apache_install
         - apache_local_facts
@@ -46,7 +46,7 @@
 
     - name: Include local facts tasks for a2query fact
       ansible.builtin.include_tasks: local_facts.yml
-      when: ansible_facts.ansible_local.a2query is not defined
+      when: ansible_facts.ansible_local.a2query is not ansible.builtin.defined
       tags:
         - apache_install
         - apache_local_facts
@@ -64,7 +64,10 @@
 
     - name: Include MPM switching tasks
       ansible.builtin.include_tasks: mpm.yml
-      when: ansible_facts.ansible_local.a2query.mpm not in apache_mods_enabled
+      when:
+        - apache_mods_enabled is ansible.builtin.defined
+        - apache_mods_enabled != []
+        - ansible_facts.ansible_local.a2query.mpm not in apache_mods_enabled
 
     - name: Apache DH parameters file present
       community.crypto.openssl_dhparam:
@@ -75,18 +78,15 @@
     - name: Include suEXEC tasks
       ansible.builtin.include_tasks: suexec.yml
       when:
-        - apache_suexec is defined
-        - apache_suexec | bool
-
-    - name: Include mod_md tasks
-      ansible.builtin.include_tasks: md.yml
-      when: ("md" in apache_mods_enabled)
-      tags:
-        - apache_install
+        - apache_suexec is ansible.builtin.defined
+        - apache_suexec | ansible.builtin.bool
 
     - name: Include mod_security2 tasks
       ansible.builtin.include_tasks: security2.yml
-      when: ("security2" in apache_mods_enabled)
+      when:
+        - apache_mods_enabled is ansible.builtin.defined
+        - apache_mods_enabled != []
+        - ("security2" in apache_mods_enabled)
       tags:
         - apache_install
 
@@ -108,15 +108,21 @@
 
     - name: Apache modules disabled and enabled
       ansible.builtin.include_tasks: a2mod.yml
-      when: (apache_mods_disabled is defined) or (apache_mods_enabled is defined)
+      when: (apache_mods_disabled is ansible.builtin.defined) or (apache_mods_enabled is ansible.builtin.defined)
+
+    - name: Include mod_md tasks
+      ansible.builtin.include_tasks: md.yml
+      when:
+        - apache_mods_enabled is ansible.builtin.defined
+        - ("md" in apache_mods_enabled)
 
     - name: Apache conf disabled and enabled
       ansible.builtin.include_tasks: a2conf.yml
-      when: (apache_sites_disabled is defined) or (apache_conf_enabled is defined)
+      when: (apache_sites_disabled is ansible.builtin.defined) or (apache_conf_enabled is ansible.builtin.defined)
 
     - name: Apache sites disabled and enabled
       ansible.builtin.include_tasks: a2site.yml
-      when: (apache_sites_disabled is defined) or (apache_sites_enabled is defined)
+      when: (apache_sites_disabled is ansible.builtin.defined) or (apache_sites_enabled is ansible.builtin.defined)
 
     - name: Apache enabled for systemd servers
       ansible.builtin.systemd:
@@ -131,12 +137,13 @@
       check_mode: false
       changed_when: false
       register: apache_configtest
-      failed_when: apache_configtest.rc is not regex('^0|1$')
+      failed_when: apache_configtest.rc is not ansible.builtin.regex('^0|1$')
 
     - name: Print the apache2ctl configtest standard error
       ansible.builtin.debug:
         msg: "{{ apache_configtest.stderr }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: >-
+          {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}
       tags:
         - debug
 
@@ -148,13 +155,13 @@
     - name: Verify variables that start with apache_
       ansible.builtin.include_tasks: verify.yml
       when:
-        - apache_verify is defined
-        - apache_verify | bool
+        - apache_verify is ansible.builtin.defined
+        - apache_verify | ansible.builtin.bool
       tags:
         - apache_install
         - apache_local_facts
 
-  when: apache | bool
+  when: apache | ansible.builtin.bool
   tags:
     - apache
 ...

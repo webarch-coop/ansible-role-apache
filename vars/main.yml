@@ -49,7 +49,6 @@ apache_sury_distros:
 # To update them delete everything after this comment and inset the results of the script.
 # For example delete the lines and run:
 # bash ./sury-packages.sh >> main.yml
-
 apache_pkgs_sury:
   - name: bookworm
     pkg:
@@ -84,6 +83,13 @@ apache_pkgs_sury:
       - apache2-suexec-custom
       - apache2-suexec-pristine
       - apache2-utils
+      - libapr1
+      - libaprutil1
+      - libaprutil1-dbd-mysql
+      - libaprutil1-dbd-odbc
+      - libaprutil1-dbd-pgsql
+      - libaprutil1-dbd-sqlite3
+      - libaprutil1-ldap
   - name: resolute
     pkg:
       - apache2
@@ -93,6 +99,7 @@ apache_pkgs_sury:
       - apache2-suexec-custom
       - apache2-suexec-pristine
       - apache2-utils
+      - libapr1t64
   - name: trixie
     pkg:
       - apache2

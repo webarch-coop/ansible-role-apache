@@ -222,10 +222,6 @@ argument_specs:
         type: str
         required: false
         description: Apache MDRenewWindow.
-      apache_md_version:
-        type: str
-        required: false
-        description: The version of mod_md to install.
       apache_mods_disabled:
         type: list
         elements: str

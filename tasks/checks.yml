@@ -73,31 +73,28 @@
         quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
         fail_msg: "The apache_version variable should be a semvar >= 2.4.41 however it is set to {{ apache_version }}"
 
-    # https://github.com/icing/mod_md?tab=readme-ov-file#versions-and-releases
-    - name: "When mod_md is enabled the Apache version required is >= 2.4.48, it is {{ apache_version }}"
-      ansible.builtin.assert:
-        that:
-          - apache_version is ansible.builtin.version('2.4.48', '>=', version_type='semver')
-        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
-        fail_msg: "The apache_version variable should be a semvar >= 2.4.48 when mod_md is enabled but it is {{ apache_version }}"
-      when:
-        - ("md" in apache_mods_enabled)
-        - apache_md_version is defined
-        - apache_md_version != "default"
+    - name: Apache mod_md checks
+      block:
 
-    # https://github.com/icing/mod_md?tab=readme-ov-file#prerequisites
-    - name: When mod_md is enabled mod_ssl is required
-      ansible.builtin.assert:
-        that:
-          - ("ssl" in apache_mods_enabled)
-        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
-        fail_msg: >-
-          Apache module ssl is required when md is enabled, apache_mods_enabled is a list containing
-          {{ apache_mods_enabled | join(', ') }}
-      when:
-        - ("md" in apache_mods_enabled)
-        - apache_md_version is defined
-        - apache_md_version != "default"
+        # https://github.com/icing/mod_md?tab=readme-ov-file#versions-and-releases
+        - name: "When mod_md is enabled the Apache version required is >= 2.4.48, it is {{ apache_version }}"
+          ansible.builtin.assert:
+            that:
+              - apache_version is ansible.builtin.version('2.4.48', '>=', version_type='semver')
+            quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+            fail_msg: "The apache_version variable should be a semvar >= 2.4.48 when mod_md is enabled but it is {{ apache_version }}"
+
+        # https://github.com/icing/mod_md?tab=readme-ov-file#prerequisites
+        - name: When mod_md is enabled mod_ssl is required
+          ansible.builtin.assert:
+            that:
+              - ("ssl" in apache_mods_enabled)
+            quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+            fail_msg: >-
+              Apache module ssl is required when md is enabled, apache_mods_enabled is a list containing
+              {{ apache_mods_enabled | join(', ') }}
+
+      when: ("md" in apache_mods_enabled)
 
     - name: Gather service facts
       ansible.builtin.service_facts:

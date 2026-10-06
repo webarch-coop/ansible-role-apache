@@ -37,9 +37,9 @@
           There is an empty file at {{ apache_md_cert_cp.pubcert.src }}.
           {% endif %}
       when: >-
-        (not apache_md_cert_cp_privkey_src.stat.exists | bool) or
+        (not apache_md_cert_cp_privkey_src.stat.exists | ansible.builtin.bool) or
         (apache_md_cert_cp_privkey_src.stat.size == 0) or
-        (not apache_md_cert_cp_pubcert_src.stat.exists | bool) or
+        (not apache_md_cert_cp_pubcert_src.stat.exists | ansible.builtin.bool) or
         (apache_md_cert_cp_pubcert_src.stat.size == 0)
 
     - name: Query OpenSSL X.509 certificate
@@ -53,35 +53,35 @@
         - name: "Debug all the OpenSSL X.509 certificate info for {{ apache_md_cert_cp.privkey.src }}"
           ansible.builtin.debug:
             var: apache_md_cert_cp_pubcert_info
-            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
           tags:
             - debug
 
         - name: "Debug the commonName for the OpenSSL X.509 certificate at {{ apache_md_cert_cp.privkey.src }}"
           ansible.builtin.debug:
             var: apache_md_cert_cp_pubcert_info.subject.commonName
-            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
           tags:
             - debug
 
         - name: "Ensure that the OpenSSL X.509 certificate is valid and the check didn't fail for {{ apache_md_cert_cp.privkey.src }}"
           ansible.builtin.assert:
             that:
-              - not apache_md_cert_cp_pubcert_info.expired | bool
-              - not apache_md_cert_cp_pubcert_info.failed | bool
+              - not apache_md_cert_cp_pubcert_info.expired | ansible.builtin.bool
+              - not apache_md_cert_cp_pubcert_info.failed | ansible.builtin.bool
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
             fail_msg: >-
-              {% if apache_md_cert_cp_pubcert_info.expired | bool %}
+              {% if apache_md_cert_cp_pubcert_info.expired | ansible.builtin.bool %}
               The certificate at {{ apache_md_cert_cp.privkey.src }} has expired.
               {% endif %}
-              {% if apache_md_cert_cp_pubcert_info.failed | bool %}
+              {% if apache_md_cert_cp_pubcert_info.failed | ansible.builtin.bool %}
               The certificate check for {{ apache_md_cert_cp.privkey.src }} has failed.
               {% endif %}
 
       when:
-        - apache_md_cert_cp_privkey_src.stat.exists | bool
+        - apache_md_cert_cp_privkey_src.stat.exists | ansible.builtin.bool
         - apache_md_cert_cp_privkey_src.stat.size > 0
-        - apache_md_cert_cp_pubcert_src.stat.exists | bool
+        - apache_md_cert_cp_pubcert_src.stat.exists | ansible.builtin.bool
         - apache_md_cert_cp_pubcert_src.stat.size > 0
 
     - name: Certificate directories present
@@ -131,8 +131,8 @@
             name: "{{ apache_md_cert_cp.name }}"
             state: restarted
           when:
-            - apache_md_cert_cp.restart | bool
-            - (apache_md_cert_cp_privkey.changed | bool) or (apache_md_cert_cp_pubcert.changed | bool)
+            - apache_md_cert_cp.restart | ansible.builtin.bool
+            - (apache_md_cert_cp_privkey.changed | ansible.builtin.bool) or (apache_md_cert_cp_pubcert.changed | ansible.builtin.bool)
 
         - name: "Template Apache mod_md cert script for {{ apache_md_cert_cp.name }}"
           ansible.builtin.template:
@@ -152,9 +152,11 @@
             cmd: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
           vars:
             apache_md_cert_cp_script_run_changed: "{{ apache_md_cert_cp.name }} restarted for new cert"
+          environment:
+            PATH: usr/local/bin:/usr/bin:/bin
           when:
-            - apache_md_cert_cp_privkey_src.stat.exists | bool
-            - apache_md_cert_cp_pubcert_src.stat.exists | bool
+            - apache_md_cert_cp_privkey_src.stat.exists | ansible.builtin.bool
+            - apache_md_cert_cp_pubcert_src.stat.exists | ansible.builtin.bool
           register: apache_md_cert_cp_script_run
           changed_when: apache_md_cert_cp_script_run.stdout == apache_md_cert_cp_script_run_changed
 
@@ -165,20 +167,20 @@
             job: "/usr/local/bin/apache_md_cert_cp_{{ apache_md_cert_cp.name }}.sh"
 
       when:
-        - apache_md_cert_cp_privkey_src.stat.exists | bool
+        - apache_md_cert_cp_privkey_src.stat.exists | ansible.builtin.bool
         - apache_md_cert_cp_privkey_src.stat.size > 0
-        - apache_md_cert_cp_pubcert_src.stat.exists | bool
+        - apache_md_cert_cp_pubcert_src.stat.exists | ansible.builtin.bool
         - apache_md_cert_cp_pubcert_src.stat.size > 0
-        - not apache_md_cert_cp_pubcert_info.expired | bool
-        - not apache_md_cert_cp_pubcert_info.failed | bool
+        - not apache_md_cert_cp_pubcert_info.expired | ansible.builtin.bool
+        - not apache_md_cert_cp_pubcert_info.failed | ansible.builtin.bool
 
     - name: "Crontab absent for Apache mod_md cert script absent for {{ apache_md_cert_cp.name }}"
       ansible.builtin.cron:
         name: "Apache mod_md cert copy and service restart {{ apache_md_cert_cp.name }}"
         state: absent
       when:
-        - not apache_md_cert_cp_privkey_src.stat.exists | bool
-        - not apache_md_cert_cp_pubcert_src.stat.exists | bool
+        - not apache_md_cert_cp_privkey_src.stat.exists | ansible.builtin.bool
+        - not apache_md_cert_cp_pubcert_src.stat.exists | ansible.builtin.bool
 
   tags:
     - apache

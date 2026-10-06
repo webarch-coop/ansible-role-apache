@@ -137,10 +137,14 @@ argument_specs:
         type: dict
         required: false
         description: Internal variable for the internal argument spec.
+      apache_md_cert_reload:
+        type: dict
+        required: false
+        description: Internal result from running /usr/local/bin/apache_md_cert_reload.sh.
       apache_md_cert_reload_path:
         type: dict
         required: false
-        description: Internal result of stating /usr/local/bin/apache_md_cert_reload.sh.
+        description: Internal result from stating /usr/local/bin/apache_md_cert_reload.sh.
       apache_mods_available_paths:
         type: dict
         required: false

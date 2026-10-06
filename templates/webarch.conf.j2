@@ -179,7 +179,7 @@ ErrorDocument 506 /wsh/506.shtml
       </MDomain>
     </IfFile>
     <IfFile !/etc/ssl/le/{{ inventory_hostname }}.fullchain.pem>
-      MDomain {{ inventory_hostname }}
+      MDomain {{ inventory_hostname }} www.{{ inventory_hostname }} manual
     </IfFile>
   </IfFile>
 </IfModule>
@@ -189,9 +189,9 @@ ErrorDocument 506 /wsh/506.shtml
 <VirtualHost *:443>
   ServerName {{ inventory_hostname }}
   ServerAlias www.{{ inventory_hostname }}
-  <IfModule !md_module>
+  # <IfModule !md_module>
     ServerAlias {{ ansible_facts.default_ipv4.address }}
-  </IfModule>
+  # </IfModule>
   StrictHostCheck on
   <IfModule suexec_module>
     SuexecUserGroup www-data www-data

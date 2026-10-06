@@ -11,13 +11,10 @@
 - name: Apache mod_md tasks
   block:
 
-    - name: Include mod_md install tasks
-      ansible.builtin.include_tasks: md_install.yml
-      when:
-        - apache_md_version is defined
-        - apache_md_version != "default"
-      tags:
-        - apache_install
+    - name: Apache mod_md source code absent
+      ansible.builtin.file:
+        path: /usr/local/src/mod_md
+        state: absent
 
     - name: Include Apache mod_md cert copy tasks
       ansible.builtin.include_tasks: md_cert_cp.yml
@@ -42,6 +39,15 @@
       ansible.builtin.stat:
         path: /usr/local/bin/apache_md_cert_reload.sh
       register: apache_md_cert_reload_path
+
+    - name: Run the Apache reload script when it is present
+      ansible.builtin.command:
+        cmd: /usr/local/bin/apache_md_cert_reload.sh
+      environment:
+        PATH: usr/local/bin:/usr/bin:/bin
+      check_mode: false
+      register: apache_md_cert_reload
+      changed_when: ("Reloading Apache for new certificates" in apache_md_cert_reload.stdout)
 
     - name: Check loaded Apache modules
       block:
@@ -74,7 +80,9 @@
         - name: Set an array of the loaded modules
           ansible.builtin.set_fact:
             apache_modules_loaded: >-
-              {{- apache_modules_check.stdout_lines | map('ansible.builtin.regex_replace', '[ ].*$') | sort -}}
+              {{- apache_modules_check.stdout_lines
+              | ansible.builtin.map('ansible.builtin.regex_replace', '[ ].*$')
+              | ansible.builtin.sort -}}
 
       when:
         - apache_modules_check.stdout is defined
@@ -87,7 +95,7 @@
       tags:
         - debug
 
-    - name: Apavche reload script checked and cron job in place
+    - name: Apache reload script checked and cron job in place
       block:
 
         - name: Check the Apache reload script
@@ -106,7 +114,6 @@
         - ("md" in apache_modules_loaded)
         - apache_md_cert_reload_path.stat.exists | ansible.builtin.bool
 
-  when: apache_md_version != "default"
   tags:
     - apache
 ...

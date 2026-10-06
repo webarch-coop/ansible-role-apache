@@ -272,27 +272,30 @@
     - name: Debug apache_pkg_absent | ansible.builtin.type_debug
       ansible.builtin.debug:
         msg: "{{ apache_pkg_absent | ansible.builtin.type_debug }}"
-        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}"
       tags:
         - debug
 
     - name: Debug apache_pkg_present
       ansible.builtin.debug:
         var: apache_pkg_present
-        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}"
       tags:
         - debug
 
     - name: Debug apache_pkg_present | ansible.builtin.type_debug
       ansible.builtin.debug:
         msg: "{{ apache_pkg_present | ansible.builtin.type_debug }}"
-        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}"
       tags:
         - debug
 
-    - name: Debug Apache packages to be removed
+    - name: Debug Apache packages to be absent
       ansible.builtin.debug:
         msg: "The following packages are due to be removed: {{ apache_pkg_absent | ansible.builtin.join(', ') }}"
+      when:
+        - apache_pkg_absent is defined
+        - apache_pkg_absent != []
 
     - name: Apache packages absent
       ansible.builtin.apt:
@@ -305,9 +308,12 @@
         - apache_pkg_absent | ansible.builtin.type_debug != none
       notify: Restart Apache
 
-    - name: Debug Apache packages to be installed
+    - name: Debug Apache packages to be present
       ansible.builtin.debug:
-        msg: "The following packages are due to be installed: {{ apache_pkg_present | ansible.builtin.join(', ') }}"
+        msg: "The following packages are set to be present: {{ apache_pkg_present | ansible.builtin.join(', ') }}"
+      when:
+        - apache_pkg_present is defined
+        - apache_pkg_present != []
 
     - name: Apache packages present
       ansible.builtin.apt:
