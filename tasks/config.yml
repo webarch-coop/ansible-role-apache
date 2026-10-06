@@ -116,7 +116,7 @@
     - name: Apache localhost and localhost.d directories in place
       ansible.builtin.file:
         path: "{{ apache_dir }}"
-        state: apache_directory
+        state: directory
         owner: root
         group: root
         mode: "0755"
