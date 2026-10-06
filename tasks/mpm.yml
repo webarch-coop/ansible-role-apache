@@ -14,7 +14,7 @@
     - name: Debug Apache modules enabled
       ansible.builtin.debug:
         var: ansible_facts.ansible_local.a2query.modules_enabled
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug
 
@@ -24,7 +24,7 @@
     #     name: "{{ apache_phpfpm_mod }}"
     #     state: absent
     #   when:
-    #     - apache_phpfpm_mod is defined
+    #     - apache_phpfpm_mod is ansible.builtin.defined
     #     - apache_phpfpm_mod in ansible_facts.ansible_local.a2query.modules_enabled
 
     - name: Disable Apache module
@@ -32,7 +32,7 @@
         cmd: "a2dismod {{ apache_phpfpm_mod }}"
         removes: "/etc/apache2/mods-enabled/{{ apache_phpfpm_mod }}.load"
       when:
-        - apache_phpfpm_mod is defined
+        - apache_phpfpm_mod is ansible.builtin.defined
         - apache_phpfpm_mod in ansible_facts.ansible_local.a2query.modules_enabled
 
     - name: Disable Apache module mpm_prefork
@@ -54,8 +54,8 @@
         name: apache2
         state: restarted
       when:
-        - apache_mpm_event_enabled.changed | bool
-        - apache_init is defined
+        - apache_mpm_event_enabled.changed | ansible.builtin.bool
+        - apache_init is ansible.builtin.defined
         - apache_init == "systemd"
 
   when:
@@ -86,8 +86,8 @@
         name: apache2
         state: restarted
       when:
-        - apache_mpm_prefork_enabled.changed | bool
-        - apache_init is defined
+        - apache_mpm_prefork_enabled.changed | ansible.builtin.bool
+        - apache_init is ansible.builtin.defined
         - apache_init == "systemd"
 
   when:

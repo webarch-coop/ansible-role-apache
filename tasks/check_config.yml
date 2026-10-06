@@ -22,21 +22,28 @@
 
     - name: Set a fact for the mods available
       ansible.builtin.set_fact:
-        apache_mods_available: "{{ apache_mods_available_paths | community.general.json_query('files[].path') | map('basename') | map('regex_replace', '[.]load$') | sort }}"
+        apache_mods_available: >-
+          {{ apache_mods_available_paths
+          | community.general.json_query('files[].path')
+          | ansible.builtin.map('basename')
+          | ansible.builtin.map('regex_replace', '[.]load$')
+          | ansible.builtin.sort }}
 
     - name: Debug the mods available
       ansible.builtin.debug:
         var: apache_mods_available
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug
 
     - name: Check that all mods to be enabled are available
       ansible.builtin.assert:
         that:
-          - apache_mods_enabled | difference(apache_mods_available) | length == 0
+          - apache_mods_enabled | ansible.builtin.difference(apache_mods_available) | length == 0
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-        fail_msg: "The following mods that are set to be enabled are not available:{% for apache_mod in apache_mods_enabled | difference(apache_mods_available) %} {{ apache_mod }}{% endfor %}"
+        fail_msg: >-
+          The following mods that are set to be enabled are not available:
+          {{ apache_mods_enabled | ansible.builtin.difference(apache_mods_available) | ansible.builtin.join(', ') }}
 
     - name: Find the conf available
       ansible.builtin.find:
@@ -49,20 +56,27 @@
 
     - name: Set a fact for the conf available
       ansible.builtin.set_fact:
-        apache_conf_available: "{{ apache_conf_available_paths | community.general.json_query('files[].path') | map('basename') | map('regex_replace', '[.]conf$') | sort }}"
+        apache_conf_available: >-
+          {{ apache_conf_available_paths
+          | community.general.json_query('files[].path')
+          | ansible.builtin.map('basename')
+          | ansible.builtin.map('regex_replace', '[.]conf$')
+          | ansible.builtin.sort }}
 
     - name: Debug the conf available
       ansible.builtin.debug:
         var: apache_conf_available
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
     - name: Check that all conf to be enabled is available
       ansible.builtin.assert:
         that:
-          - apache_conf_enabled | difference(apache_conf_available) | length == 0
-        fail_msg: "The following conf that is set to be enabled is not available:{% for apache_conf in apache_conf_enabled | difference(apache_conf_available) %} {{ apache_conf }}{% endfor %}"
+          - apache_conf_enabled | ansible.builtin.difference(apache_conf_available) | length == 0
+        fail_msg: >-
+          The following conf that is set to be enabled is not available:
+          {{ apache_conf_enabled | ansible.builtin.difference(apache_conf_available) | ansible.builtin.join(', ') }}
 
     - name: Find the sites available
       ansible.builtin.find:
@@ -75,20 +89,27 @@
 
     - name: Set a fact for the sites available
       ansible.builtin.set_fact:
-        apache_sites_available: "{{ apache_sites_available_paths | community.general.json_query('files[].path') | map('basename') | map('regex_replace', '[.]conf$') | sort }}"
+        apache_sites_available: >-
+          {{ apache_sites_available_paths
+          | community.general.json_query('files[].path')
+          | ansible.builtin.map('basename')
+          | ansible.builtin.map('regex_replace', '[.]conf$')
+          | ansible.builtin.sort }}
 
     - name: Debug the sites available
       ansible.builtin.debug:
         var: apache_sites_available
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
     - name: Check that all sites to be enabled are available
       ansible.builtin.assert:
         that:
-          - apache_sites_enabled | difference(apache_sites_available) | length == 0
-        fail_msg: "The following sites that are set to be enabled are not available:{% for apache_sites in apache_sites_enabled | difference(apache_sites_available) %} {{ apache_sites }}{% endfor %}"
+          - apache_sites_enabled | ansible.builtin.difference(apache_sites_available) | length == 0
+        fail_msg: >-
+          The following sites that are set to be enabled are not available:
+          {{ apache_sites_enabled | ansible.builtin.difference(apache_sites_available) | ansible.builtin.join(', ') }}
 
   tags:
     - apache

@@ -96,7 +96,7 @@
         loop_var: apache_md_cert_cp_dir
         label: "{{ apache_md_cert_cp_dir.path }}"
       when:
-        - apache_md_cert_cp.dirs is defined
+        - apache_md_cert_cp.dirs is ansible.builtin.defined
         - apache_md_cert_cp.dirs != []
 
     - name: Copy the private key and certificate when they exist and the cert is valid

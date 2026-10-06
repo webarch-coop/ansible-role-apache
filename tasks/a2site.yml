@@ -16,7 +16,7 @@
         cmd: "a2dissite {{ apache_site }}"
         removes: "/etc/apache2/sites-enabled/{{ apache_site }}.conf"
       when:
-        - apache_sites_disabled is defined
+        - apache_sites_disabled is ansible.builtin.defined
         - apache_sites_disabled != []
         - apache_site in ansible_facts.ansible_local.a2query.sites_enabled
       loop: "{{ apache_sites_disabled }}"
@@ -31,8 +31,8 @@
     #   when: apache_site not in ansible_facts.ansible_local.a2query.sites_enabled
     #   register: apache_site_path
     #   failed_when:
-    #     - not ansible_check_mode | bool
-    #     - not apache_site_path.stat.exists | bool
+    #     - not ansible_check_mode | ansible.builtin.bool
+    #     - not apache_site_path.stat.exists | ansible.builtin.bool
     #   loop: "{{ apache_sites_enabled }}"
     #   loop_control:
     #     loop_var: apache_site
@@ -43,7 +43,7 @@
         cmd: "a2ensite {{ apache_site }}"
         creates: "/etc/apache2/sites-enabled/{{ apache_site }}.conf"
       when:
-        - apache_sites_enabled is defined
+        - apache_sites_enabled is ansible.builtin.defined
         - apache_sites_enabled != []
         - apache_site not in ansible_facts.ansible_local.a2query.sites_enabled
       loop: "{{ apache_sites_enabled }}"

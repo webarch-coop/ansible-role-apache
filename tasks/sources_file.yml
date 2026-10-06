@@ -18,16 +18,19 @@
 
     - name: Decode the base64 encoded version of /etc/apt/sources.list.d/apache.sources
       ansible.builtin.set_fact:
-        apache_sources_contents: "{{ apache_sources_contents_b64encoded['content'] | ansible.builtin.b64decode | community.general.jc('ini') }}"
+        apache_sources_contents: >-
+          {{ apache_sources_contents_b64encoded['content']
+          | ansible.builtin.b64decode
+          | community.general.jc('ini') }}
 
     - name: Print the contents of /etc/apt/sources.list.d/apache.sources
       ansible.builtin.debug:
         var: apache_sources_contents
-        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug
 
-  when: apache_sources_path.stat.exists | bool
+  when: apache_sources_path.stat.exists | ansible.builtin.bool
   tags:
     - apache
     - apache_apt

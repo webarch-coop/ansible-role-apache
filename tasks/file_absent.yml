@@ -14,7 +14,7 @@
     - name: Debug apache_file_absent
       ansible.builtin.debug:
         var: apache_file_absent
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug
 
@@ -33,9 +33,10 @@
         removes: "{{ apache_file_absent }}"
         creates: "{{ apache_file_backup }}"
       vars:
-        apache_file_backup: "{{ apache_file_absent | ansible.builtin.dirname }}/.{{ apache_file_absent | ansible.builtin.basename }}.{{ ansible_facts.date_time.iso8601_basic_short }}.ansible.save"
+        apache_file_backup: >-
+          {{ apache_file_absent | ansible.builtin.dirname }}/.{{ apache_file_absent | ansible.builtin.basename }}.{{ ansible_facts.date_time.iso8601_basic_short }}.ansible.save
       register: apache_file_path_absent
-      when: apache_file_absent_path.stat.exists | bool
+      when: apache_file_absent_path.stat.exists | ansible.builtin.bool
 
   tags:
     - apache

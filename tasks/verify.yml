@@ -14,14 +14,14 @@
     - name: Debug the hostvars variable names that start with apache_
       ansible.builtin.debug:
         var: apachevarnames
-        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool %}3{% else %}4{% endif %}"
       tags:
         - debug
 
     - name: Debug the hostvars variable names that start with apache_
       ansible.builtin.debug:
         var: apachehostvars
-        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool %}3{% else %}4{% endif %}"
       tags:
         - debug
 
@@ -39,7 +39,7 @@
         argument_spec: "{{ apache_combined_argument_spec['argument_specs']['main']['options'] }}"
         provided_arguments: "{{ apachehostvars }}"
 
-  when: apache_verify | bool
+  when: apache_verify | ansible.builtin.bool
   tags:
     - apache
 ...

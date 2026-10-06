@@ -27,12 +27,15 @@
 
     - name: Create an array from the Cloudflare IP lists
       ansible.builtin.set_fact:
-        apache_cloudflare_ips: "{{ (apache_cloudflare_ips_v4_b64encoded['content'] | b64decode | trim).split('\n') }}"
+        apache_cloudflare_ips: >-
+          {{ (apache_cloudflare_ips_v4_b64encoded['content']
+          | ansible.builtin.b64decode
+          | ansible.builtin.trim).split('\n') }}"
 
     - name: Debug Cloudflare IP array
       ansible.builtin.debug:
         msg: "apache_cloudflare_ips: {{ apache_cloudflare_ips }}"
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 

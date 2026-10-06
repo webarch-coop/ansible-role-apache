@@ -16,7 +16,7 @@
         cmd: "a2disconf {{ apache_conf }}"
         removes: "/etc/apache2/conf-enabled/{{ apache_conf }}.conf"
       when:
-        - apache_conf_disabled is defined
+        - apache_conf_disabled is ansible.builtin.defined
         - apache_conf_disabled != []
         - apache_conf in ansible_facts.ansible_local.a2query.conf_enabled
       loop: "{{ apache_conf_disabled }}"
@@ -31,8 +31,8 @@
       when: apache_conf not in ansible_facts.ansible_local.a2query.conf_enabled
       register: apache_conf_path
       failed_when:
-        - not ansible_check_mode | bool
-        - not apache_conf_path.stat.exists | bool
+        - not ansible_check_mode | ansible.builtin.bool
+        - not apache_conf_path.stat.exists | ansible.builtin.bool
       loop: "{{ apache_conf_enabled }}"
       loop_control:
         loop_var: apache_conf
@@ -43,7 +43,7 @@
         cmd: "a2enconf {{ apache_conf }}"
         creates: "/etc/apache2/conf-enabled/{{ apache_conf }}.conf"
       when:
-        - apache_conf_enabled is defined
+        - apache_conf_enabled is ansible.builtin.defined
         - apache_conf_enabled != []
         - apache_conf not in ansible_facts.ansible_local.a2query.conf_enabled
       loop: "{{ apache_conf_enabled }}"

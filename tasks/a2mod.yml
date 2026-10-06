@@ -42,7 +42,7 @@
       vars:
         apache_mod_php_pkg: "libapache2-mod-php{{ apache_php_version }}"
       when:
-        - apache_php | bool
+        - apache_php | ansible.builtin.bool
         - ("apache_phpfpm_mod" in apache_mods_disabled)
         - (apache_mod_php_pkg in ansible_facts.ansible_local.dpkg.installed)
       notify: Restart Apache
@@ -63,7 +63,7 @@
         filter: ansible_local
 
   when:
-    - apache_mods_disabled is defined
+    - apache_mods_disabled is ansible.builtin.defined
     - apache_mods_disabled != []
     - apache_mods_disabled | ansible.builtin.intersect(ansible_local.a2query.modules_enabled) != []
   tags:
@@ -103,7 +103,7 @@
       vars:
         apache_mod_php_pkg: "libapache2-mod-php{{ apache_php_version }}"
       when:
-        - apache_php | bool
+        - apache_php | ansible.builtin.bool
         - ("apache_phpfpm_mod" in apache_mods_enabled)
         - (apache_mod_php_pkg not in ansible_facts.ansible_local.dpkg.installed)
       notify: Restart Apache
@@ -114,8 +114,8 @@
     #   when: apache_mod not in ansible_facts.ansible_local.a2query.modules_enabled
     #   register: apache_mod_path
     #   failed_when:
-    #     - not ansible_check_mode | bool
-    #     - not apache_mod_path.stat.exists | bool
+    #     - not ansible_check_mode | ansible.builtin.bool
+    #     - not apache_mod_path.stat.exists | ansible.builtin.bool
     #   loop: "{{ apache_mods_enabled }}"
     #   loop_control:
     #     loop_var: apache_mod
@@ -137,7 +137,7 @@
         filter: ansible_local
 
   when:
-    - apache_mods_enabled is defined
+    - apache_mods_enabled is ansible.builtin.defined
     - apache_mods_enabled != []
     - apache_mods_enabled | ansible.builtin.difference(ansible_local.a2query.modules_enabled) != []
   tags:
