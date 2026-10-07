@@ -29,23 +29,6 @@
         - apache_install
         - apache_local_facts
 
-    - name: Include local fact tasks
-      ansible.builtin.include_tasks: local_facts.yml
-      when: >-
-        (ansible_facts.ansible_local.apache.state is not ansible.builtin.defined) or
-        (ansible_facts.ansible_local.apache.version is not ansible.builtin.defined) or
-        (ansible_facts.ansible_local.apache.mpm is not ansible.builtin.defined) or
-        (ansible_facts.ansible_local.apache.conf_enabled is not ansible.builtin.defined) or
-        (ansible_facts.ansible_local.apache.modules_enabled is not ansible.builtin.defined) or
-        (ansible_facts.ansible_local.apache.sites_enabled is not ansible.builtin.defined) or
-        (ansible_facts.ansible_local.apache.servername_enabled is not ansible.builtin.defined)
-      tags:
-        - apache_install
-        - apache_local_facts
-
-    - name: Include Apache apt tasks
-      ansible.builtin.include_tasks: apt.yml
-
     - name: Include apt role local fact tasks
       ansible.builtin.include_role:
         name: apt
@@ -54,6 +37,28 @@
         (ansible_facts.ansible_local.dpkg.arch is not ansible.builtin.defined) or
         (ansible_facts.ansible_local.gpg.version is not ansible.builtin.defined) or
         (ansible_facts.ansible_local.bash.path is not ansible.builtin.defined)
+      tags:
+        - apache_install
+        - apache_local_facts
+
+    - name: Include Apache apt tasks
+      ansible.builtin.include_tasks: apt.yml
+
+    - name: Include local fact tasks
+      ansible.builtin.include_tasks: local_facts.yml
+      when:
+        - >-
+          (ansible_facts.ansible_local.apache.state is not ansible.builtin.defined) or
+          (ansible_facts.ansible_local.apache.version is not ansible.builtin.defined) or
+          (ansible_facts.ansible_local.apache.mpm is not ansible.builtin.defined) or
+          (ansible_facts.ansible_local.apache.conf_enabled is not ansible.builtin.defined) or
+          (ansible_facts.ansible_local.apache.modules_enabled is not ansible.builtin.defined) or
+          (ansible_facts.ansible_local.apache.sites_enabled is not ansible.builtin.defined) or
+          (ansible_facts.ansible_local.apache.servername_enabled is not ansible.builtin.defined)
+        - ansible_facts.ansible_local.dpkg.installed is defined
+        - ("apache2" in ansible_facts.ansible_local.dpkg.installed)
+        - ("apache2-bin" in ansible_facts.ansible_local.dpkg.installed)
+        - ("apache2-utils" in ansible_facts.ansible_local.dpkg.installed)
       tags:
         - apache_install
         - apache_local_facts

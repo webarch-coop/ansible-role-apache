@@ -327,6 +327,12 @@
         - apache_pkg_present | ansible.builtin.type_debug != none
       notify: Restart Apache
 
+    - name: Read apache local facts  # noqa: no-handler
+      ansible.builtin.setup:
+        filter: ansible_local
+      check_mode: false
+      changed_when: false
+
   tags:
     - apache
     - apache_install
