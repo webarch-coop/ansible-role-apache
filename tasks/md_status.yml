@@ -38,7 +38,7 @@
 
     - name: "Debug the mdomain status for {{ apache_mdomain }}"
       ansible.builtin.debug:
-        var: apache_mdomain_status.json
+        var: apache_mdomain_status.json.valid
         verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       when: apache_mdomain_status.json is defined
       tags:

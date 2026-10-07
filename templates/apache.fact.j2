@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2016
+# {{ ansible_managed }}
+
+# Copyright 2018-2026 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+
+set -euo pipefail
+
+a2query_path="$(type -p a2query)"
+apache2ctl_path="$(type -p apache2ctl)"
+gawk_path="$(type -p gawk)"
+grep_path="$(type -p grep)"
+jo_path="$(type -p jo)"
+sort_path="$(type -p sort)"
+
+if [[ -e "${gawk_path}" && -e "${grep_path}" && -e "${sort_path=}" && -e "${jo_path}" && -e "${a2query_path}" && -e "${apache2ctl_path}" ]]
+then
+  declare -a conf_enabled=()
+  readarray -t conf_enabled < <("${a2query_path}" -c | "${gawk_path}" '{print $1}' | "${sort_path}")
+  declare -a modules_enabled=()
+  readarray -t modules_enabled < <("${a2query_path}" -m | "${gawk_path}" '{print $1}' | "${sort_path}")
+  declare -a sites_enabled=()
+  readarray -t sites_enabled < <("${a2query_path}" -s | "${gawk_path}" '{print $1}' | "${sort_path}")
+  declare -a servernames=()
+  readarray -t servernames < <("${apache2ctl_path}" -S | "${grep_path}" -e '^         port 443 namevhost ' | "${gawk_path}" '{ print $4 }' | "${sort_path}")
+  "${jo_path}" state="present" version="$("${a2query_path}" -v)" mpm="$("${a2query_path}" -M)" \
+     conf_enabled="$("${jo_path}" -a "${conf_enabled[@]}")" \
+     modules_enabled="$("${jo_path}" -a "${modules_enabled[@]}")" \
+     sites_enabled="$("${jo_path}" -a "${sites_enabled[@]}")" \
+     servernames="$("${jo_path}" -a "${servernames[@]}")"
+elif [[ -e "${jo_path}" ]]
+then
+  "${jo_path}" state=absent
+else
+  echo '{"state":"absent"}'
+fi
+
+# vim: syntax=bash

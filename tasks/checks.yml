@@ -460,7 +460,7 @@
 
     - name: Debug Apache version
       ansible.builtin.debug:
-        var: ansible_facts.ansible_local.a2query.version
+        var: ansible_facts.ansible_local.apache.version
         verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug
@@ -471,7 +471,7 @@
         - name: Set facts for TLS versions
           ansible.builtin.set_fact:
             apache_tls1_3: true
-          when: ansible_facts.ansible_local.a2query.version is version('2.4.41', '>=')
+          when: ansible_facts.ansible_local.apache.version is version('2.4.41', '>=')
 
         - name: Debug TLS 1.3 variable
           ansible.builtin.debug:
@@ -480,7 +480,7 @@
           tags:
             - debug
 
-      when: ansible_facts.ansible_local.a2query.version is ansible.builtin.version('2.4.41', 'ge')
+      when: ansible_facts.ansible_local.apache.version is ansible.builtin.version('2.4.41', 'ge')
 
     - name: Check if phpquery is installed
       ansible.builtin.command:
@@ -575,7 +575,7 @@
 
     - name: Debug the enabled MPM
       ansible.builtin.debug:
-        var: ansible_facts.ansible_local.a2query.mpm
+        var: ansible_facts.ansible_local.apache.mpm
         verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug

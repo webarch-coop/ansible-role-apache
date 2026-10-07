@@ -83,10 +83,14 @@ argument_specs:
         elements: str
         required: false
         description: List of enabled Apache modules.
-      apache_a2query_facts:
+      apache_facts:
         type: dict
         required: false
-        description: Internal dictionary for the results of copying the a2query local facts script into place.
+        description: Internal dictionary for the facts returned by the apache local facts script.
+      apache_facts_script:
+        type: dict
+        required: false
+        description: Internal dictionary for the results of copying the apache local facts script into place.
       apache_argument_spec:
         type: dict
         required: false

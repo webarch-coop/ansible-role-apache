@@ -29,6 +29,23 @@
         - apache_install
         - apache_local_facts
 
+    - name: Include local fact tasks
+      ansible.builtin.include_tasks: local_facts.yml
+      when: >-
+        (ansible_facts.ansible_local.apache.state is not ansible.builtin.defined) or
+        (ansible_facts.ansible_local.apache.version is not ansible.builtin.defined) or
+        (ansible_facts.ansible_local.apache.mpm is not ansible.builtin.defined) or
+        (ansible_facts.ansible_local.apache.conf_enabled is not ansible.builtin.defined) or
+        (ansible_facts.ansible_local.apache.modules_enabled is not ansible.builtin.defined) or
+        (ansible_facts.ansible_local.apache.sites_enabled is not ansible.builtin.defined) or
+        (ansible_facts.ansible_local.apache.servername_enabled is not ansible.builtin.defined)
+      tags:
+        - apache_install
+        - apache_local_facts
+
+    - name: Include Apache apt tasks
+      ansible.builtin.include_tasks: apt.yml
+
     - name: Include apt role local fact tasks
       ansible.builtin.include_role:
         name: apt
@@ -37,16 +54,6 @@
         (ansible_facts.ansible_local.dpkg.arch is not ansible.builtin.defined) or
         (ansible_facts.ansible_local.gpg.version is not ansible.builtin.defined) or
         (ansible_facts.ansible_local.bash.path is not ansible.builtin.defined)
-      tags:
-        - apache_install
-        - apache_local_facts
-
-    - name: Include Apache apt tasks
-      ansible.builtin.include_tasks: apt.yml
-
-    - name: Include local facts tasks for a2query fact
-      ansible.builtin.include_tasks: local_facts.yml
-      when: ansible_facts.ansible_local.a2query is not ansible.builtin.defined
       tags:
         - apache_install
         - apache_local_facts
@@ -67,7 +74,7 @@
       when:
         - apache_mods_enabled is ansible.builtin.defined
         - apache_mods_enabled != []
-        - ansible_facts.ansible_local.a2query.mpm not in apache_mods_enabled
+        - ansible_facts.ansible_local.apache.mpm not in apache_mods_enabled
 
     - name: Apache DH parameters file present
       community.crypto.openssl_dhparam:

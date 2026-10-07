@@ -20,21 +20,43 @@
         owner: root
         group: root
 
-    - name: Ansible a2query local facts script present
+    - name: Ansible a2query local facts script absent
+      ansible.builtin.file:
+        path: /etc/ansible/facts.d/a2query.fact
+        state: absent
+
+    - name: Ansible apache local facts script present
       ansible.builtin.template:
-        src: a2query.fact.j2
-        dest: /etc/ansible/facts.d/a2query.fact
+        src: apache.fact.j2
+        dest: /etc/ansible/facts.d/apache.fact
         mode: "0755"
         owner: root
         group: root
         validate: bash %s
-      register: apache_a2query_facts
 
-    - name: Re-read Ansible local facts  # noqa: no-handler
-      ansible.builtin.setup:
-        filter: ansible_local
-      changed_when: false
-      when: apache_a2query_facts.changed | ansible.builtin.bool
+    - name: Stat /etc/ansible/facts.d/apache.fact
+      ansible.builtin.stat:
+        path: /etc/ansible/facts.d/apache.fact
+      register: apache_facts_script
+
+    - name: Read and debug apache local facts
+      block:
+
+        - name: Read apache local facts  # noqa: no-handler
+          ansible.builtin.setup:
+            filter: ansible_local
+          check_mode: false
+          changed_when: false
+          register: apache_facts
+
+        - name: Debug apache_facts
+          ansible.builtin.debug:
+            var: apache_facts
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
+          tags:
+            - debig
+
+      when: apache_facts_script.stat.exists
 
   tags:
     - apache
