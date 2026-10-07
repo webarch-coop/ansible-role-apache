@@ -20,10 +20,16 @@
         owner: root
         group: root
 
+    - name: Stat /etc/ansible/facts.d/a2query.fact
+      ansible.builtin.stat:
+        path: /etc/ansible/facts.d/a2query.fact
+      register: apache_a2query_path
+
     - name: Ansible a2query local facts script absent
       ansible.builtin.file:
         path: /etc/ansible/facts.d/a2query.fact
         state: absent
+      when: apache_a2query_path.stat.exists | ansible.builtin.bool
 
     - name: Ansible apache local facts script present
       ansible.builtin.template:

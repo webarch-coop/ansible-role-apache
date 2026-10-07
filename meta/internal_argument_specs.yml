@@ -14,6 +14,10 @@ argument_specs:
     description: An Ansible role for installing and configuring the Apache HTTP server.
     short_description: The main entry point for the Apache role.
     options:
+      apache_a2query_path:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.stat module.
       apache_apt_key_path:
         type: dict
         required: false
