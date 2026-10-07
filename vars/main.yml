@@ -41,7 +41,8 @@ apache_pkg_available_sury: "{{ apache_pkgs_sury | community.general.json_query(a
 
 apache_sury_distros:
   - bookworm
-  - forky
+  # No sury support for forky yet
+  # - forky
   - noble
   - resolute
   - trixie
