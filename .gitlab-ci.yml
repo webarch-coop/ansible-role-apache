@@ -35,20 +35,20 @@ before_script:
   - which molecule
   - molecule --version
 stages:
-  - resolute
-  - trixie
-  - bookworm
   # No sury repo support for forky yet
   # - forky
+  - bookworm
   - noble
+  - resolute
+  - trixie
 # No sury repo support for forky yet
-forky:
-  image: registry.git.coop/webarch/containers/images/forky:20260916
-  stage: forky
-  script:
-    - pre-commit install
-    - pre-commit run --all-files
-    - molecule test --all
+# forky:
+#   image: registry.git.coop/webarch/containers/images/forky:20260916
+#   stage: forky
+#   script:
+#     - pre-commit install
+#     - pre-commit run --all-files
+#     - molecule test --all
 trixie:
   image: registry.git.coop/webarch/containers/images/trixie:20260916
   stage: trixie
