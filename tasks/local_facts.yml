@@ -11,6 +11,22 @@
 - name: Apache local facts
   block:
 
+    - name: JC local parsers directory present
+      ansible.builtin.file:
+        path: /root/.local/share/jc/jcparsers
+        state: directory
+        mode: "0750"
+        owner: root
+        group: root
+
+    - name: JC apachectl parset present
+      ansible.builtin.copy:
+        src: apachectl.py
+        dest: /root/.local/share/jc/jcparsers/apachectl.py
+        mode: "0640"
+        owner: root
+        group: root
+
     - name: Ansible facts.d directory present
       ansible.builtin.file:
         path: /etc/ansible/facts.d
@@ -42,19 +58,18 @@
     - name: Read and debug apache local facts
       block:
 
-        - name: Read apache local facts  # noqa: no-handler
+        - name: Read local facts  # noqa: no-handler
           ansible.builtin.setup:
             filter: ansible_local
           check_mode: false
           changed_when: false
-          register: apache_facts
 
-        - name: Debug apache_facts
+        - name: Debug ansible_facts.ansible_local.apache
           ansible.builtin.debug:
-            var: apache_facts
+            var: ansible_facts.ansible_local.apache
             verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
           tags:
-            - debig
+            - debug
 
       when: apache_facts_script.stat.exists
 

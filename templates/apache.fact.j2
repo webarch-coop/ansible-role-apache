@@ -14,6 +14,7 @@
 
 set -euo pipefail
 
+# If any of the following don't exist then the script will exit with error code 1
 a2query_path="$(type -p a2query)"
 apache2ctl_path="$(type -p apache2ctl)"
 gawk_path="$(type -p gawk)"
@@ -36,9 +37,6 @@ then
      modules_enabled="$("${jo_path}" -a "${modules_enabled[@]}")" \
      sites_enabled="$("${jo_path}" -a "${sites_enabled[@]}")" \
      servernames="$("${jo_path}" -a "${servernames[@]}")"
-elif [[ -e "${jo_path}" ]]
-then
-  "${jo_path}" state=absent
 else
   echo '{"state":"absent"}'
 fi

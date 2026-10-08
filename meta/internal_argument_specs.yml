@@ -83,10 +83,6 @@ argument_specs:
         elements: str
         required: false
         description: List of enabled Apache modules.
-      apache_facts:
-        type: dict
-        required: false
-        description: Internal dictionary for the facts returned by the apache local facts script.
       apache_facts_script:
         type: dict
         required: false
