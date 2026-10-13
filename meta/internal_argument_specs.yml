@@ -82,6 +82,38 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.stat module.
+      apache_md_status_get:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.uri module.
+      apache_mod_md_cert_domains:
+        type: list
+        required: false
+        description: List of mod_md certificate domain names and aliases.
+        options:
+          name:
+            type: str
+            required: true
+            description: The certificate domain name.
+          altnames:
+            type: list
+            required: false
+            description: A list of subjectAltNames.
+            elements: str
+      apache_virtual_host_domains:
+        type: list
+        required: false
+        description: List of Apache VirtualHost domain names and aliases.
+        options:
+          name:
+            type: str
+            required: true
+            description: The certificate domain name.
+          altnames:
+            type: list
+            required: false
+            description: A list of subjectAltNames.
+            elements: str
       apache_a2query_facts:
         type: dict
         required: false
