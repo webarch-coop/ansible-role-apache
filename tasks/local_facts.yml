@@ -11,21 +11,40 @@
 - name: Apache local facts
   block:
 
-    - name: JC local parsers directory present
-      ansible.builtin.file:
-        path: /root/.local/share/jc/jcparsers
-        state: directory
-        mode: "0750"
-        owner: root
-        group: root
+    - name: Generate about JC information
+      ansible.builtin.command:
+        cmd: jc -am --json
+      check_mode: false
+      changed_when: false
+      register: apache_jc_about
 
-    - name: JC apachectl parset present
-      ansible.builtin.copy:
-        src: apachectl.py
-        dest: /root/.local/share/jc/jcparsers/apachectl.py
-        mode: "0640"
-        owner: root
-        group: root
+    - name: Set a fact for the JC information
+      ansible.builtin.set_fact:
+        apache_jc: "{{ apache_jc_about.stdout | ansible.builtin.from_json }}"
+
+    - name: Install JC apachectl parser
+      block:
+
+        - name: JC local parsers directory present
+          ansible.builtin.file:
+            path: /root/.local/share/jc/jcparsers
+            state: directory
+            mode: "0750"
+            owner: root
+            group: root
+
+        - name: JC apachectl parset present
+          ansible.builtin.copy:
+            src: apachectl.py
+            dest: /root/.local/share/jc/jcparsers/apachectl.py
+            mode: "0640"
+            owner: root
+            group: root
+
+      when:
+        - apache_jc | community.general.json_query('parsers[].name') is defined
+        - apache_jc | community.general.json_query('parsers[].name') != []
+        - ("apachectl" not in apache_jc | community.general.json_query('parsers[].name'))
 
     - name: Ansible facts.d directory present
       ansible.builtin.file:
@@ -36,26 +55,35 @@
         owner: root
         group: root
 
-    - name: Ansible a2query local facts script absent
-      ansible.builtin.file:
-        path: /etc/ansible/facts.d/a2query.fact
-        state: absent
-
-    - name: Ansible apache local facts script present
-      ansible.builtin.template:
-        src: apache.fact.j2
-        dest: /etc/ansible/facts.d/apache.fact
+    - name: Ansible a2query local facts script present
+      ansible.builtin.copy:
+        src: a2query.fact
+        dest: /etc/ansible/facts.d/a2query.fact
         mode: "0755"
         owner: root
         group: root
         validate: bash %s
 
-    - name: Stat /etc/ansible/facts.d/apache.fact
-      ansible.builtin.stat:
-        path: /etc/ansible/facts.d/apache.fact
-      register: apache_facts_script
+    - name: Ansible apachectl local facts script present
+      ansible.builtin.copy:
+        src: apachectl.fact
+        dest: /etc/ansible/facts.d/apachectl.fact
+        mode: "0755"
+        owner: root
+        group: root
+        validate: bash %s
 
-    - name: Read and debug apache local facts
+    - name: Stat /etc/ansible/facts.d/a2query.fact
+      ansible.builtin.stat:
+        path: /etc/ansible/facts.d/a2query.fact
+      register: apache_a2query_facts
+
+    - name: Stat /etc/ansible/facts.d/apachectl.fact
+      ansible.builtin.stat:
+        path: /etc/ansible/facts.d/apachectl.fact
+      register: apache_apachectl_facts
+
+    - name: Read Apache local facts
       block:
 
         - name: Read local facts  # noqa: no-handler
@@ -64,14 +92,23 @@
           check_mode: false
           changed_when: false
 
-        - name: Debug ansible_facts.ansible_local.apache
+        - name: Debug ansible_facts.ansible_local.a2query
           ansible.builtin.debug:
-            var: ansible_facts.ansible_local.apache
-            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
+            var: ansible_facts.ansible_local.a2query
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
           tags:
             - debug
 
-      when: apache_facts_script.stat.exists
+        - name: Debug ansible_facts.ansible_local.apachectl
+          ansible.builtin.debug:
+            var: ansible_facts.ansible_local.apachectl
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+          tags:
+            - debug
+
+      when:
+        - apache_a2query_facts.stat.exists | ansible.builtin.bool
+        - apache_apachectl_facts.stat.exists | ansible.builtin.bool
 
   tags:
     - apache

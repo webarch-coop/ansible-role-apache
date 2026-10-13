@@ -30,6 +30,14 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.command module.
+      apache_jc:
+        type: dict
+        required: false
+        description: JSON result from running jc -am --json.
+      apache_jc_about:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.command module.
       apache_mdomain_status:
         type: dict
         required: false
@@ -74,19 +82,14 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.stat module.
-      apache_modules_check:
+      apache_a2query_facts:
         type: dict
         required: false
-        description: Results from running the ansible.builtin.command module.
-      apache_modules_loaded:
-        type: list
-        elements: str
-        required: false
-        description: List of enabled Apache modules.
-      apache_facts_script:
+        description: Internal dictionary for the results of copying the a2query local facts script into place.
+      apache_apachectl_facts:
         type: dict
         required: false
-        description: Internal dictionary for the results of copying the apache local facts script into place.
+        description: Internal dictionary for the results of copying the apachectl local facts script into place.
       apache_argument_spec:
         type: dict
         required: false

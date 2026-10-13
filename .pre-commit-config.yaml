@@ -31,13 +31,13 @@ repos:
           - templates
   # https://github.com/jackdewinter/pymarkdown/releases
   - repo: https://github.com/jackdewinter/pymarkdown.git
-    rev: v0.9.39
+    rev: v0.9.41
     hooks:
       - id: pymarkdown
         name: Markdown Lint
   # https://github.com/ansible/ansible-lint/releases
   - repo: https://github.com/ansible/ansible-lint.git
-    rev: v26.9.0
+    rev: v26.10.1
     hooks:
       - id: ansible-lint
         name: Ansible Lint

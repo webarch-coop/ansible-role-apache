@@ -82,6 +82,14 @@ argument_specs:
         required: true
         description: Dictionary of JMESPath queries.
         options:
+          mod_md_cert_domains:
+            type: str
+            required: true
+            description: JMESPath query for mod_md certificate names and domains.
+          mod_md_names:
+            type: str
+            required: true
+            description: JMESPath query for mod_md certificate names.
           pkgs_absent:
             type: str
             required: true
@@ -94,6 +102,14 @@ argument_specs:
             type: str
             required: true
             description: JMESPath query for packages present.
+          vhost_443_domains:
+            type: str
+            required: true
+            description: JMESPath query for port 443 VirtualHost ServerNames and ServerAliases.
+          vhost_443_names:
+            type: str
+            required: true
+            description: JMESPath query for port 443 VirtualHost names.
       apache_localhost_port:
         type: int
         required: true

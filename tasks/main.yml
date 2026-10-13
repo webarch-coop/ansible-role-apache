@@ -71,7 +71,7 @@
       when:
         - apache_mods_enabled is ansible.builtin.defined
         - apache_mods_enabled != []
-        - ansible_facts.ansible_local.apache.mpm not in apache_mods_enabled
+        - ansible_facts.ansible_local.a2query.mpm not in apache_mods_enabled
 
     - name: Apache DH parameters file present
       community.crypto.openssl_dhparam:

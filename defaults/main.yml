@@ -53,6 +53,7 @@ apache_pkgs:
       - apache2
       - apache2-utils
       - debsuryorg-archive-keyring
+      - jc
       - jo
       - lynx
   - name: forky
@@ -65,6 +66,7 @@ apache_pkgs:
       - apache2
       - apache2-utils
       - debsuryorg-archive-keyring
+      - jc
       - jo
       - lynx
   - name: noble
@@ -76,6 +78,7 @@ apache_pkgs:
       - apache2
       - apache2-utils
       - debsuryorg-archive-keyring
+      - jc
       - jo
       - lynx
   - name: resolute
@@ -87,6 +90,7 @@ apache_pkgs:
       - apache2
       - apache2-utils
       - debsuryorg-archive-keyring
+      - jc
       - jo
       - lynx
   - name: trixie
@@ -98,6 +102,7 @@ apache_pkgs:
       - apache2
       - apache2-utils
       - debsuryorg-archive-keyring
+      - jc
       - jo
       - lynx
 

@@ -16,6 +16,12 @@
         path: /usr/local/src/mod_md
         state: absent
 
+    - name: Read local facts  # noqa: no-handler
+      ansible.builtin.setup:
+        filter: ansible_local
+      check_mode: false
+      changed_when: false
+
     - name: Include Apache mod_md cert copy tasks
       ansible.builtin.include_tasks: md_cert_cp.yml
       loop: "{{ apache_md_cert_copy }}"
@@ -49,52 +55,6 @@
       register: apache_md_cert_reload
       changed_when: ("Reloading Apache for new certificates" in apache_md_cert_reload.stdout)
 
-    - name: Check loaded Apache modules
-      block:
-
-        - name: Register the loaded Apache modules
-          ansible.builtin.command:
-            cmd: a2query -m
-          check_mode: false
-          changed_when: false
-          register: apache_modules_check
-
-      rescue:
-
-        - name: No mods enabled
-          ansible.builtin.set_fact:
-            apache_modules_loaded: []
-          when: ("No module matches" in apache_modules_check.stderr)
-
-
-    - name: Set an array of loaded Apache modules
-      block:
-
-        - name: Debug the loaded modules
-          ansible.builtin.debug:
-            var: apache_modules_check.stdout_lines
-            verbosity: 3
-          tags:
-            - debug
-
-        - name: Set an array of the loaded modules
-          ansible.builtin.set_fact:
-            apache_modules_loaded: >-
-              {{- apache_modules_check.stdout_lines
-              | ansible.builtin.map('ansible.builtin.regex_replace', '[ ].*$')
-              | ansible.builtin.sort -}}
-
-      when:
-        - apache_modules_check.stdout is defined
-        - apache_modules_check.stderr | length == 0
-
-    - name: Debug loaded modules
-      ansible.builtin.debug:
-        var: apache_modules_loaded
-        verbosity: 3
-      tags:
-        - debug
-
     - name: Apache reload script checked and cron job in place
       block:
 
@@ -111,8 +71,73 @@
             job: /usr/local/bin/apache_md_cert_reload.sh
 
       when:
-        - ("md" in apache_modules_loaded)
+        - ("md" in ansible_facts.ansible_local.a2query.modules_enabled)
         - apache_md_cert_reload_path.stat.exists | ansible.builtin.bool
+
+    - name: "Get the Apache md-status for {{ inventory_hostname }}"
+      ansible.builtin.uri:
+        url: http://localhost/md-status
+        return_content: true
+        status_code: 200
+        method: get
+      delegate_to: "{{ inventory_hostname }}"
+      check_mode: false
+      changed_when: false
+      register: apache_md_status_get
+
+    - name: Debug apache_md_status_get.json
+      ansible.builtin.debug:
+        var: apache_md_status_get.json
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
+      tags:
+        - debug
+
+    - name: Set a fact for the mod_md certificate domain names
+      ansible.builtin.set_fact:
+        apache_mod_md_cert_domains: >-
+          {{ apache_md_status_get.json | community.general.json_query(apache_jpq.mod_md_cert_domains)
+          | ansible.builtin.sort(attribute='name') }}
+
+    - name: Debug apache_mod_md_cert_domains
+      ansible.builtin.debug:
+        var: apache_mod_md_cert_domains
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}
+      tags:
+        - debug
+
+    - name: Debug ansible_facts.ansible_local.apachectl.virtual_hosts
+      ansible.builtin.debug:
+        var: ansible_facts.ansible_local.apachectl.virtual_hosts
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
+      tags:
+        - debug
+
+    - name: Set a fact for the active Apache VirtualHost ServerNames and ServerAliases
+      ansible.builtin.set_fact:
+        apache_virtual_host_domains: >-
+          {{ ansible_facts.ansible_local.apachectl.virtual_hosts | community.general.json_query(apache_jpq.vhost_443_domains)
+          | ansible.builtin.sort(attribute='name') }}
+
+    - name: Debug apache_virtual_host_domains
+      ansible.builtin.debug:
+        var: apache_virtual_host_domains
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}
+      tags:
+        - debug
+
+     # TODO Compare the Apache VirtualHosts and mod_md certificates to check if any certificates are missing or if any
+     #      VirtualHosts have ServerNames or ServerAliases missing
+
+     #  - name: Check Apache VirtualHost certificates
+     #    ansible.builtin.include_tasks: md_vhosts.yml
+     #    loop: "{{ apache_virtual_host_domains }}"
+     #    loop_control:
+     #      loop_var: apache_vhost
+     #      label: "{{ apache_vhost.name }}"
 
   tags:
     - apache
