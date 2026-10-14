@@ -11,6 +11,11 @@
 - name: Generate Cloudflare config
   block:
 
+    - name: Legacy Cloudflare IPv4 list absent
+      ansible.builtin.file:
+        path: /root/cloudflare_ips_v4.txt
+        state: absent
+
     - name: Get Cloudflare IPv4 list
       ansible.builtin.uri:
         url: https://www.cloudflare.com/ips-v4

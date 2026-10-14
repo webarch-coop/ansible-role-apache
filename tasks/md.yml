@@ -89,7 +89,7 @@
       ansible.builtin.debug:
         var: apache_md_status_get.json
         verbosity: >-
-          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}2{% else %}3{% endif %}
       tags:
         - debug
 
@@ -103,7 +103,20 @@
       ansible.builtin.debug:
         var: apache_mod_md_cert_domains
         verbosity: >-
-          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
+      tags:
+        - debug
+
+    - name: Set a fact for all the subjectAltNames
+      ansible.builtin.set_fact:
+        apache_mod_md_cert_all_domains: >-
+          {{ apache_mod_md_cert_domains | community.general.json_query(apache_jpq.mod_md_cert_all_domains) | ansible.builtin.sort }}
+
+    - name: Debug apache_mod_md_cert_all_domains
+      ansible.builtin.debug:
+        var: apache_mod_md_cert_all_domains
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
       tags:
         - debug
 
@@ -125,19 +138,56 @@
       ansible.builtin.debug:
         var: apache_virtual_host_domains
         verbosity: >-
-          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
       tags:
         - debug
 
-     # TODO Compare the Apache VirtualHosts and mod_md certificates to check if any certificates are missing or if any
-     #      VirtualHosts have ServerNames or ServerAliases missing
+    - name: Set a fact for all the Apache ServerName and ServerAliases
+      ansible.builtin.set_fact:
+        apache_virtual_host_all_domains: >-
+          {{ (apache_virtual_host_domains | community.general.json_query(apache_jpq.vhost_all_names)
+          + apache_virtual_host_domains | community.general.json_query(apache_jpq.vhost_all_altnames))
+          | ansible.builtin.sort }}
 
-     #  - name: Check Apache VirtualHost certificates
-     #    ansible.builtin.include_tasks: md_vhosts.yml
-     #    loop: "{{ apache_virtual_host_domains }}"
-     #    loop_control:
-     #      loop_var: apache_vhost
-     #      label: "{{ apache_vhost.name }}"
+    - name: Debug apache_virtual_host_all_domains
+      ansible.builtin.debug:
+        var: apache_virtual_host_all_domains
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
+      tags:
+        - debug
+
+    - name: Apache VirtualHost ServerNames and ServerAliases missing from the mod_md certificates
+      ansible.builtin.debug:
+        var: apache_domains_not_in_certs
+      vars:
+        apache_domains_not_in_certs: >-
+          {{ apache_virtual_host_all_domains | ansible.builtin.difference(apache_mod_md_cert_all_domains) }}
+      when:
+        - apache_domains_not_in_certs != []
+
+    - name: Apache mod_md certificate subjectAltNames not listed in VirtualHost ServerNames and ServerAliases
+      ansible.builtin.debug:
+        var: apache_domains_not_in_vhosts
+      vars:
+        apache_domains_not_in_vhosts: >-
+          {{ apache_mod_md_cert_all_domains | ansible.builtin.difference(apache_virtual_host_all_domains) }}
+      when:
+        - apache_domains_not_in_vhosts != []
+
+    - name: "Suggested icinga_check_commands for certificates written to {{ apache_icinga_check_commands }}"
+      ansible.builtin.template:
+        src: icinga_check_commands.yml.j2
+        dest: "{{ apache_icinga_check_commands }}"
+        mode: "0644"
+      become: false
+      connection: local
+      delegate_to: localhost
+      check_mode: false
+      vars:
+        apache_icinga_check_commands: >-
+          /tmp/icinga_check_commands_{{ inventory_hostname | ansible.builtin.regex_replace('[.]', '_') }}.yml
+      when: apache_icinga_check_commands_suggestion | ansible.builtin.bool
 
   tags:
     - apache
