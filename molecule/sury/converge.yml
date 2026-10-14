@@ -78,8 +78,6 @@
           - other-vhosts-access-log
           - security
           - version-control
-        # The Sury repo doesn't yet support forky
-        apache_sury: "{%- if ansible_facts.distribution_release == 'forky' -%}false{%- else -%}true{%- endif -%}"
         apache_pkgs:
           - name: bookworm
             pkgs_absent:

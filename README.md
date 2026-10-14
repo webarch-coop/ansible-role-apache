@@ -6,7 +6,7 @@ This repo contains an Ansible role for installing and configuring Apache on Debi
 
 If you use this role please use a tagged release, see [the release notes](https://git.coop/webarch/apache/-/releases).
 
-By default this role uses [mod_md](https://github.com/icing/mod_md/) for HTTPS certifiates, in addition the cert and key matching the `inventory_hostname` are be copied for use by other applications, specifically Exim, see the `apache_md_cert_copy` list of dictionaries.
+By default this role uses the latest Apache from the [Sury apache2 deb repo](https://packages.sury.org/apache2/README.txt) and [mod_md](https://httpd.apache.org/docs/2.4/mod/mod_md.html) for HTTPS certifiates, optionally the cert and key matching the `inventory_hostname` are be copied for use by other applications, specifically Exim, see the `apache_md_cert_copy` list of dictionaries.
 
 ## Usage
 
