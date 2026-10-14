@@ -90,6 +90,11 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.uri module.
+      apache_mod_md_cert_all_domains:
+        type: list
+        elements: str
+        required: false
+        description: A list of all the subjectAltNames in all the mod_md certificates.
       apache_mod_md_cert_domains:
         type: list
         required: false
@@ -104,6 +109,11 @@ argument_specs:
             required: false
             description: A list of subjectAltNames.
             elements: str
+      apache_virtual_host_all_domains:
+        type: list
+        elements: str
+        required: false
+        description: A list of all the Apache ServerNames and ServerAliases.
       apache_virtual_host_domains:
         type: list
         required: false
