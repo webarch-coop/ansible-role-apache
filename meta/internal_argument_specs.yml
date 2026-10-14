@@ -30,6 +30,10 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.command module.
+      apache_get_cloudflare_ips_v4:
+        type: dict
+        required: false
+        description: Results from running the ansible.builtin.uri module.
       apache_jc:
         type: dict
         required: false
@@ -139,10 +143,6 @@ argument_specs:
         elements: str
         required: false
         description: Internal list of Cloudflare IP addresses.
-      apache_cloudflare_ips_v4_b64encoded:
-        type: dict
-        required: false
-        description: Internal dictionary for the result of slurping the Cloudflare IPv4 file.
       apache_combined_argument_spec:
         type: dict
         required: false

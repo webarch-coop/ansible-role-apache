@@ -55,6 +55,10 @@ apache_pkgs:
       - debsuryorg-archive-keyring
       - jc
       - jo
+      # libapache2-mod-md is a transitional package to apache2 for users of
+      # libapache2-mod-md. It can be safely removed after the installation is
+      # complete. https://packages.debian.org/bookworm/libapache2-mod-md
+      - libapache2-mod-md
       - lynx
   - name: forky
     pkgs_absent: []
@@ -92,6 +96,7 @@ apache_pkgs:
       - debsuryorg-archive-keyring
       - jc
       - jo
+      - libapache2-mod-md
       - lynx
   - name: trixie
     pkgs_absent: []

@@ -11,33 +11,38 @@
 - name: Generate Cloudflare config
   block:
 
-    - name: Download Cloudflare IPv4 list
-      ansible.builtin.get_url:
+    - name: Get Cloudflare IPv4 list
+      ansible.builtin.uri:
         url: https://www.cloudflare.com/ips-v4
-        dest: /root/cloudflare_ips_v4.txt
-        owner: root
-        group: root
-        mode: "0644"
-        force: true
+        return_content: true
+      register: apache_get_cloudflare_ips_v4
 
-    - name: Slurp Cloudflare IPv4 list
-      ansible.builtin.slurp:
-        src: /root/cloudflare_ips_v4.txt
-      register: apache_cloudflare_ips_v4_b64encoded
-
-    - name: Create an array from the Cloudflare IP lists
-      ansible.builtin.set_fact:
-        apache_cloudflare_ips: >-
-          {{ (apache_cloudflare_ips_v4_b64encoded['content']
-          | ansible.builtin.b64decode
-          | ansible.builtin.trim).split('\n') }}"
-
-    - name: Debug Cloudflare IP array
+    - name: Debug apache_get_cloudflare_ips_v4.content
       ansible.builtin.debug:
-        msg: "apache_cloudflare_ips: {{ apache_cloudflare_ips }}"
-        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+        var: apache_get_cloudflare_ips_v4.content
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
       tags:
         - debug
+
+    - name: Set a fact for the Cloudflare IPv4 list
+      ansible.builtin.set_fact:
+        apache_cloudflare_ips: "{{ apache_get_cloudflare_ips_v4.content | ansible.builtin.split('\n') }}"
+
+    - name: Debug apache_cloudflare_ips
+      ansible.builtin.debug:
+        var: apache_cloudflare_ips
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}
+      tags:
+        - debug
+
+    - name: The Cloudflare IPv4 list should be a list of more than 8 IPv4 ranges
+      ansible.builtin.assert:
+        that:
+          - apache_cloudflare_ips | ansible.builtin.type_debug == "list"
+          - apache_cloudflare_ips | ansible.builtin.length >= 8
+        quiet: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_verbosity >= 1) %}false{% else %}true{% endif %}"
 
     - name: Apache Cloudflare config generated
       ansible.builtin.template:

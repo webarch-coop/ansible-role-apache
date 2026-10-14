@@ -89,6 +89,7 @@
               - apache2-suexec-custom
               - apache2-utils
               - debsuryorg-archive-keyring
+              - jc
               - jo
               - lynx
           - name: forky
@@ -98,6 +99,7 @@
               - apache2
               - apache2-suexec-custom
               - apache2-utils
+              - jc
               - jo
               - lynx
               # The Sury repo doesn't yet support forky
@@ -110,6 +112,7 @@
               - apache2-suexec-custom
               - apache2-utils
               - debsuryorg-archive-keyring
+              - jc
               - jo
               - lynx
           - name: resolute
@@ -120,6 +123,7 @@
               - apache2-suexec-custom
               - apache2-utils
               - debsuryorg-archive-keyring
+              - jc
               - jo
               - lynx
           - name: trixie
@@ -130,6 +134,7 @@
               - apache2-suexec-custom
               - apache2-utils
               - debsuryorg-archive-keyring
+              - jc
               - jo
               - lynx
 
