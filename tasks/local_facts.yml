@@ -62,7 +62,7 @@
         mode: "0755"
         owner: root
         group: root
-        validate: bash %s
+        validate: "{{ ansible_facts.ansible_local.bash.path }} %s"
 
     - name: Ansible apachectl local facts script present
       ansible.builtin.copy:
@@ -71,7 +71,7 @@
         mode: "0755"
         owner: root
         group: root
-        validate: bash %s
+        validate: "{{ ansible_facts.ansible_local.bash.path }} %s"
 
     - name: Stat /etc/ansible/facts.d/a2query.fact
       ansible.builtin.stat:

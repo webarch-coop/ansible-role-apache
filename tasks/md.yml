@@ -74,16 +74,37 @@
         - ("md" in ansible_facts.ansible_local.a2query.modules_enabled)
         - apache_md_cert_reload_path.stat.exists | ansible.builtin.bool
 
-    - name: "Get the Apache md-status for {{ inventory_hostname }}"
-      ansible.builtin.uri:
-        url: http://localhost/md-status
-        return_content: true
-        status_code: 200
-        method: get
-      delegate_to: "{{ inventory_hostname }}"
-      check_mode: false
-      changed_when: false
-      register: apache_md_status_get
+    - name: Check Apache md-status
+      block:
+
+        - name: "Get the Apache md-status for {{ inventory_hostname }}"
+          ansible.builtin.uri:
+            url: http://localhost/md-status
+            return_content: true
+            status_code: 200
+            method: get
+          delegate_to: "{{ inventory_hostname }}"
+          check_mode: false
+          changed_when: false
+          register: apache_md_status_get
+
+      rescue:
+
+        - name: Restart Apache in case that fixes the Apache md-status failure
+          ansible.builtin.service:
+            name: apache2
+            state: restarted
+
+        - name: "Get the Apache md-status for {{ inventory_hostname }}"
+          ansible.builtin.uri:
+            url: http://localhost/md-status
+            return_content: true
+            status_code: 200
+            method: get
+          delegate_to: "{{ inventory_hostname }}"
+          check_mode: false
+          changed_when: false
+          register: apache_md_status_get
 
     - name: Debug apache_md_status_get.json
       ansible.builtin.debug:
