@@ -431,10 +431,17 @@
 - name: Check the Apache version, modules and conf, loaded and enabled
   block:
 
+    - name: Read local facts  # noqa: no-handler
+      ansible.builtin.setup:
+        filter: ansible_local
+      check_mode: false
+      changed_when: false
+
     - name: Debug Apache version
       ansible.builtin.debug:
         var: ansible_facts.ansible_local.a2query.version
-        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
+        verbosity: >-
+          {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug
 

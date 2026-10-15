@@ -55,49 +55,23 @@
         owner: root
         group: root
 
-    - name: Local facts present with validating
-      block:
+    - name: Ansible a2query local facts script present
+      ansible.builtin.copy:
+        src: a2query.fact
+        dest: /etc/ansible/facts.d/a2query.fact
+        mode: "0755"
+        owner: root
+        group: root
+        validate: "{{ ansible_facts.ansible_local.bash.path }} %s"
 
-        - name: Ansible a2query local facts script present
-          ansible.builtin.copy:
-            src: a2query.fact
-            dest: /etc/ansible/facts.d/a2query.fact
-            mode: "0755"
-            owner: root
-            group: root
-            validate: "{{ ansible_facts.ansible_local.bash.path }} %s"
-
-        - name: Ansible apachectl local facts script present
-          ansible.builtin.copy:
-            src: apachectl.fact
-            dest: /etc/ansible/facts.d/apachectl.fact
-            mode: "0755"
-            owner: root
-            group: root
-            validate: "{{ ansible_facts.ansible_local.bash.path }} %s"
-
-      when: apache_init != "chroot"
-
-    - name: Local facts present in chroots without validating
-      block:
-
-        - name: Ansible a2query local facts script present
-          ansible.builtin.copy:
-            src: a2query.fact
-            dest: /etc/ansible/facts.d/a2query.fact
-            mode: "0755"
-            owner: root
-            group: root
-
-        - name: Ansible apachectl local facts script present
-          ansible.builtin.copy:
-            src: apachectl.fact
-            dest: /etc/ansible/facts.d/apachectl.fact
-            mode: "0755"
-            owner: root
-            group: root
-
-      when: apache_init == "chroot"
+    - name: Ansible apachectl local facts script present
+      ansible.builtin.copy:
+        src: apachectl.fact
+        dest: /etc/ansible/facts.d/apachectl.fact
+        mode: "0755"
+        owner: root
+        group: root
+        validate: "{{ ansible_facts.ansible_local.bash.path }} %s"
 
     - name: Stat /etc/ansible/facts.d/a2query.fact
       ansible.builtin.stat:
