@@ -441,7 +441,7 @@
       ansible.builtin.debug:
         var: ansible_facts.ansible_local.a2query.version
         verbosity: >-
-          {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
+          {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}
       tags:
         - debug
 
