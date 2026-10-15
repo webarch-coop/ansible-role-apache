@@ -1,0 +1,62 @@
+# Copyright 2018-2026 Chris Croome
+#
+# This file is part of the Webarchitects Apache Ansible role.
+#
+# The Webarchitects Apache Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects Apache Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Check for running in a chroot
+  block:
+
+    # When in a docker container apache_init.stdout is usually sh or bash
+    - name: Check if system has been booted with systemd as init system
+      ansible.builtin.command:
+        cmd: "ps -p 1 -o comm="
+      check_mode: false
+      changed_when: false
+      register: apache_ps
+      failed_when: apache_ps.rc is not regex('^0|47$')
+
+    - name: Set a fact for the init system
+      ansible.builtin.set_fact:
+        apache_init: "{{ apache_ps.stdout }}"
+      when: apache_ps.rc == 0
+
+    - name: When the exit code is 47 assume is is because this is a chroot
+      ansible.builtin.set_fact:
+        apache_init: chroot
+      when: apache_ps.rc == 47
+
+    - name: Debug the ini system when it is not systemd
+      ansible.builtin.debug:
+        var: apache_init
+        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
+      when: apache_init != "systemd"
+      tags:
+        - debug
+
+    - name: Chroot checks
+      block:
+
+        - name: Check the chroot directory
+          ansible.builtin.stat:
+            path: "{{ apache_chroot_dir }}"
+          register: apache_chroot_dir_path
+
+        - name: The chroot directory needs to exists for Apache to be chrooted into it
+          ansible.builtin.assert:
+            that:
+              - apache_chroot_dir_path.stat.isdir is ansible.builtin.defined
+              - apache_chroot_dir_path.stat.isdir | ansible.builtin.bool
+            quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+            fail_msg: >-
+              The directory {{ apache_chroot_dir }} must exist before Apache can be chrooted into it.
+
+      when: apache_chroot | ansible.builtin.bool
+
+  tags:
+    - apache
+...

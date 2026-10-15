@@ -41,6 +41,9 @@
         - apache_install
         - apache_local_facts
 
+    - name: Include Apache chroot checks
+      ansible.builtin.include_tasks: chroot_checks.yml
+
     - name: Include Apache apt tasks
       ansible.builtin.include_tasks: apt.yml
 
