@@ -90,6 +90,21 @@
 
       rescue:
 
+        - name: Apache localhost site available
+          ansible.builtin.template:
+            src: localhost.conf.j2
+            dest: "/etc/apache2/sites-available/localhost.conf"
+            owner: root
+            group: root
+            mode: "0644"
+            backup: true
+
+        - name: Apache localhost site enabled
+          ansible.builtin.command:
+            cmd: a2ensite localhost
+            creates: /etc/apache2/sites-enabled/localhost.conf
+          when: ("localhost" in apache_sites_enabled)
+
         - name: Restart Apache in case that fixes the Apache md-status failure
           ansible.builtin.service:
             name: apache2
