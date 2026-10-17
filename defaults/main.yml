@@ -45,63 +45,73 @@ apache_sury: true
 # The debsuryorg-archive-keyring package should be present when apache_sury is true
 apache_pkgs:
   - name: bookworm
-    pkgs_absent: []
+    pkgs_absent:
+      - apache2-dev
+      - apache2-ssl-dev
     pkgs_present:
       # - apache2-suexec-custom
-      # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
       - apache2
       - apache2-utils
       - debsuryorg-archive-keyring
       - jc
       - jo
+      - libapache2-mod-fcgid
       # libapache2-mod-md is a transitional package to apache2 for users of
       # libapache2-mod-md. It can be safely removed after the installation is
       # complete. https://packages.debian.org/bookworm/libapache2-mod-md
       # - libapache2-mod-md
       - lynx
   - name: forky
-    pkgs_absent: []
+    pkgs_absent:
+      - apache2-dev
+      - apache2-ssl-dev
     pkgs_present:
       # - apache2-suexec-custom
-      # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
       - apache2
       - apache2-utils
+      - libapache2-mod-fcgid
       # The Sury apache2 repo doesn't yet support Debian Forky
       # - debsuryorg-archive-keyring
       - jc
       - jo
       - lynx
   - name: noble
-    pkgs_absent: []
+    pkgs_absent:
+      - apache2-dev
+      - apache2-ssl-dev
     pkgs_present:
       # - apache2-suexec-custom
-      # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
       - apache2
       - apache2-utils
       - debsuryorg-archive-keyring
       - jc
       - jo
+      - libapache2-mod-fcgid
       - lynx
   - name: resolute
-    pkgs_absent: []
+    pkgs_absent:
+      - apache2-dev
+      - apache2-ssl-dev
     pkgs_present:
       # - apache2-suexec-custom
-      # - libapache2-mod-fcgid
       # - libapache2-mod-geoip
       - apache2
       - apache2-utils
       - debsuryorg-archive-keyring
       - jc
       - jo
+      - libapache2-mod-fcgid
       - lynx
   - name: trixie
-    pkgs_absent: []
+    pkgs_absent:
+      - apache2-dev
+      - apache2-ssl-dev
     pkgs_present:
       # - apache2-suexec-custom
-      # - libapache2-mod-fcgid
+      - libapache2-mod-fcgid
       # - libapache2-mod-geoip
       - apache2
       - apache2-utils
@@ -109,7 +119,6 @@ apache_pkgs:
       - jc
       - jo
       - lynx
-
 apache_sites_enabled:
   - localhost
   - 000-default
@@ -120,6 +129,7 @@ apache_conf_enabled:
   - other-vhosts-access-log
   - security
   - version-control
+  - webarch
 apache_conf_disabled:
   - le
   - mc3
@@ -129,8 +139,9 @@ apache_conf_disabled:
   - php8.2-fpm
   - php8.3-fpm
   - php8.4-fpm
+  - php8.5-fpm
+  - php8.6-fpm
   - serve-cgi-bin
-  - webarch
 apache_mods_enabled:
   - access_compat
   - alias
@@ -248,57 +259,56 @@ apache_mods_disabled: []
   # - usertrack
   # - vhost_alias
   # - xml2enc
-apache_md_cert_copy: []
 # apache_md_cert_copy is an empty list by default as when Apache is first
 # installed cert's won't exist so the tasks to copy the certs will fail.  In
 # addition the paths for the Apache MD certs might need adjusting for each
 # server if a cert is not generated for the inventory_hostname, enabling the
 # webarch conf causes one to be generated.
-# apache_md_cert_copy:
-#   # Copy the mod_md key pair for Exim4
-#   - name: exim4
-#     restart: true
-#     pkgs:
-#       - exim4-config
-#       - exim4-daemon-light
-#     privkey:
-#       src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.secp384r1.pem"
-#       dest: /etc/exim4/exim.key
-#       owner: Debian-exim
-#       group: ssl-cert
-#       mode: "0640"
-#     pubcert:
-#       src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.secp384r1.pem"
-#       dest: /etc/exim4/exim.crt
-#       owner: Debian-exim
-#       group: ssl-cert
-#       mode: "0640"
-#     special_time: daily
-#   # Copy the mod_md key pair for Authentik
-#   # - name: docker
-#   #   restart: false
-#   #   dirs:
-#   #     - path: "/home/authentik/authentik/certs/{{ inventory_hostname }}"
-#   #       owner: authentik
-#   #       group: authentik
-#   #       mode: "0750"
-#   #   pkgs:
-#   #     - docker-ce
-#   #     - docker-ce-cli
-#   #     - docker-compose-plugin
-#   #   privkey:
-#   #     src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.secp384r1.pem"
-#   #     dest: "/home/authentik/authentik/certs/{{ inventory_hostname }}/privkey.pem"
-#   #     owner: authentik
-#   #     group: authentik
-#   #     mode: "0640"
-#   #   pubcert:
-#   #     src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.secp384r1.pem"
-#   #     dest: "/home/authentik/authentik/certs/{{ inventory_hostname }}/fullchain.pem"
-#   #     owner: authentik
-#   #     group: authentik
-#   #     mode: "0640"
-#   #   special_time: daily
+apache_md_cert_copy:
+  # Copy the mod_md key pair for Exim4
+  - name: exim4
+    restart: true
+    pkgs:
+      - exim4-config
+      - exim4-daemon-light
+    privkey:
+      src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.secp384r1.pem"
+      dest: /etc/exim4/exim.key
+      owner: Debian-exim
+      group: ssl-cert
+      mode: "0640"
+    pubcert:
+      src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.secp384r1.pem"
+      dest: /etc/exim4/exim.crt
+      owner: Debian-exim
+      group: ssl-cert
+      mode: "0640"
+    special_time: daily
+  # Copy the mod_md key pair for Authentik
+  # - name: docker
+  #   restart: false
+  #   dirs:
+  #     - path: "/home/authentik/authentik/certs/{{ inventory_hostname }}"
+  #       owner: authentik
+  #       group: authentik
+  #       mode: "0750"
+  #   pkgs:
+  #     - docker-ce
+  #     - docker-ce-cli
+  #     - docker-compose-plugin
+  #   privkey:
+  #     src: "/etc/apache2/md/domains/{{ inventory_hostname }}/privkey.secp384r1.pem"
+  #     dest: "/home/authentik/authentik/certs/{{ inventory_hostname }}/privkey.pem"
+  #     owner: authentik
+  #     group: authentik
+  #     mode: "0640"
+  #   pubcert:
+  #     src: "/etc/apache2/md/domains/{{ inventory_hostname }}/pubcert.secp384r1.pem"
+  #     dest: "/home/authentik/authentik/certs/{{ inventory_hostname }}/fullchain.pem"
+  #     owner: authentik
+  #     group: authentik
+  #     mode: "0640"
+  #   special_time: daily
 # See this issue https://github.com/icing/mod_md/issues/260
 apache_md_private_keys:
   - rsa3072
@@ -316,5 +326,5 @@ apache_mpm_max_request_workers: 150
 apache_icinga_check_commands_suggestion: true
 apache_verify: true
 apache_webarch:
-  site_title: "Webarchitects Shared Hosting"
+  site_title: "Webarchitects Hosting"
 ...
