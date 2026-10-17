@@ -137,6 +137,7 @@
           - other-vhosts-access-log
           - security
           - version-control
+        apache_md_cert_copy: []
 
     - name: Include role verify argument spec tasks
       ansible.builtin.include_role:
