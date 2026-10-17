@@ -1,0 +1,24 @@
+---
+# Apache generated Icinga config for monitoring apache mod_md certificates for {{ inventory_hostname }}
+icinga_check_commands:
+{% if inventory_hostname not in apache_virtual_host_domains | community.general.json_query('[].name') %}
+  http_cert_{{ inventory_hostname | ansible.builtin.regex_replace('[.]', '_') }}:
+    command: http
+    args:
+      http_certificate: "25,10"
+      http_vhost: {{ inventory_hostname }}
+      http_ssl: 1
+      http_sni: 1
+      http_port: 443
+{% endif %}
+{% for apache_mod_md_cert_domain in apache_virtual_host_domains | community.general.json_query('[].name') %}
+  http_cert_{{ apache_mod_md_cert_domain | ansible.builtin.regex_replace('[.]', '_') }}:
+    command: http
+    args:
+      http_certificate: "25,10"
+      http_vhost: {{ apache_mod_md_cert_domain }}
+      http_ssl: 1
+      http_sni: 1
+      http_port: 443
+{% endfor %}
+...
