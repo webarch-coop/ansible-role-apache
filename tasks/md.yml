@@ -67,7 +67,7 @@
         - name: Crontab for Apache reload script in place
           ansible.builtin.cron:
             name: "Apache mod_md certificate reload"
-            special_time: daily
+            special_time: hourly
             job: /usr/local/bin/apache_md_cert_reload.sh
 
       when:

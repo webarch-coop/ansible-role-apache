@@ -74,6 +74,14 @@ argument_specs:
         type: dict
         required: false
         description: Results from running the ansible.builtin.command module.
+      apache_md_cert_reload:
+        type: dict
+        required: false
+        description: Internal result from running /usr/local/bin/apache_md_cert_reload.sh.
+      apache_md_cert_reload_path:
+        type: dict
+        required: false
+        description: Internal result from stating /usr/local/bin/apache_md_cert_reload.sh.
       apache_md_latest_headers:
         type: dict
         required: false
@@ -182,14 +190,6 @@ argument_specs:
         type: dict
         required: false
         description: Internal variable for the internal argument spec.
-      apache_md_cert_reload:
-        type: dict
-        required: false
-        description: Internal result from running /usr/local/bin/apache_md_cert_reload.sh.
-      apache_md_cert_reload_path:
-        type: dict
-        required: false
-        description: Internal result from stating /usr/local/bin/apache_md_cert_reload.sh.
       apache_mods_available_paths:
         type: dict
         required: false

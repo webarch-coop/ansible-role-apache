@@ -14,8 +14,6 @@
 
 set -eE
 
-apache_reload_required=0
-
 # This script needs to be run as root
 if [[ "$(id -u)" != "0" ]] ; then
   echo "The ${0} script can only be run by root"
@@ -29,48 +27,16 @@ then
   exit 1
 fi
 
-# Check that jp is available
-if ! command -v jp &> /dev/null
-then
-  echo "jp could not be found"
-  exit 1
-fi
+# Check if one of more /etc/apache2/md/staging/*/pubcert*pem files exist
+pubcert=$(find /etc/apache2/md/staging -name pubcert.pem -type f | head -n1)
+pubcert_secp384r1=$(find /etc/apache2/md/staging -name pubcert.secp384r1.pem -type f | head -n1)
 
-# Check that wget is available
-if ! command -v wget &> /dev/null
-then
-  echo "wget could not be found"
-  exit 1
-fi
-
-# Set an array for the Apache VirtualHost ServerName's omitting the
-# default IPv4 address
-declare -a namevhosts
-readarray -t namevhosts < <(/usr/sbin/apache2ctl -S | grep -e '^         port 443 namevhost ' | awk '{ print $4 }' | grep -v '{{ ansible_facts.default_ipv4.address }}' | sort)
-
-# Get the certificate-status renewal for each VirtualHost
-for namevhost in "${namevhosts[@]}"
-do
-  # Check if a renewal dictionary exists
-  namevhost_cert_renewal=$(wget -q https://${namevhost}/.httpd/certificate-status -O - | jp renewal)
-  if [[ "${namevhost_cert_renewal}" != "null" ]]
-  then
-    # Check if the renewal has finished
-    namevhost_cert_renewal_finished=$(echo "${namevhost_cert_renewal}" | jp finished)
-    if [[ "${namevhost_cert_renewal_finished}" == "true" ]]
-    then
-      echo "Apache reload required for ${namevhost}"
-      apache_reload_required=1
-    fi
-  fi
-done
-
-# Reload Apache when required
-if [[ "${apache_reload_required}" == "1" ]]
+# Reload Apache when staging cert(s) exist
+if [[ -f "${pubcert}" || -f "${pubcert_secp384r1}" ]]
 then
   echo "Reloading Apache for new certificates"
   /usr/sbin/service apache2 reload
   exit 0
 fi
 
-# vim: syntax=bash{# vim: syntax=jinja2 #}
+# vim: syntax=bash
