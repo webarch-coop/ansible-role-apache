@@ -19,7 +19,7 @@
       ansible.builtin.assert:
         that:
           - ("apache2" in ansible_facts.packages.keys())
-        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: >-
           Please run this role with the apache_install tag to just install apache2, once apache2 is installed
           this role can be run in check mode.
@@ -44,7 +44,7 @@
       ansible.builtin.assert:
         that:
           - apache_version is ansible.builtin.version('2.4.41', '>=', version_type='semver')
-        quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: "The apache_version variable should be a semvar >= 2.4.41 however it is set to {{ apache_version }}"
 
     - name: Apache mod_md checks
@@ -55,7 +55,7 @@
           ansible.builtin.assert:
             that:
               - apache_version is ansible.builtin.version('2.4.48', '>=', version_type='semver')
-            quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
             fail_msg: "The apache_version variable should be a semvar >= 2.4.48 when mod_md is enabled but it is {{ apache_version }}"
 
         # https://github.com/icing/mod_md?tab=readme-ov-file#prerequisites
@@ -63,7 +63,7 @@
           ansible.builtin.assert:
             that:
               - ("ssl" in apache_mods_enabled)
-            quiet: "{% if ansible_check_mode or ansible_verbosity >= 1 %}false{% else %}true{% endif %}"
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
             fail_msg: >-
               Apache module ssl is required when md is enabled, apache_mods_enabled is a list containing
               {{ apache_mods_enabled | ansible.builtin.join(', ') }}
@@ -76,7 +76,8 @@
     - name: Debug the services
       ansible.builtin.debug:
         var: ansible_facts.services.keys()
-        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+        verbosity: >-
+          {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}
       tags:
         - debug
 

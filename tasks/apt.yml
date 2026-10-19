@@ -272,7 +272,7 @@
       ansible.builtin.debug:
         var: apache_pkg_absent
         verbosity: >-
-          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
       tags:
         - debug
 
@@ -280,7 +280,7 @@
       ansible.builtin.debug:
         msg: "{{ apache_pkg_absent | ansible.builtin.type_debug }}"
         verbosity: >-
-          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}2{% else %}3{% endif %}
       tags:
         - debug
 
@@ -296,7 +296,7 @@
       ansible.builtin.debug:
         msg: "{{ apache_pkg_present | ansible.builtin.type_debug }}"
         verbosity: >-
-          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}2{% else %}3{% endif %}
       tags:
         - debug
 

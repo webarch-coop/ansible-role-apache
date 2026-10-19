@@ -74,6 +74,7 @@
       ansible.builtin.assert:
         that:
           - apache_conf_enabled | ansible.builtin.difference(apache_conf_available) | length == 0
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: >-
           The following conf that is set to be enabled is not available:
           {{ apache_conf_enabled | ansible.builtin.difference(apache_conf_available) | ansible.builtin.join(', ') }}
@@ -107,6 +108,7 @@
       ansible.builtin.assert:
         that:
           - apache_sites_enabled | ansible.builtin.difference(apache_sites_available) | length == 0
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: >-
           The following sites that are set to be enabled are not available:
           {{ apache_sites_enabled | ansible.builtin.difference(apache_sites_available) | ansible.builtin.join(', ') }}
