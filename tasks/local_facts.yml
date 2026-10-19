@@ -22,7 +22,13 @@
       ansible.builtin.set_fact:
         apache_jc: "{{ apache_jc_about.stdout | ansible.builtin.from_json }}"
 
-    - name: Install JC apachectl parser
+    - name: Debug apache_jc.version
+      ansible.builtin.debug:
+        var: apache_jc.version
+        verbosity: >-
+          {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}
+
+    - name: JC apachectl parser present for JC < 1.26.1
       block:
 
         - name: JC local parsers directory present
@@ -42,9 +48,16 @@
             group: root
 
       when:
-        - apache_jc | community.general.json_query('parsers[].name') is defined
-        - apache_jc | community.general.json_query('parsers[].name') != []
-        - ("apachectl" not in apache_jc | community.general.json_query('parsers[].name'))
+        - apache_jc.version is defined
+        - apache_jc.version is ansible.builtin.version('1.26.1', 'lt')
+
+    - name: JC apachectl parser absent for JC >= 1.26.1
+      ansible.builtin.file:
+        path: /root/.local/share/jc/jcparsers/apachectl.py
+        state: absent
+      when:
+        - apache_jc.version is defined
+        - apache_jc.version is ansible.builtin.version('1.26.1', 'ge')
 
     - name: Ansible facts.d directory present
       ansible.builtin.file:
@@ -95,14 +108,16 @@
         - name: Debug ansible_facts.ansible_local.a2query
           ansible.builtin.debug:
             var: ansible_facts.ansible_local.a2query
-            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+            verbosity: >-
+              {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}
           tags:
             - debug
 
         - name: Debug ansible_facts.ansible_local.apachectl
           ansible.builtin.debug:
             var: ansible_facts.ansible_local.apachectl
-            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+            verbosity: >-
+              {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}
           tags:
             - debug
 

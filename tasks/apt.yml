@@ -50,8 +50,10 @@
       ansible.builtin.assert:
         that:
           - ansible_facts.distribution_release in apache_sury_distros
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: >-
-          The packages.sury.org Apache repo only supports {{ apache_sury_distros | ansible.builtin.join(', ') }}, not {{ ansible_facts.distribution_release }}.
+          The packages.sury.org Apache repo only supports {{ apache_sury_distros | ansible.builtin.join(', ') }}, not
+          {{ ansible_facts.distribution_release }}.
 
     - name: Required apt packages present
       ansible.builtin.apt:
@@ -116,7 +118,9 @@
             - name: Debug apache_sources_check
               ansible.builtin.debug:
                 var: apache_sources_check
-                verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+                verbosity: >-
+                  {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode
+                  | ansible.builtin.bool %}1{% else %}2{% endif %}
               when:
                 - apache_sources_check is defined
               tags:
@@ -172,7 +176,9 @@
             - name: Debug updated apache_sources.repo
               ansible.builtin.debug:
                 var: apache_sources.repo
-                verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+                verbosity: >-
+                  {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode
+                  | ansible.builtin.bool %}1{% else %}2{% endif %}
               tags:
                 - debug
 
@@ -265,28 +271,32 @@
     - name: Debug apache_pkg_absent
       ansible.builtin.debug:
         var: apache_pkg_absent
-        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}"
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}0{% else %}1{% endif %}
       tags:
         - debug
 
     - name: Debug apache_pkg_absent | ansible.builtin.type_debug
       ansible.builtin.debug:
         msg: "{{ apache_pkg_absent | ansible.builtin.type_debug }}"
-        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}"
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
       tags:
         - debug
 
     - name: Debug apache_pkg_present
       ansible.builtin.debug:
         var: apache_pkg_present
-        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}"
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
       tags:
         - debug
 
     - name: Debug apache_pkg_present | ansible.builtin.type_debug
       ansible.builtin.debug:
         msg: "{{ apache_pkg_present | ansible.builtin.type_debug }}"
-        verbosity: "{% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}"
+        verbosity: >-
+          {% if (ansible_check_mode | ansible.builtin.bool) or (ansible_diff_mode | ansible.builtin.bool) %}1{% else %}2{% endif %}
       tags:
         - debug
 

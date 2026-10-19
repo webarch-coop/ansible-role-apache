@@ -45,7 +45,7 @@ repos:
         language_version: python3
         additional_dependencies:
           # https://github.com/kellyjonbrazil/jc/releases
-          - jc==1.26.0
+          - jc==1.26.1
           # https://github.com/jmespath/jmespath.py/tags
           - jmespath==1.0.1
 ...
