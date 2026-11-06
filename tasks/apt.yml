@@ -16,11 +16,17 @@
         manager: apt
       when: ansible_facts.packages is not defined
 
+    - name: Debug ansible_facts.packages.apt[0].version
+      ansible.builtin.debug:
+        var: ansible_facts.packages.apt[0].version
+      tags:
+        - debug
+
     - name: Set a fact for the apt package version
       ansible.builtin.set_fact:
         apache_apt_version: >-
           {{ ansible_facts.packages.apt[0].version
-          | ansible.builtin.regex_replace('[a-z]{0,20}[0-9.]{0,6}$') }}
+          | ansible.builtin.regex_replace('ubuntu.*$') }}
 
     - name: Debug apache_apt_version
       ansible.builtin.debug:
