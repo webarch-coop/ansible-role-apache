@@ -20,7 +20,7 @@
       ansible.builtin.set_fact:
         apache_apt_version: >-
           {{ ansible_facts.packages.apt[0].version
-          | ansible.builtin.regex_replace('[a-z]{0-9}.*$') }}"
+          | ansible.builtin.regex_replace('[a-z]{0-9}.*$') }}
 
     - name: Debug apache_apt_version
       ansible.builtin.debug:
