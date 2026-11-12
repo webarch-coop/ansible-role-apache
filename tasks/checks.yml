@@ -11,17 +11,15 @@
 - name: Apache version checks
   block:
 
-    - name: Read package facts when not defined
+    - name: Read package facts
       ansible.builtin.package_facts:
         manager: apt
-      when: ansible_facts.packages is not ansible.builtin.defined
 
-    - name: Read local facts when not defined  # noqa: no-handler
+    - name: Read local facts  # noqa: no-handler
       ansible.builtin.setup:
         filter: ansible_local
       check_mode: false
       changed_when: false
-      when: ansible_facts.ansible_local is not ansible.builtin.defined
 
     - name: The apache2 package is required to be installed for the tasks in this role to run
       ansible.builtin.assert:
