@@ -63,6 +63,8 @@
 
     - name: Include Apache checks
       ansible.builtin.include_tasks: checks.yml
+      tags:
+        - apache_checks
 
     - name: Apache DocumentRoot present
       ansible.builtin.file:

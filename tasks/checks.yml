@@ -8,12 +8,20 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects Apache Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Check that mistakes haven't been made in the variables and arrays
+- name: Apache version checks
   block:
 
     - name: Read package facts when not defined
       ansible.builtin.package_facts:
         manager: apt
+      when: ansible_facts.packages is not ansible.builtin.defined
+
+    - name: Read local facts when not defined  # noqa: no-handler
+      ansible.builtin.setup:
+        filter: ansible_local
+      check_mode: false
+      changed_when: false
+      when: ansible_facts.ansible_local is not ansible.builtin.defined
 
     - name: The apache2 package is required to be installed for the tasks in this role to run
       ansible.builtin.assert:
@@ -27,25 +35,46 @@
     - name: Set a fact for the Apache apt package version
       ansible.builtin.set_fact:
         apache_version: >-
+          {% if ansible_facts.ansible_local.a2query.version is defined %}
+          {{- ansible_facts.ansible_local.a2query.version -}}
+          {% else %}
           {{- ansible_facts.packages['apache2']
           | community.general.json_query('[0].version')
           | ansible.builtin.regex_replace('-.*$')
           | ansible.builtin.string -}}
+          {% endif %}
 
-    - name: Debug apache_version
+    - name: "Apache modules enabled for version {{ ansible_facts.ansible_local.a2query.version }}"
       ansible.builtin.debug:
-        var: apache_version
+        var: ansible_facts.ansible_local.a2query.modules_enabled
         verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
       tags:
         - debug
 
-    # https://packages.ubuntu.com/focal-updates/apache2
-    - name: "The Apache version string should be a semvar >= 2.4.41, it is {{ apache_version }}"
+    # https://httpd.apache.org/security/vulnerabilities_24.html
+    - name: Fail if the Apache version is less than 2.4.71 and the Sury repo is enabbled
       ansible.builtin.assert:
         that:
-          - apache_version is ansible.builtin.version('2.4.41', '>=', version_type='semver')
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-        fail_msg: "The apache_version variable should be a semvar >= 2.4.41 however it is set to {{ apache_version }}"
+          - apache_version is ansible.builtin.version('2.4.71', 'ge', version_type='semver')
+        quiet: true
+      when: apache_sury | ansible.builtin.bool
+
+    - name: TLS versions
+      block:
+
+        - name: Set facts for TLS versions
+          ansible.builtin.set_fact:
+            apache_tls1_3: true
+          when: ansible_facts.ansible_local.a2query.version is version('2.4.41', '>=')
+
+        - name: Debug TLS 1.3 variable
+          ansible.builtin.debug:
+            var: apache_tls1_3
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
+          tags:
+            - debug
+
+      when: ansible_facts.ansible_local.a2query.version is ansible.builtin.version('2.4.41', 'ge')
 
     - name: Apache mod_md checks
       block:
@@ -68,7 +97,60 @@
               Apache module ssl is required when md is enabled, apache_mods_enabled is a list containing
               {{ apache_mods_enabled | ansible.builtin.join(', ') }}
 
-      when: ("md" in apache_mods_enabled)
+        - name: Debug the services that certs are to be copied for
+          ansible.builtin.debug:
+            var: apache_md_cert_copy_service.name
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+          loop: "{{ apache_md_cert_copy }}"
+          loop_control:
+            loop_var: apache_md_cert_copy_service
+            label: "{{ apache_md_cert_copy_service.name }}"
+          when:
+            - apache_md_cert_copy is ansible.builtin.defined
+            - apache_md_cert_copy != []
+          tags:
+            - debug
+
+        - name: Debug the JMESPath query for services that certs are to be copied for
+          ansible.builtin.debug:
+            var: apache_md_cert_cp_jpq
+            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
+          vars:
+            apache_md_cert_cp_jpq: '["{{ apache_md_cert_cp.name }}.service"]|[0]'
+          loop: "{{ apache_md_cert_copy }}"
+          loop_control:
+            loop_var: apache_md_cert_cp
+            label: "{{ apache_md_cert_cp.name }}"
+          when:
+            - apache_md_cert_copy is ansible.builtin.defined
+            - apache_md_cert_copy != []
+          tags:
+            - debug
+
+        - name: Check that the packages that certs are to be copied for are installed
+          ansible.builtin.assert:
+            that:
+              - apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.packages.keys()) == []
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              Copying of the certificate for {{ apache_md_cert_cp.name }} will not be done as there are missing packages,
+              {{ apache_md_cert_cp.pkgs
+              | ansible.builtin.difference(ansible_facts.packages.keys())
+              | ansible.builtin.join(', ') }}.
+          loop: "{{ apache_md_cert_copy }}"
+          loop_control:
+            loop_var: apache_md_cert_cp
+            label: "{{ apache_md_cert_cp.name }}"
+          when:
+            - apache_md_cert_copy is ansible.builtin.defined
+            - apache_md_cert_copy != []
+            - apache_md_cert_cp.pkgs is ansible.builtin.defined
+            - apache_md_cert_cp.pkgs != []
+
+      when:
+        - apache_mods_enabled is ansible.builtin.defined
+        - apache_mods_enabled != []
+        - ("md" in apache_mods_enabled)
 
     - name: Gather service facts
       ansible.builtin.service_facts:
@@ -80,56 +162,6 @@
           {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}
       tags:
         - debug
-
-    - name: Debug the services that certs are to be copied for
-      ansible.builtin.debug:
-        var: apache_md_cert_copy_service.name
-        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
-      loop: "{{ apache_md_cert_copy }}"
-      loop_control:
-        loop_var: apache_md_cert_copy_service
-        label: "{{ apache_md_cert_copy_service.name }}"
-      when:
-        - apache_md_cert_copy is ansible.builtin.defined
-        - apache_md_cert_copy != []
-      tags:
-        - debug
-
-    - name: Debug the JMESPath query for services that certs are to be copied for
-      ansible.builtin.debug:
-        var: apache_md_cert_cp_jpq
-        verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}1{% else %}2{% endif %}"
-      vars:
-        apache_md_cert_cp_jpq: '["{{ apache_md_cert_cp.name }}.service"]|[0]'
-      loop: "{{ apache_md_cert_copy }}"
-      loop_control:
-        loop_var: apache_md_cert_cp
-        label: "{{ apache_md_cert_cp.name }}"
-      when:
-        - apache_md_cert_copy is ansible.builtin.defined
-        - apache_md_cert_copy != []
-      tags:
-        - debug
-
-    - name: Check that the packages that certs are to be copied for are installed
-      ansible.builtin.assert:
-        that:
-          - apache_md_cert_cp.pkgs | ansible.builtin.difference(ansible_facts.packages.keys()) == []
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-        fail_msg: >-
-          Copying of the certificate for {{ apache_md_cert_cp.name }} will not be done as there are missing packages,
-          {{ apache_md_cert_cp.pkgs
-          | ansible.builtin.difference(ansible_facts.packages.keys())
-          | ansible.builtin.join(', ') }}.
-      loop: "{{ apache_md_cert_copy }}"
-      loop_control:
-        loop_var: apache_md_cert_cp
-        label: "{{ apache_md_cert_cp.name }}"
-      when:
-        - apache_md_cert_copy is ansible.builtin.defined
-        - apache_md_cert_copy != []
-        - apache_md_cert_cp.pkgs is ansible.builtin.defined
-        - apache_md_cert_cp.pkgs != []
 
     - name: Getent users
       ansible.builtin.getent:
@@ -429,40 +461,6 @@
         - apache_sites_enabled != []
         - apache_sites_disabled != []
 
-- name: Check the Apache version, modules and conf, loaded and enabled
-  block:
-
-    - name: Read local facts  # noqa: no-handler
-      ansible.builtin.setup:
-        filter: ansible_local
-      check_mode: false
-      changed_when: false
-
-    - name: Debug Apache version
-      ansible.builtin.debug:
-        var: ansible_facts.ansible_local.a2query.version
-        verbosity: >-
-          {% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}
-      tags:
-        - debug
-
-    - name: TLS versions
-      block:
-
-        - name: Set facts for TLS versions
-          ansible.builtin.set_fact:
-            apache_tls1_3: true
-          when: ansible_facts.ansible_local.a2query.version is version('2.4.41', '>=')
-
-        - name: Debug TLS 1.3 variable
-          ansible.builtin.debug:
-            var: apache_tls1_3
-            verbosity: "{% if ansible_check_mode | ansible.builtin.bool or ansible_diff_mode | ansible.builtin.bool %}0{% else %}1{% endif %}"
-          tags:
-            - debug
-
-      when: ansible_facts.ansible_local.a2query.version is ansible.builtin.version('2.4.41', 'ge')
-
     - name: Check if phpquery is installed
       ansible.builtin.command:
         cmd: which phpquery
@@ -585,8 +583,11 @@
             fail_msg: >-
               The directory {{ apache_chroot_dir }} must exist before Apache can be chrooted into it.
 
-      when: apache_chroot | ansible.builtin.bool
+      when:
+        - apache_chroot is ansible.builtin.defined
+        - apache_chroot | ansible.builtin.bool
 
   tags:
     - apache
+    - apache_checks
 ...

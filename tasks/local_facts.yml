@@ -121,14 +121,9 @@
           tags:
             - debug
 
-        - name: "Apache version {{ ansible_facts.ansible_local.a2query.version }}"
-          ansible.builtin.debug:
-            var: ansible_facts.ansible_local.a2query.modules_enabled
-
       when:
         - apache_a2query_facts.stat.exists | ansible.builtin.bool
         - apache_apachectl_facts.stat.exists | ansible.builtin.bool
-
   tags:
     - apache
     - apache_local_facts
