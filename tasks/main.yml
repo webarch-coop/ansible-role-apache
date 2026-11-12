@@ -44,6 +44,7 @@
     - name: Include chroot checks
       ansible.builtin.include_tasks: chroot_checks.yml
       tags:
+        - apache_check
         - apache_checks
 
     - name: Include Apache apt tasks
@@ -66,6 +67,7 @@
     - name: Include Apache checks
       ansible.builtin.include_tasks: checks.yml
       tags:
+        - apache_check
         - apache_checks
 
     - name: Apache DocumentRoot present
@@ -119,6 +121,9 @@
 
     - name: Include Apache check config tasks
       ansible.builtin.include_tasks: check_config.yml
+      tags:
+        - apache_check
+        - apache_checks
 
     - name: Apache modules disabled and enabled
       ansible.builtin.include_tasks: a2mod.yml

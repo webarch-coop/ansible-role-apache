@@ -61,5 +61,6 @@
 
   tags:
     - apache
+    - apache_check
     - apache_checks
 ...
