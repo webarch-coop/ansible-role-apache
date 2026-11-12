@@ -55,8 +55,11 @@
             fail_msg: >-
               The directory {{ apache_chroot_dir }} must exist before Apache can be chrooted into it.
 
-      when: apache_chroot | ansible.builtin.bool
+      when:
+        - apache_chroot is defined
+        - apache_chroot | ansible.builtin.bool
 
   tags:
     - apache
+    - apache_checks
 ...

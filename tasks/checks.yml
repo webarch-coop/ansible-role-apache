@@ -50,12 +50,12 @@
         - debug
 
     # https://httpd.apache.org/security/vulnerabilities_24.html
-    - name: Fail if the Apache version is less than 2.4.71 and the Sury repo is enabbled
+    - name: Fail if the Apache version is less than 2.4.71 and the Sury repo is enabled or the http2 module is enabled
       ansible.builtin.assert:
         that:
           - apache_version is ansible.builtin.version('2.4.71', 'ge', version_type='semver')
         quiet: true
-      when: apache_sury | ansible.builtin.bool
+      when: (apache_sury | ansible.builtin.bool) or ("http2" in apache_mods_enabled)
 
     - name: TLS versions
       block:
