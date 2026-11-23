@@ -324,6 +324,20 @@ apache_mpm_max_connections_per_child: 10000
 apache_mpm_max_request_workers: 150
 # Generate suggested config for the Icinga role for monitoring mod_md certificates
 apache_icinga_check_commands_suggestion: true
+# https://codeberg.org/oerdnj/deb.sury.org/issues/174
+apache_systemd_units:
+  - name: apache2
+    files:
+      - path: /etc/systemd/system/apache2.service.d/override.conf
+        conf:
+          Service:
+            ProtectSystem: 0
+            ProtectHome: 0
+        state: present
+    pkgs:
+      - apache2
+    state: enabled
+    verify: apache2.service
 apache_verify: true
 apache_webarch:
   site_title: "Webarchitects Hosting"

@@ -70,6 +70,17 @@
         - apache_check
         - apache_checks
 
+    - name: Include Systemd role
+      ansible.builtin.include_role:
+        name: systemd
+        tasks_from: unit_present.yml
+      loop: "{{ apache_systemd_units }}"
+      loop_control:
+        loop_var: systemd_unit
+        label: "{{ systemd_unit.name }}"
+      tags:
+        - apache_systemd
+
     - name: Apache DocumentRoot present
       ansible.builtin.file:
         path: "{{ apache_document_root }}"
