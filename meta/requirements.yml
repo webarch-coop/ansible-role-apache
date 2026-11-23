@@ -13,4 +13,10 @@
   # https://git.coop/webarch/apt/-/releases
   version: 5.1.0  # apt
   scm: git
+
+- name: systemd
+  src: https://git.coop/webarch/systemd.git
+  # https://git.coop/webarch/systemd/-/releases
+  version: 2.12.3  # systemd
+  scm: git
 ...
